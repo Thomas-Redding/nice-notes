@@ -59,3 +59,13 @@ h3:before {
     font-weight: bold;
     display: block;
 }
+
+img {
+    max-width: 100%;
+}
+
+figcaption {
+    text-align: center;
+}
+
+
