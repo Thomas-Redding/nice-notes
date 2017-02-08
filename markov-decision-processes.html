@@ -16,11 +16,87 @@ MathJax.Hub.Config({
 <body>
 <main>
 <h1>Markov Decision Processes</h1>
+<h2>The Problem</h2>
+<p>
+    Consider an agent in a world. The world consists of a set of possible states, and the agent has a <em>policy</em> which tells them which action to take in any given states. So, if the current state is $s$, the policy is a function, $\pi(s)$ that takes this state and returns an action, $a$, to perform.
+</p>
+<p>
+    However, because real life isn't a chess game, we want to relax the assumption that the current state and an action completely determine the next state. Instead, we say that given a current state $s$ and action $a$, there is a probability of transitioning to a new state $s'$. This probability is denoted $T(s,a,s')$. More formally,
+    $$T(s,a,s') = P(S'=s' | S=s, A=s)$$
+</p>
+<p>
+    We also want to relax the idea that utility is something determined just at the end of the search. Instead, we're going to earn utility after each transition, which we represent $R(s,a,s')$.
+</p>
+<p>
+    Finally, because we want our sums of utility over time to converge, we typically want to discount utility from future actions. Due to it's nice mathematical and decision-theoretic properties, the natural choice is to exponentially discount over time. In particular, we say that a reward gained in $n$ time-steps is worth $\gamma^n$ times as much as a reward now, where $\gamma$ is a constant between 0 and 1.
+</p>
+<p>
+    Having established all these, we can express the expected (discounted) utility the agent will achieve from a state $s$ as
+
+    $$V^\pi(s)=\sum_{s'}{T(s,\pi(s),s')(R(s,\pi(s),s')+\gamma V^\pi(s'))}$$
+</p>
+<p>
+    Since our goal here is typically to determine the policy, it might be more useful to write the expression where the policy is optimal:
+
+    $$V^*(s)=\max_a{\sum_{s'}{T(s,a,s')(R(s,a,s')+\gamma V^*(s'))}}$$
+
+    This is called the <a href="https://en.wikipedia.org/wiki/Bellman_equation">Bellman equation.</a>
+</p>
+<p>
+    If we solve this equation by finding the value of $V^*$ for all states $s$, then we can simply use a greedy-choice algorithm to choose actions, by chosing the action that maximizes the next expected $V^*$.
+</p>
 <h2>Value Iteration</h2>
+<p>
+    In practice, solving these equations precisely is quite difficult, so we use approximating methods like <em>value iteration</em>. Here's the general algorithm:
+</p>
+<code class="code-block">
+todo
+</code>
+<p>
+    ...todo
+</p>
+<h2>Temporal-Difference Learning</h2>
+<p>
+    While value iteration is very effective if we know how $T$ and $R$ are defined. In real-world problems, these functions are often unknown, which motives an algorithm that can "explore" the world to evaluate a policy. One such algorithm is <em>Temporal-Difference (TD) Learning</em>.
+</p>
+<p>
+    TD Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often.
+</p>
+<p>
+    Before we start, we need to create two tables: one from states to visit-count and one from states to value-estimates. We initalize both to all 0s.
+</p>
+<p>
+    From here, we will perform a loop:
+    <ol>
+        <li>If we're in state $s$, choose an action based on our policy, $\pi$.</li>
+        <li>This action results in a new state $s'$ and a reward $r$. From this, we can update our tables. First, we increment the visit-count; next, we Magically update our value-estimates.</li>
+    </ol>
+</p>
+<p>
+    If we're sufficiently Magical, this will cause our value-estimates for each state to converge to their true values: $V^\pi(s)$.
+</p>
+<p>
+    ...TODO: Explain Magic
+</p>
 <h2>Q-Learning</h2>
 <p>
-    An active temporal-difference agent alters its policy over time as it learns new information. One such algorithm is <em>Q-learning</em>, [todo]
+    The primary limitation of TD learning is that your policy doesn't change, which means you'll repeatedly perform bad actions. While this is good for <em>evaluating</em> policies, it is limited in <em>choosing a good policy</em>. So, it'd be nice if our policy would gradually change as we gained new information, so that we could converge to an optimal policy.
 </p>
+<p>
+    In particular, we want to start off by exploring all our action-state combinations and then gradually start focusing on more promising paths.
+</p>
+<p>
+    To do this, we're going to introduce a new function: $Q$. While $V$ gives us the expected value of going to a state, $Q$ is a function that gives us the expected value of performing an action in a given state:
+    
+    $$Q(s,a) = \sum_{s'}{T(s,a,s')(R(s,a,s') + \gamma V(s'))}$$
+
+    Note, then, that
+    $$V^*(s)=\max_a{Q(s,a)}$$
+</p>
+<p>
+    //
+</p>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 $$Q[a,s] = Q[a,s] + \alpha \cdot N[s,a] \cdot (r + \gamma \max_{a'}{Q[a',s']}-Q[a,s])$$
 <h2>Policy Search</h2>
 </main>
