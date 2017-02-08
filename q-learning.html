@@ -1,0 +1,25 @@
+<html>
+<head>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="MathJax-2.6.noindex/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Q-learning</h1>
+<p>
+    An active temporal-difference agent alters its policy over time as it learns new information. One such algorithm is <em>Q-learning</em>, [todo]
+</p>
+$$Q[a,s] = Q[a,s] + \alpha \cdot N[s,a] \cdot (r + \gamma \max_{a'}{Q[a',s']}-Q[a,s])$$
+</main>
+</body>
+</html>

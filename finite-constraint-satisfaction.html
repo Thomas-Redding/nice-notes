@@ -1,0 +1,137 @@
+<html>
+<head>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="MathJax-2.6.noindex/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Finite Constraint Satisfaction Problems</h1>
+<h2>The Problem</h2>
+<p>
+    A <em>constraint satisfaction problem</em> (CSP) is defined as
+    <ol>
+        <li>a set of variables $(X_1,\dots,X_n)$, each of which has a domain $(D_1,\dots,D_n)$</li>
+        <li>a set of constraints $(C_1,\dots,C_m)$ that restricts what combination of variable-value assignments are allowed</li>
+    </ol>
+    A solution to a CSP is a set of assignments of variables-to-values that satisfy the constraints. In this section, we will concern ourselves only with variables with finite domains.
+</p>
+<p>
+    A typical example of this is solving a <a href="https://en.wikipedia.org/wiki/Sudoku">Sudoku puzzle</a>. In this case, the variables are the "cell" on the board, the domain of each variable are the digits from 1-9, and the constraints are
+    <ol>
+        <li>No two cells in a row can have the same value.</li>
+        <li>No two cells in a column can have the same value.</li>
+        <li>No two cells in a 3x3 subtable can have the same value.</li>
+        <li>The cells whose values are provided must have those values</li>
+    </ol>
+</p>
+<p>
+    We can classify constraints as 1-constraints, 2-constraints, etc. based on how many variables interact in the restriction. In our example, (1)-(3) are 9-constraints, while (4) is a 1-constraint.
+</p>
+<h2>Simple Algorithms</h2>
+<p>
+    The "trivial" algorithm is simply to check every combination of assignments and see any of them satisfy the constraints. To do this, we can implement depth-first search over a tree in which variables are nodes and values are edges. Sadly, if we have $n$ variables with $d$ possible values and $c$ constraints, this runs in $O(c \cdot d^n)$ time. I should n
+</p>
+<p>
+    We can often improve the constant factor of this algorithm by checking our constraints at each level rather than just the leaf-nodes. While this isn't guaranteed to improve the running time, it often does due to the exponential nature of trees and the fact that many assignments lead to constraint violations at earlier depths.
+</p>
+    Sadly, CSPs include <a href="https://en.wikipedia.org/wiki/Boolean_satisfiability_problem#3-satisfiability">3SAT</a> as a special case, so it is unlikely we'll ever find a polynomial-time algorithm. However, that doesn't mean that we can't achieve significant improvements in practice. Alas, these simple algorithms are rather bad even in practice, so we'll have to be cleverer.
+</p>
+<h2>Backtracking Search</h2>
+<p>
+     It turns out that we can use <a href="https://en.wikipedia.org/wiki/Decomposition_method_(constraint_satisfaction)">decomposition methods</a> to reduce any set of constraints into an equivalent set consisting only of 1- and 2-constraints. Hence, we only need an algorithm that can solve CSPs with 1- and 2-constraints. The former are quite easy to enforce from the get-go, just reduce each variable's domain to satsify them. Hence, we just need to worry about 2-constraints.
+</p>
+<p>
+    Enter the idea of a <em>constraint graph</em>. A constraint graph is a graph whose vertices correspond to variables and whose edges correspond to constraints. In particular
+    <code class="code-block">
+    class Node {<br/>
+    &emsp;set&lt;VALUE&gt; domain; <br/>
+    &emsp;set&lt;BinaryConstraint*&gt; constraints; <br/>
+    } <br/>
+    <br/>
+    class BinaryConstraint {<br/>
+    &emsp;Node* x; <br/>
+    &emsp;Node* y; <br/>
+    &emsp;bool get_y_domain(set&lt;VALUE&gt; x_domain); <br/>
+    }
+    </code>
+    To be a little more precise, each constraint corresponds two two directed edges: one from vertex/variable $A$ to $B$, and the other from $B$ to $A$.
+</p>
+<p>
+    So, now we've represented the CSP as a graph - so what? Well, now we can use a smarter set of algorithms collectively called <em>backtracking search</em>. Here's the general procedure:
+    <code class="code-block">
+    backtrack(Assignment ass, CSP csp) {<br/>
+    &emsp;if (ass complete) return ass;<br/>
+    &emsp;var = <span style="color: red">select_unassigned_variable</span>(csp, ass); <br/>
+    &emsp;for each value in domain_of(var, ass) { <br/>
+    &emsp;&emsp;if (value doesn't violate csp.constraints) { <br/>
+    &emsp;&emsp;&emsp;ass[var] = value <br/>
+    &emsp;&emsp;&emsp;result = backtrack(ass, csp); <br/>
+    &emsp;&emsp;&emsp;if (result != null) return result; <br/>
+    &emsp;&emsp;&emsp;delete ass[var]; <br/>
+    &emsp;&emsp;} <br/>
+    &emsp;} <br/>
+    &emsp;return null; <br/>
+    }
+    </code>
+</p>
+<p>
+    You'll note, however, that the function <span style="color: red">select_unassigned_variable</span> is left deliberately vague. If this just randomly chooses a variable, then we haven't really improved over our simple depth-first search.
+</p>
+<p>
+    However, if we use the <em>minimum remaining values</em> (MRV) heuristic, then we can often (but not always) do much better. This heuristic basically says that we should assign the variable with the fewest choices to assign. The idea being that we want to fail as fast as possible to reduce the number of nodes we need to search.
+</p>
+<p>
+    Moreover, we can also change the order we search the domain of the selected variable. In particular, if we search the values that cause the fewest conflicts in the constraint graph (<em>least constraining value</em>). Unlike MRV, this heuristic will only make the algorithm faster if a solution actually exists - and even then it's not guaranteed.
+</p>
+<p>
+    In practice, this is often enough to vastly speed up CSP solving. However, if we're even cleverer, we can do even better...
+</p>
+<h2>Forward Checking</h2>
+<p>
+    Instead of starting from scratch, let's build on our backtracking search. One relatively simple way to do this is by using <em>forward checking</em>. The idea here is simple: sometimes by assigning one variable a specific value, we've reduced the options for another variable.
+</p>
+<p>
+    For instance, in Sudoku, if I assign one cell the value "3", then none of the other cells in the row can be assigned "3". When I make this assignment, forward checking simply says that I should look at all of the vertice's (variable's) edges (constraints) and update it's neighbors domains. Of course, when I'm going back up the <a href="https://en.m.wikipedia.org/wiki/Call_stack">call stack</a>, I'll need to undo these changes.
+</p>
+<p>
+    This simple addition to the algorithm can dramatically prune the tree, but we can do even better...
+</p>
+<h2>Arc Consistency</h2>
+<p>
+    When forward checking, we restrict the immediate neighbors of the vertex we assign. But, this restriction can cause cascading, as any Sudoku player can attest: the fact that my neighbor can't take a certain value can further restrict it's neighbors, and so on and so forth. This is similar in Sudoku to how, upon deducing one cell's value, you can immediately (1) deduce other cells' values and (2) restrict other cells' domains. If we keep propogating these restrictions until no more domain-updating can occur, we maintain a property called <em>arc consistency</em>.
+</p><p>
+    As you can imagine all this propogating of domain-restrictions can be costly. Indeed, the worst-case time for achieving arc consistency is $O(n^2 d^3)$. This means that, in practice, we are sometimes better off only computing arc-consistency once at the beginning and then simply running forward checking.
+</p>
+<div class="definition">
+    An <em>arc</em> is simply a directed edge. An arc from $X$ to $Y$ with constraint $C$ is called <em>arc consistency</em> if and only if for every value in the domain of $X$, there exist a value in the domain of $Y$ so that $C$ is satisfied.
+</div>
+<h2>$k$-Consistency</h2>
+<p>
+    1-consistency simply means that each variable is consistent with itself. This is, you may recall, often simply guaranteed at the beginning of the algorithm. 2-consistency is identical to arc consistency.
+</p>
+<p>
+    We can even generalize this by saying that a graph has <em>$k$-consistency</em> if and only if for "any set of $k-1$ variables adnf or any consistent assignment to those variables, a consistent value can always be assigned to any $k$<sup>th</sup> variable. Similarly, we can call a graph <em>strongly $k$-consistent</em> if it is 1-consistent, 2-consistent, ..., and $k$-consistent.
+</p>
+<h2>More Information</h2>
+<p>
+    Additional concepts to look into include
+    <ul>
+        <li>Efficiency gains if one of our constraints is that no two variables can hold the same values</li>
+        <li>Chronological and conflict-directed backtracking</li>
+        <li>Local search algorithms</li>
+    </ul>
+    These can be found in sections 5.2 - 5.4 in <em>Artificial Intelligence: A Modern Approach</em>.
+</p>
+</main>
+</body>
+</html>

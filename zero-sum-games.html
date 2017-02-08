@@ -1,0 +1,85 @@
+<html>
+<head>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="MathJax-2.6.noindex/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Zero-Sum Games</h1>
+<h2>Minimax</h2>
+<h3>Simple Algorithm</h3>
+<h3>Evaluation Functions</h3>
+<h3>Pruning</h3>
+<h2>Monte Carlo tree search</h2>
+<h3>The Algorithm</h3>
+<p>
+<em>Monte Carlo tree search</em> is a non-deterministic algorithm that is guaranteed to converge to Minimax. This algorithm creates a tree of nodes, which look like
+    <code class="code-block">
+    class Node {<br/>
+    &emsp;double wins = 0; <br/>
+    &emsp;uint count = 1; <br/>
+    &emsp;list&lt;Node&gt; children; <br/>
+    }
+    </code>
+</p>
+<p>
+    The general algorithm repeatedly 
+    <ol>
+        <li>Start at the root</li>
+        <li>Recursively selects already explored children in a Magic way until it reaches an unexplored child. Add a node for the unexplored child. Update the <code>count</code> field in all these nodes</li>
+        <li>Plays a sequence of random moves for both sides and returns the result back up the tree to the previously unexplored node. Do NOT create new nodes for this playthrough.</li>
+        <li>Percolates the results up in a Magic way.</li>
+    </ol>
+    Each of these iterations is called a <em>rollout</em>. After performing a large number of these, the algorithm returns the action at the root that will lead to the child with the highest value-to-count ratio.
+</p>
+<p>
+    So, let's explain what these two pieces of Magic are. The first describes how you choose which child to go down. The procedure is
+    <ol>
+        <li>If any of your children are unexpored, then explore them.</li>
+        <li>Otherwise, randomly choose from your children, but make it so that the probably of choosing child $i$ is proportional to
+        \begin{equation}
+        \frac{w_i}{n_i} + c \cdot \sqrt{\frac{\ln{N}}{n_i}}
+        \label{foo}
+        \end{equation}
+        where
+        <ul>
+            <li>$w_i$ is the <code>wins</code> of the child from the parent's point of view</li>
+            <li>$c$ is an empirically determined positive constant that indicates how important exploration is compared to explotation</li>
+            <li>$N$ is the number of times the parent has been visited</li>
+            <li>$n_i$ is the number of times the child has been visited - i.e. <code>count</code></li>
+        </ul>
+        </li>
+    </ol>
+    The second piece of Magic is how percolating the results back up the tree works. This is actually pretty straightforward:
+    <ol>
+        <li>Simply pass the utility of the result (generaly 1.0 for a win, 0.5 for a tie, and 0 for a loss) back up the game until you get to the intial unexplored node.</li>
+        <li>Simply add the result to this node's <code>wins</code> and all its ancestors.</li>
+    </ol>
+    Note, you should flip the value at every level, so that the utility is correct form the point-of-view of the parent.
+</p>
+<h3>Explanation</h3>
+<p>
+    Equation $\ref{foo}$ is based on an idea called <em>upper-confidence bound</em>, which basically says that you should explore the move with the highest plausible value.
+</p>
+<p>
+    While proving this is very difficult, it is a fact that using this function to choose your child will guarantee that this Monte Carlo approach will converge to Minimax as the number of rollouts approaches infinity.
+</p>
+<p>
+    To get a feel for while this is the case, consider a node with two children, $A$ and $B$, where $A$ always leads to a win and $B$ always leads to a loss. If we assume, for simplicity, that $c=0.2$, then the weight given to $A$ after a single exploration is 1.17, while $B$ has a weight of 0.17, so we'll choose $A$ 87% of the time.
+</p>
+<p>
+    If we explore $A$ 870 times and explore $B$ 130 times, these weights change to 1.02 and 0.05, meaning we'll choose $A$ 95% of the time. As we explore $A$ more and more (compared to $B$), the parent (which is essentially a weighted sum of its children) converges to $A$'s value.
+</p>
+</main>
+</body>
+</html>
