@@ -29,10 +29,10 @@ MathJax.Hub.Config({
     We also want to relax the idea that utility is something determined just at the end of the search. Instead, we're going to earn utility after each transition, which we represent $R(s,a,s')$.
 </p>
 <p>
-    Finally, because we want our sums of utility over time to converge, we typically want to discount utility from future actions. Due to it's nice mathematical and decision-theoretic properties, the natural choice is to exponentially discount over time. In particular, we say that a reward gained in $n$ time-steps is worth $\gamma^n$ times as much as a reward now, where $\gamma$ is a constant between 0 and 1.
+    Finally, because we want our sums of utility over time to converge, we typically want to discount utility from future actions. Due to it's nice mathematical and decision-theoretic properties, the natural choice is to exponentially discount over time. In particular, we say that a reward gained in $n$ time-steps is worth $\gamma^n$ times as much as a reward now, where $\gamma$ is a constant between 0 and 1. In this way, future rewards get assigned less value than present ones.
 </p>
 <p>
-    Having established all these, we can express the expected (discounted) utility the agent will achieve from a state $s$ as
+    Having established this framework, we can express the expected (discounted) utility the agent will achieve from a state $s$ as
 
     $$V^\pi(s)=\sum_{s'}{T(s,\pi(s),s')(R(s,\pi(s),s')+\gamma V^\pi(s'))}$$
 </p>
@@ -48,13 +48,26 @@ MathJax.Hub.Config({
 </p>
 <h2>Value Iteration</h2>
 <p>
-    In practice, solving these equations precisely is quite difficult, so we use approximating methods like <em>value iteration</em>. Here's the general algorithm:
+    In practice, solving these equations precisely is quite difficult, so we use approximating methods like <em>value iteration</em>. While the algorithm is rather difficult to clearly and concisely state, because it consists of loops in loops in loops in loops, we'll describe it mathematically:
 </p>
-<code class="code-block">
-todo
-</code>
+<ol>
+    <li>Let $V_0[s]=0$ for all states $s$.</li>
+    <li>For each state, compute a new estimate for $V$ based on the old values of it's neighboring states:
+    $$V_1=\max_a{\sum_{s'}{T(s,a,s')(R(s,a,s')+\gamma V_0(s'))}}$$
+    </li>
+    <li>Compute $V_2$, $V_3$, etc. until the values in $V$ stop changing by much.</li>
+</ol>
 <p>
-    ...todo
+
+</p>
+<p>
+    Although it may seem kind of ad-hoc, this algorithm's $V$'s <a href="http://uhaweb.hartford.edu/compsci/ccli/projects/QLearning.pdf">is guaranteed</a> to converge to $V^*$, which effectively gives us the optimal policy.
+</p>
+<p>
+    To see why this is the case, we can think of value iteration as searching an Expectimax tree via iterative deepening where $V_i$ is the value assigned to the roots' children after searching $i$ layers. While the connection between iterative deepning Expectimax and value iteraiton takes some time to see, it should be obvious that Expectimax will yield the right answer, so this connection is the proof of value iterations' optimality.
+</p>
+<p>
+    The only other question is why the $V$'s should converge in the first place. However, once you see the value-iteration-expectimax connection, this should also be clear, as each layer is less important than the last due to the discount factor.
 </p>
 <h2>Temporal-Difference Learning</h2>
 <p>
