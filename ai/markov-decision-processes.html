@@ -1,0 +1,176 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="../MathJax-2.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Markov Decision Processes</h1>
+<h2>The Problem</h2>
+<p>
+    Consider an agent in a world. The world consists of a set of possible states, and the agent has a <em>policy</em> which tells them which action to take in any given states. So, if the current state is $s$, the policy is a function, $\pi(s)$ that takes this state and returns an action, $a$, to perform.
+</p>
+<p>
+    However, because real life isn't a chess game, we want to relax the assumption that the current state and an action completely determine the next state. Instead, we say that given a current state $s$ and action $a$, there is a probability of transitioning to a new state $s'$. This probability is denoted $T(s,a,s')$. More formally,
+    $$T(s,a,s') = P(S'=s' | S=s, A=s)$$
+</p>
+<p>
+    We also want to relax the idea that utility is something determined just at the end of the search. Instead, we're going to earn utility after each transition, which we represent $R(s,a,s')$.
+</p>
+<p>
+    Finally, because we want our sums of utility over time to converge, we typically want to discount utility from future actions. Due to it's nice mathematical and decision-theoretic properties, the natural choice is to exponentially discount over time. In particular, we say that a reward gained in $n$ time-steps is worth $\gamma^n$ times as much as a reward now, where $\gamma$ is a constant between 0 and 1. In this way, future rewards get assigned less value than present ones.
+</p>
+<p>
+    Having established this framework, we can express the expected (discounted) utility the agent will achieve from a state $s$ as
+
+    $$V^\pi(s)=\sum_{s'}{T(s,\pi(s),s')(R(s,\pi(s),s')+\gamma V^\pi(s'))}$$
+</p>
+<p>
+    Since our goal here is typically to determine the policy, it might be more useful to write the expression where the policy is optimal:
+
+    $$V^*(s)=\max_a{\sum_{s'}{T(s,a,s')(R(s,a,s')+\gamma V^*(s'))}}$$
+
+    This is called the <a href="https://en.wikipedia.org/wiki/Bellman_equation">Bellman equation.</a>
+</p>
+<p>
+    If we solve this equation by finding the value of $V^*$ for all states $s$, then we can simply use a greedy-choice algorithm to choose actions, by chosing the action that maximizes the next expected $V^*$.
+</p>
+<h2>Value Iteration</h2>
+<p>
+    In practice, solving these equations precisely is quite difficult, so we use approximating methods like <em>value iteration</em>. While the algorithm is rather difficult to clearly and concisely state, because it consists of loops in loops in loops in loops, we'll describe it mathematically:
+</p>
+<ol>
+    <li>Let $V_0[s]=0$ for all states $s$.</li>
+    <li>For each state, compute a new estimate for $V$ based on the old values of it's neighboring states:
+    $$V_1=\max_a{\sum_{s'}{T(s,a,s')(R(s,a,s')+\gamma V_0(s'))}}$$
+    </li>
+    <li>Compute $V_2$, $V_3$, etc. until the values in $V$ stop changing by much.</li>
+</ol>
+<p>
+
+</p>
+<p>
+    Although it may seem kind of ad-hoc, this algorithm's $V$'s <a href="http://uhaweb.hartford.edu/compsci/ccli/projects/QLearning.pdf">is guaranteed</a> to converge to $V^*$, which effectively gives us the optimal policy.
+</p>
+<p>
+    To see why this is the case, we can think of value iteration as searching an Expectimax tree via iterative deepening where $V_i$ is the value assigned to the roots' children after searching $i$ layers. While the connection between iterative deepning Expectimax and value iteraiton takes some time to see, it should be obvious that Expectimax will yield the right answer, so this connection is the proof of value iterations' optimality.
+</p>
+<p>
+    The only other question is why the $V$'s should converge in the first place. However, once you see the value-iteration-expectimax connection, this should also be clear, as each layer is less important than the last due to the discount factor.
+</p>
+<h2>Temporal-Difference Learning</h2>
+<p>
+    While value iteration is very effective if we know how $T$ and $R$ are defined. In real-world problems, these functions are often unknown, which motives an algorithm that can "explore" the world to evaluate a policy. One such algorithm is <em>Temporal-Difference (TD) Learning</em>. Here is the pseudocode
+</p>
+<code class="code-block">
+    TD_Learn(Game game, Map&lt;State,Action&gt; policy, float alpha) {<br/>
+    &emsp;Map&lt;State, float&gt; V;<br/>
+    &emsp;while(!game.is_over()) { <br/>
+    &emsp;&emsp;s = game.current_state; <br/>
+    &emsp;&emsp;a = policy[s]; <br/>
+    &emsp;&emsp;reward, s' = game.do(a); <br/>
+    &emsp;&emsp;V[s] += alpha * (reward + gamma * V[s'] - V[s]); <br/>
+    &emsp;} <br/>
+    &emsp;return V; <br/>
+    }
+</code>
+<p>
+    So, basically we just choose the action the policy dictates and then update our estimate for <code>V[s]</code> - otherwise known as $V^\pi(s)$. We just have to talk about why the given formula works.
+</p>
+<code class="code-block">
+V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]); 
+</code>
+<p>
+    Imagine, for now that <code>alpha=1</code>. In this case, the formula simplifies to
+    <code class="code-block">V[s] = V[s] + reward + gamma * V[s'] - V[s]</code>
+    which equals
+    <code class="code-block">V[s] = reward + gamma * V[s']</code>
+    So, when <code>alpha=1</code>, we basically just make our new estimate of $V^\pi(s)$ equal to a simple estimate of the value we'll get this specific time. This is very similar to the value iteration method.
+</p>
+<p>
+    If, on the other hand, <code>alpha≠1</code>, then we have:
+    <code class="code-block"> V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]); </code>
+    which expands to
+    <code class="code-block"> V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); </code>
+    All this does is smooth our estimates out, so that we're not throwing away all the previous information we found out before.
+</p>
+<h2>Q-Learning</h2>
+<p>
+    The primary limitation of TD learning is that your policy doesn't change, which means you'll repeatedly perform bad actions. While this is good for <em>evaluating</em> policies, it is limited in <em>choosing a good policy</em>. So, it'd be nice if our policy would gradually change as we gained new information, so that we could converge to an optimal policy.
+</p>
+<p>
+    In particular, we want to start off by exploring all our action-state combinations and then gradually start focusing on more promising paths.
+</p>
+<p>
+    To do this, we're going to introduce a new function: $Q$. While $V$ gives us the expected value of going to a state, $Q$ is a function that gives us the expected value of performing an action in a given state:
+    
+    $$Q(s,a) = \sum_{s'}{T(s,a,s')(R(s,a,s') + \gamma V(s'))}$$
+
+    Note, then, that
+    $$V^*(s)=\max_a{Q(s,a)}$$
+</p>
+<p>
+    Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure:
+    <code class="code-block">
+    q_learn(Game game, float alpha, float gamma) { <br/>
+    &emsp;Map&lt;(State, Action), float&gt; Q; <br/>
+    &emsp;Map&lt;(State, Action), float&gt; N; <br/>
+    &emsp;while (game.current_state() != null) { <br/>
+    &emsp;&emsp;State s = game.current_state(); <br/>
+    &emsp;&emsp;List<Action> actions = game.legal_actions() <br/>
+    &emsp;&emsp;Action a = <span style="color: red">select_action</span>(s, actions, Q, N); <br/>
+    &emsp;&emsp;++N[s, a]; <br/>
+    &emsp;&emsp;(float, state) (reward, s') = game.do(a); <br/>
+    &emsp;&emsp;Q[s,a]+=alpha*(reward+gamma*max_q(game, Q, s')-Q[s,a])<br/>
+    &emsp;}
+    <br/>
+    } <br/>
+    <br/>
+    max_q(Game game, Map&lt;(State, Action), float&gt; Q, State s) { <br/>
+    &emsp;rtn = -Infinity <br/>
+    &emsp;for (a in game) { <br/>
+    &emsp;&emsp;if (Q[(s, a)] > rtn)<br/>
+    &emsp;&emsp;&emsp;rtn = Q[(s, a)] <br/>
+    &emsp;} <br/>
+    &emsp;return rtn; <br/>
+    }
+    </code>
+</p>
+<p>
+    Here <code>game</code> is an object that encodes the game we're playing, <code>alpha</code> is a number between 0 and 1 representing the learning rate, and <code>gamma</code> is a number between 0 and 1 representing the discount rate. One thing to realize is that <code>max_q(g, Q, s)</code> returns our estiamte of the expected utility of pursuing the optimal policy at state <code>s</code>, so <code>max_q(g, Q, s)</code> can be thought of as our estimate for $V^*(s)$.
+</p>
+<p>
+    One simple <code style="color: red">select_action</code> function is to choose some $epsilon$ between 0 and 1. Then, choose the action with highest expected value with probability $1-\epsilon$ and choose a random action with probability $\epsilon$. It turns out that this is sufficient to guarantee our estimates of $Q$ converge to the correct values, so let's consider this special, simple case in more detail.
+</p>
+<p>
+    The key is the line
+    <code class="code-block">
+        Q[s,a]+=alpha*(reward+gamma*max_q(game, Q, s')-Q[s,a])
+    </code>
+    Like for TD-learning, let's let <code>alpha=1</code> to get
+    <code class="code-block">
+        Q[s,a] = reward+gamma*max_q(game, Q, s')
+    </code>
+    Note that <code>reward+gamma*max_q(game, Q, s')</code> is simply a guess of how much utility we'll achieve from here on out, so as with TD-learning, when <code>alpha=1</code>, we simply update our estimate for <code>Q[s,a]</code> with our new estimate at this time.
+</p>
+<p>
+    As with TD-learning, when we choose some other value for <code>alpha</code>, this causes smoothing. This is important for Q-learning, because actions don't always result in the same next-state, so we need some smoothing to make this algorithm work well.
+</p>
+<h2>Policy Search</h2>
+<p>
+    todo
+</p>
+</main>
+</body>
+</html>
