@@ -1,0 +1,67 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="../MathJax-2.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Statistical Applications</h1>
+<h2>PCA Analysis</h2>
+<h2>Overview</h2>
+<p>
+    If you have a high-dimensional dataset, it's often useful to see if you can remove a few dimensions without significant loss of information. For instance, you might want to collapse people's answers to hundreds of personality questions down to 5 personality traits, or people's answers to hundreds of political questions down to 2 political axes.
+</p>
+<p>
+    You can also take two dimensions down to one:
+</p>
+<figure>
+<img src="pca-example.png"/>
+<figcaption>PCA of a 2d dataset</figcaption>
+</figure>
+<p>
+    As you can see just by looking at the "cloud" of points, the green vector captures the vast majority the variance in points. We're going to discuss how PCA can help us find these high-information directions.
+</p>
+<h2>Theory</h2>
+<p>
+    Imagine you had $n$ points with dimension $m$. We're going to represent this dataset as an $n \times m$ matrix $X$ with rows corresponding to points and columns corresponding to dimensions. In particular, we will denote dimension $j$ of point $i$ as $X_{ij}$. We're going to assume our data is centered at 0 to simplify the calculations.
+</p>
+<p>
+    Recall that given two vectors, $\vec{a}$ and $\vec{b}$, we can compute the projection of one onto the other using the dot product:
+    <figure>
+    <img src="dot-product-projection.png" style="max-width: 15em;"/>
+    <figcaption>Example of projection using a dot product</figcaption>
+    </figure>
+</p>
+<p>
+    It turns out that if we interpret $a$ as a point in our dataset and $b$ as a vector, this projection is equal to the (signed) distance of $a$ along the $b$ direction, so if we square the dot product, we will will get how much variance point $a$ has along vecotr $b$. If we also require that $b$ be a unit-vector, then we can even drop the denominator and just say that the variance captured equals $(\vec{a} \cdot \vec{b})^2$.
+</p>
+<p>
+    So, we're trying to find a unit vector $\vec{u}$ that captures the most variance. Mathematically, we are trying to find
+    $$\max_\vec{u}{\sum_i^n{(X_i \cdot \vec{u})^2}}$$
+</p>
+<p>
+    Some thought should convince you that that this is equivalent to saying
+    $$\max_\vec{u}{\lvert X \vec{u} \rvert^2}$$
+    which is equivalent to
+    $$\max_\vec{u}{\vec{u}^T X^T X \vec{u}}$$
+</p>
+<p>
+    Some <a href="https://en.wikipedia.org/wiki/Principal_component_analysis#First_component">math magic</a>, this alows us to conclude that $w$ must be the eigenvector of $X^T X$ with the largest eigenvalue.
+</p>
+<p>
+    Having thus found the vector that explains the most variance, we can repeat this process with the residuals to greedily explain the as much variance as possible.
+</p>
+</main>
+</body>
+</html>

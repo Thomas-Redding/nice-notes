@@ -61,9 +61,12 @@ h3:before {
 }
 
 img {
+    display: block;
+    margin: 0 auto;
     max-width: 100%;
 }
 
 figcaption {
     text-align: center;
+    margin: 1em auto;
 }
