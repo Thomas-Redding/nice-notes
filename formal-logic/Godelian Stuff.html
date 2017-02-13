@@ -1,0 +1,55 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>G&ouml;delian Stuff</h1>
+First-order logic is <b>undecidable</b>. This means that a terminating algorithm that is both sound and complete cannot exist.
+<h3>L&ouml;wenheim-Skolem Theorem</h3>
+<b>Statement:</b> If a countable first-order theory has an infinite model, then for every cardinal number, $\kappa$, it has a model of size $\kappa$.
+<br><br>
+<b>Explanation</b>: ???
+<br><br>
+<b>Implication</b>: ???
+<h3>L&ouml;b's Theorem</h3>
+<b>Statement:</b> Consider a system with Peano arithmetic and any well-formed formula $A$. Moreover, let $P$ mean "is provable". Then: $P\left(P\left(A\right)\Rightarrow A\right)\Rightarrow P\left(A\right)$.
+<br><br>
+<b>Explanation:</b> In English, this reads:
+<p>If you can prove that "A being provable implies A", then A is provable.</p>
+
+<br><br>
+<b>Implication:</b> ???
+<h3>G&ouml;del's Completeness Theorem</h3>
+<b>Statement:</b> For any first-order theory $T$ with a well-orderable language and any sentence $S$ in $T$, there is a formal proof of $S$ if and only if $S$ is a semantic consequence of $T$.
+<br><br>
+<b>Explanation:</b> ???
+<br><Br>
+<b>Implication:</b> ???
+<h3>G&ouml;del's Incompleteness Theorems</h3>
+<b>Statement:</b> Any effective first-order theory that includes a sufficient portion of the theory of the natural numbers can never be both complete and consistent.
+<br><br>
+<b>Explanation</b>: In general, we care much more about consistency than completness, because an inconsistent system has sentences that are both true and false. Thus, to oversimply, it really boils down to "any interesting formal system is not complete."
+<br><br>
+<b>Implication</b>: ???
+<h3>Tarski's Undefinability Theorem</h3>
+<b>Statement:</b> Let $L$ be the language of first-order arithmetic and let $N$ be its model. Every $x$ in $L$ has a G&ouml; number $g\left(x\right)$. Let $T$ be the set of $L$-sentences true in $N$ and $T^*$ be the set of G&ouml; numbers of these sentences. There is no formula in $L$ that defines $T^*$.
+<br><br>
+<b>Explanation:</b> In English, this states that no formal arithmetic cannot define the set of true statements, or, equivalently, cannot contain a function that sends all sentences to true or false correctly. However, a truth predicate can be defined in a higher order logic (e.g. second-order logic). However, this formula couldn't define its own truth predicate - that would require yet a higher logic.
+<br><br>
+<b>Implication:</b> ???
+</main>
+</body>
+</html>

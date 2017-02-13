@@ -1,0 +1,40 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Propositional Logic</h1>
+Propositional (sentential) logic (calculus) is a formal system well-formed formulas may be interpreted to represent <b>propositions</b>. In <b>truth-functional propositional logic</b>, every proposition has a truth-value of either true or false. The family of all formal systems isomorphic to truth-functional propositional logic are called <b>zeroth-order logic</b>.
+<br><br>
+A propositional logic is a formal system, $L$:
+
+$$L=\left(A,\Omega,Z,I\right)$$
+
+<ul>
+<li>$A$ (alpha set) - a finite set of <b>propositional symbols</b> (variables) that function as the system's atomic formulas (i.e. terminal elements) and are typically represented by the letters $P$, $Q$, $R$, etc.</li>
+<li>$\Omega$ (omega set) - the finite set of <b>operator symbols</b> (i.e. logical connectives). $\Omega$ can be partitioned into the disjoint subsets $\Omega_0, \Omega_1, \Omega_2, ...\Omega_n$ where $\Omega_i$ represents the set of oeprators of <b>arity</b> j. A function's arity is the number of inputs it takes. The most common operator symbols in propositional calculus are $\neg$, $\wedge$, $\vee$, $\Rightarrow$, and $\Leftrightarrow$. Often, we treat the logical values as operators of arity zero: $\Omega_0 = \left\{0,1\right\}$.</li>
+<li>$Z$ (zeta set) - a finite set of transformation rules (i.e. rules of inference)</li>
+<li>$I$ (iota set) - a finite set of <b>initial points</b>, which are called axioms when they receive a logical interpretation</li>
+</ul>
+$L$ is defined inductively by
+<ol>
+<li>Any element of $A$ is a well-formed formula of $L$.</li>
+<li>If $p_1,p_2,...p_i$ are well-formed formula and $f$ is in $\Omega_i$, then $f\left(p_1,p_2,...p_i\right)$ is a well-formed formula.</li>
+<li>Nothing else is a formula of $L$.</li>
+</ol>
+</main>
+</body>
+</html>
