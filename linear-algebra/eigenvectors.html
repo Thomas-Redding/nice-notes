@@ -22,15 +22,32 @@ MathJax.Hub.Config({
     An <em>eigenvector</em> is a nonzero vector $\vec{v}$ such that there exists a number $\lambda$ so that $A \vec{v} = \lambda \vec{v}$. The $\lambda$ is known as an <em>eigenvalue</em>, and together they form an <em>eigenpair</em>.
 </div>
 <p>
-    Intuitively, an eigenvector is a vector whose direction doesn't change when a transformation is applied. If the eigenvector originally has length 1, then it will 
+	    An eigenvector of a linear transformation $A$ is a vector whose direction doesn't change when a transformation is applied.  What may change is its magnitude, which is scaled by the eigenvector's corresponding eigenvalue.
 </p>
 <figure>
 <img src="mona-lisa.png" style="max-width: 15em;"/>
-<figcaption>Blue is an eigenvector, while red is not.</figcaption>
+<figcaption>Blue is an eigenvector.  Red is not, because it changes directions.</figcaption>
 </figure>
-<h3></h3>
+<h2>As A Basis</h2>
+...
+<h2>Iteration</h2>
 <p>
-    ...
+    Eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$.
+</p>
+<figure>
+	<img src="iterated_eigenvector.gif"/>
+	<figcaption>Applying a linear transformation to a set of points; the points converge to one of the eigenvectors</figcaption>
+</figure>
+<h3>Imaginary Eigenvectors</h3>
+<p>
+	This leads to a curious phenmenon where the eigenvector of a real matrix can be imaginary.  This means that $A^n \vec{v}$ is always real, so what does a complex eigenvector imply for its long-term behavior?
+</p>
+<figure>
+	<img src="complex_iterated_eigenvector.gif"/>
+	<figcaption>Applying a linear transformation to a set of points</figcaption>
+</figure>
+<p>
+	The points spiral!  Depending on the exact eigenpair, the points my spiral inwards and converge on (0, 0) or diverge outwards to infinity (as shown above), but this spiraling behavior is consistent for imaginary-eigenvectored matrices.
 </p>
 </main>
 </body>
