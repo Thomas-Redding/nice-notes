@@ -1,0 +1,39 @@
+- Data Collection
+	- Sampling
+	- Experiments
+	- Observaitonal Studies
+
+- Exploratory Analysis
+	- Plots: Histograms, Boxplots, QQ
+	- Numerical Sumamries
+
+- Estimation
+	- Maximum Likelihood
+	- Method of Moments
+	- Bias, Variance, SE, MSE, Efficiency, Properties of MLE
+
+- Confidence Intervals
+	- Sampling Distributions
+	- Normal Intervals
+		- Mean
+		- Standard Deviation
+	- Pivotal Statistic
+	- T-Student Intervals
+	- Proportion Intervals
+	- Bootstrap Intervals
+
+- Hypothesis Testing
+	- Test for Means (Normal)
+	- Test for Means (General)
+	- Test for Proportions
+	- Type I and Type II Errors
+	- Permutation Testing
+	- Chi-Square Test: Independence/Homogeneity
+	- Chi-Square Test Goodness-of-Fit
+
+- Regression
+
+- Bayesian
+
+
+

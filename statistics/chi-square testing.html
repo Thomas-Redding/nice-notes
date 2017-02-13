@@ -1,0 +1,100 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Chi-Square Test</h1>
+<h3>General Idea</h3>
+Back in days before powerful computers it wasn't feasible to use permutation tests for all but the smallest sample sizes, so mathematicians had to find more innovative methods to test null-hypotheses involving independence between two factor variables.
+<br><br>
+They considered the case when your sample-size was infinity and found that there was a much more efficient way to compute p-values in this special case. Better yet, they found that even relatively small samples were closely approximated by this method.
+<h3>Example</h3>
+The chi-square test is used to determine whether two factors are independent. Basically, we start with a set of factor variables such as:
+<table>
+<tr><td></td><td colspan=2><b>Cancer?</b></td></tr>
+<tr><td></td><td><b>Yes</b></td><td><b>No</b></td></tr>
+<tr><td><b>Drug</b></td><td>20</td><td>30</td></tr>
+<tr><td><b>Control</b></td><td>15</td><td>50</td></tr>
+</table>
+The question is whether the drug is associated with cancer. Our null-hypothesis is that whether someone develops cancer is independent to whether they took the drug. If this is the case, the proportion who develop cancer should be the same in both the Treatment and Control groups. If this is the case, our best estimate for the proportion of the population who develops cancer is
+$$p=\frac{20+15}{20+15+30+50}=\frac{7}{23}$$
+If this is the case, the expected value of the table's cells are. Note, that to do this, we hold constant the size of the Treatment and Control groups. In other words, no matter whether the null-hypothesis is true or not, there would have been 50 people in our Treatment group and 65 in our Control group.
+<table>
+<tr><td></td><td colspan=2><b>Cancer?</b></td></tr>
+<tr><td></td><td><b>Yes</b></td><td><b>No</b></td></tr>
+<tr><td><b>Drug</b></td><td>15.217</td><td>34.783</td></tr>
+<tr><td><b>Control</b></td><td>19.783</td><td>45.217</td></tr>
+</table>
+Next, we compute the chi-squared <b>test-statistic</b>. A test-statistic is simply a statistic that is useful when computing a null-hypothesis test. In this case,
+
+$$c=\frac{\left(20-15.217\right)^2}{15.217}+\frac{\left(30-34.783\right)^2}{34.783}+\frac{\left(15-19.783\right)^2}{19.783}+\frac{\left(50-45.217\right)^2}{45.217}$$
+
+$$c=3.823$$
+
+We now just need one more number to run the chi-square test; the <b>degree of freedom</b> (<b>df</b>) of the test. The degrees of freedom of a chi-squared test is the number of cells in the table that you would need to deduce the rest of the cells, assuming you new the sums of all columns and rows.
+<br><br>
+In this case, there is 1 degree of freedom. To show, we must first note that we could can't determine all the cells' values just from the sums (go ahead and try). However, if we know, for instance, that the upper-left cell is 20:
+<br><br>
+<table>
+<tr><td></td><td colspan=2><b>Cancer?</b></td><td rowspan=2><b>Sum</b><td></tr>
+<tr><td></td><td><b>Yes</b></td><td><b>No</b></td></tr>
+<tr><td><b>Drug</b></td><td>20</td><td>a</td><td><b>50</b></td></tr>
+<tr><td><b>Control</b></td><td>b</td><td>c</td><td><b>65</b></td></tr>
+<tr><td><b>Sum</b></td><td><b>35</b></td><td><b>80</b></td></tt>
+</table>
+Since the first row adds up to 50, we know a=30. Similarly, we can compute that b=15 and c=50.
+<br><br>
+Anyways, so now we have $c=3.823$ and $df=1$. We can now plug it into the chi-distribution:
+<p>1-pchisq(3.823, 1)</p>
+This yields a p-value of 5.1%, which is just barely above the 5% statistical significance threshold, meaning we can't reject H<sub>0</sub>.
+<h3>Explanation</h3>
+It turns out that one can prove mathematically, that as the sample-size approaches infinity, the sampling distribution of $c$ becomes the <a href="https://en.wikipedia.org/wiki/Chi-squared_distribution" class="external">chi-square distribution</a>:
+<img src="chi-square.png" style="max-width:300px;">
+If each cell's expected value happens to equal the observed value, then $c$ will turn out to be 0. The higher $c$ is the less well the data fits the hypothesis that the two factor variables are independent. When we compute the p-value, we are finding the odds that a $c$ more extreme than the observed statistic would have happened.
+<br><br>
+If this is less than our significance threshold (usually 5%), then we reject the null hypothesis and conclude that the two variables are probably not independent.
+<h3>Generalization</h3>
+<b>More Levels</b><br>
+What if our table isn't 2x2? Assume we have a table that is $m \times n$. In this case, we could compute our degrees of freedom each time, but its really actually pretty simple:
+
+$$df=\left(m-1\right) \left(n-1\right)$$
+
+Generalizing the computation of the chi-square test statistic is simple, but unfortunately, not so elegant:
+
+$$c=\sum_{i=1}^m{\sum_{j=1}^n{\frac{\left(O_{ij}-T_{ij}\right)^2}{T_{ij}}}}$$
+In this equation, $O$ refers to the observed values while $T$ refers to the (null) theoretical values in the table.
+<br><br>
+<b>Two-Sided</b><br>
+One last note: the chi-square test example above is one-sided. The chi-squared test is <u>not</u> generalizable for two-sides, because it doesn't really make sense to check whether data is "too" independent.
+<h3>Assumptions</h3>
+The chi-test assumes that the sample size is large (technically infinite). In practice, it is safe to use the chi-square test if the expected counts in your table are all larger than 5<sup><a href="#footnote">1</a></sup>. Some people say its enough if 80% of the cells are above 20.
+<br><br>
+In fact, sometimes the intervals are set up in such a way that all of their expected counts are equal specifically to minimize the problem of small counts.
+<h3>Independence v. Homogeneity</h3>
+The chi-square test for independence test and the chi-square test for homogeneity are identical. However, which we call the test depends on how the data was collected. For instance, if we wanted to determine whether sex was independent of height, we could
+<ol>
+<li>sample people at random for their sex and height</li>
+<li>sample women at random and then sample men at random</li>
+</ol>
+In the first case, we don't know how many men and women we will have at the end of the sampling process. In the second case, we do. In the first case, we call the test a "chi-square test for independence". In the second, we call it a "chi-square test for homogeneity".
+<hr>
+<dl>
+<di>degrees of freedom</di>
+<dd>roughly speaking, the number pieces of data minus the number of independent parameters</dd>
+</dl>
+</main>
+</body>
+</html>

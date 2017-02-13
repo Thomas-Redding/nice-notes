@@ -1,0 +1,610 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<html>
+<head>
+<script>
+var cvs;
+var c;
+var font;
+var textFormatter = new TextFormatter();
+
+function Start()
+{
+	cvs = document.getElementById("cvs");
+	c = cvs.getContext("2d");
+	cvs.width = 600;
+	cvs.height = 400;
+	font = new Font();
+
+	font.setFont("Times New Roman");
+	font.setSize(40);
+	font.setEmphasis("Bold");		// "bold", "italic", or ""
+
+	c.lineWidth = 6;
+
+	c.fillStyle = "red";
+	c.globalAlpha = 0.5;
+
+	c.beginPath();
+	c.moveTo(50, 350);
+	for(var i=50; i<540; i++) {
+		var x = (i-50)/500;
+		var y = func(x);
+		c.lineTo(i, 350-300*y);
+	}
+	c.lineTo(540, 350);
+	c.fill();
+
+	c.globalAlpha = 1;
+
+	c.beginPath();
+	c.moveTo(50, 350);
+	for(var i=50; i<540; i++) {
+		var x = (i-50)/500;
+		var y = func(x);
+		c.lineTo(i, 350-300*y);
+	}
+	c.lineTo(540, 350);
+	c.stroke();
+
+	c.fillStyle = "black";
+	drawArrow(50, 350, 50, 50);
+	drawArrow(47, 350, 550, 350);
+}
+
+function func(x) {
+	x = 4*x-2;
+	x *= 2;
+	var y = x-3;
+	return Math.exp(-1*Math.pow(Math.abs(x*x),0.7));
+}
+
+/*
+1. BASIC
+*/
+
+function drawAxes(x, y, w, h, title, labelX, labelY) {
+	if(title == undefined) {
+		title = "";
+	}
+	if(labelX == undefined) {
+		labelX = "";
+	}
+	if(labelY == undefined) {
+		labelY = "";
+	}
+
+	drawArrow(x, y+c.lineWidth/2, x, y-h);
+	drawArrow(x, y, x+w, y);
+	drawLabel(title, x+w/2, y-h);
+	drawLabel(labelX, x+w/2, y+font.size/2+2);
+	drawLabel(labelY, x-font.size/2, y-h/2, Math.PI/-2);
+}
+
+function drawFunction(f, g, x, y, w, h, flip, drawEndArrow) {
+	if(flip == undefined) {
+		flip = true;
+	}
+	if(drawEndArrow == undefined) {
+		drawEndArrow = false;
+	}
+
+	var t;
+	if(flip) {
+		c.beginPath();
+		c.moveTo(w*f(0)+x, y+h-h*g(0));
+		if(drawEndArrow) {
+			for(t=0; t<=0.99; t+=0.01) {
+				c.lineTo(w*f(t)+x, y+h-h*g(t));
+			}
+			c.stroke();
+			drawArrow(w*f(0.99)+x, y+h-h*g(0.99), w*f(1)+x, y+h-h*g(1), 1.6*c.lineWidth);
+		}
+		else {
+			for(t=0; t<=1; t+=0.01) {
+				c.lineTo(w*f(t)+x, y+h-h*g(t));
+			}
+			c.stroke();
+		}
+	}
+	else {
+		c.beginPath();
+		c.moveTo(w*f(0)+x, h*g(0)+y);
+		if(drawEndArrow) {
+			for(t=0; t<=0.99; t+=0.01) {
+				c.lineTo(w*f(t)+x, h*g(t)+y);
+			}
+			c.stroke();
+			drawArrow(w*f(0.99)+x, y+h*g(0.99), w*f(1)+x, y+h*g(1), 1.6*c.lineWidth);
+		}
+		else {
+			for(t=0; t<=1; t+=0.01) {
+				c.lineTo(w*f(t)+x, h*g(t)+y);
+			}
+			c.stroke();
+		}
+	}
+}
+
+function drawBox(x, y, w, h, r, filled) {
+	var cX, cY, i;
+	c.beginPath();
+	c.moveTo(x, y+r);
+	cX = x+r;
+	cY = y+r;
+	for(i=Math.PI; i<3*Math.PI/2; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+w-r, y);
+	cX = x+w-r;
+	cY = y+r;
+	for(i=3*Math.PI/2; i<2*Math.PI; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+w, y+h-r);
+	cX = x+w-r;
+	cY = y+h-r;
+	for(i=0; i<Math.PI/2; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+r, y+h);
+	cX = x+r;
+	cY = y+h-r;
+	for(i=Math.PI/2; i<Math.PI; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x, y+r)
+	if(filled) {
+		c.fill();
+	}
+	else {
+		c.stroke();
+	}
+}
+
+function setFillColor(r, g, b) {
+	c.fillStyle = "rgb("+r+","+g+","+b+")";
+}
+
+function setStrokeColor(r, g, b) {
+	c.strokeStyle = "rgb("+r+","+g+","+b+")";
+}
+
+function drawGrid(stepSize) {
+	c.beginPath();
+	for(var i=0; i<cvs.width; i += stepSize) {
+		c.moveTo(i, 0);
+		c.lineTo(i, cvs.height);
+	}
+	for(var i=0; i<cvs.height; i += stepSize) {
+		c.moveTo(0, i);
+		c.lineTo(cvs.width, i);
+	}
+	c.stroke();
+}
+
+// draws str centered at (x,y) with an optional angle (radians)
+function drawLabel(str, x, y, angle) {
+	if(angle == undefined || angle == 0) {
+		c.fillText(str, x-c.measureText(str).width/2, y+font.size/4);
+	}
+	else {
+		c.translate(x,y);
+		c.rotate(angle);
+		c.fillText(str,-0.5*c.measureText(str).width,font.size/4);
+		c.rotate(-1*angle);
+		c.translate(-1*x,-1*y);
+	}
+}
+
+function drawCircle(x, y, radius, fill) {
+	c.beginPath();
+	c.arc(x,y,radius,0,2*Math.PI);
+	if(!fill)
+	{
+		c.stroke();
+	}
+	else
+	{
+		c.fill();
+	}
+}
+
+function drawCurlyBracket(x, y, width, height, angle, radius) {
+	var aX = height;
+	var aY = -1*width/2;
+	var bX = height/2;
+	var bY = -1*width/2;
+	var cX = height/2;
+	var cY = -1*width/4;
+	var dX = height/2;
+	var dY = 0;
+	var eX = 0;
+	var eY = 0;
+	var fX = height/2;
+	var fY = width/4;
+	var gX = height/2;
+	var gY = width/2;
+	var hX = height;
+	var hY = width/2;
+
+	if(angle == undefined) {
+		angle = 0;
+	}
+
+	if(radius == undefined) {
+		radius = 1e300;
+	}
+
+	c.translate(x,y);
+	c.rotate(angle);
+	drawCorner(aX,bY,bX,bY,cX,cY,radius);
+	drawCorner(cX,cY,dX,dY,eX,eY,radius);
+	drawCorner(fX,fY,dX,dY,eX,eY,radius);
+	drawCorner(fX,fY,gX,gY,hX,hY,radius);
+	c.rotate(-1*angle);
+	c.translate(-1*x,-1*y);
+}
+
+function drawLine(x1, y1, x2, y2) {
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2,y2);
+	c.stroke();
+}
+
+function drawLabeledLine(str, x1, y1, x2, y2, isAbove, isMirror) {
+	var theta = Math.atan2(y2-y1, x2-x1) + Math.PI;
+	if(isMirror) {
+		theta += Math.PI;
+	}
+	var midX = (x2+x1)/2;
+	var midY = (y2+y1)/2;
+	var perpX = y1-y2;
+	var perpY = x1-x2;
+	var perpLen = Math.sqrt(perpX*perpX + perpY*perpY);
+	perpX /= perpLen;
+	perpY /= perpLen;
+	perpX *= font.size/2+3;
+	perpY *= font.size/2+3;
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2,y2);
+	c.stroke();
+
+	if(isAbove == undefined || isAbove) {
+		drawLabel(str, midX-perpX, midY+perpY, theta);
+	}
+	else {
+		drawLabel(str, midX+perpX, midY-perpY, theta);
+	}
+}
+
+// draws a box with rounded corners and rotated around its center
+function drawAdvancedBox(x, y, width, height, radius, rotation) {
+	c.translate(x,y);
+	c.rotate(rotation);
+	drawCorner(width/-2,0,width/-2,height/-2,0,height/-2,radius);
+	drawCorner(width/-2,0,width/-2,height/2,0,height/2,radius);
+	drawCorner(width/2,0,width/2,height/2,0,height/2,radius);
+	drawCorner(width/2,0,width/2,height/-2,0,height/-2,radius);
+	c.rotate(-1*rotation);
+	c.translate(-1*x,-1*y);
+}
+
+// draws a rounded corner
+function drawCorner(x1, y1, x2, y2, x3, y3, radius) {
+	if(!radius)
+	{
+		radius = 0;
+	}
+	var vectorAngle = Math.acos(((x1-x2)*(x3-x2)+(y1-y2)*(y3-y2))/Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))/Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2)));
+	var angle = (Math.PI-vectorAngle)/2;
+	if((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)<radius*radius)
+	{
+		radius = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+	}
+	if((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2)<radius*radius)
+	{
+		radius = Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2))
+	}
+	c.beginPath();
+	c.moveTo(x1,y1);
+	var t = 1-Math.tan(angle)*radius/Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+	var Ax = (x2-x1)*t+x1;
+	var Ay = (y2-y1)*t+y1
+	c.lineTo(Ax,Ay);
+	c.moveTo(x3,y3);
+	t = 1-Math.tan(angle)*radius/Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2));
+	var Bx = (x2-x3)*t+x3;
+	var By = (y2-y3)*t+y3;
+	c.lineTo(Bx,By);
+	c.stroke();
+	t = ((x3-x2)*(Ax-Bx) - (Ay-By)*(y2-y3))/((x1-x2)*(y2-y3) - (x3-x2)*(y2-y1));
+	var xc = (y2-y1)*t+Ax;
+	var yc = (x1-x2)*t+Ay;
+	var bisVectX = xc-x2;
+	var bisVectY = yc-y2;	
+	c.strokeStyle = "black";
+	c.beginPath();
+	var q;
+	if(bisVectX==0 && bisVectY==0)
+	{
+		q = false;
+	}
+	if(bisVectX>=0)
+	{
+		q = Math.atan(bisVectY/bisVectX);
+	}
+	else if(bisVectY>0)
+	{
+		q = Math.PI+Math.atan(bisVectY/bisVectX);
+	}
+	else
+	{
+		q = Math.atan(bisVectY/bisVectX)-Math.PI;
+	}
+	q += Math.PI;
+	c.arc(xc,yc,radius,q-angle,q+angle,false);
+	c.stroke();
+}
+
+function drawArrow(x1, y1, x2, y2, scale) {
+	if(scale == undefined) {
+		scale = 3*Math.sqrt(c.lineWidth);
+	}
+
+	var deltaX = x2-x1;
+	var deltaY = y2-y1;
+	var oldLen = Math.sqrt(deltaX*deltaX+deltaY*deltaY);
+	var angle = 0.523598776;
+	deltaX *= scale/oldLen*3;
+	deltaY *= scale/oldLen*3;
+
+	// draw head
+	c.beginPath();
+	c.moveTo(x2,y2);
+	c.lineTo(x2-Math.sin(angle)*deltaY-Math.cos(angle)*deltaX,y2+Math.sin(angle)*deltaX-Math.cos(angle)*deltaY);
+	c.lineTo(x2+Math.sin(angle)*deltaY-Math.cos(angle)*deltaX,y2-Math.sin(angle)*deltaX-Math.cos(angle)*deltaY);
+	c.fill();
+
+	// draw line
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2 - Math.cos(angle)*deltaX,y2 - Math.cos(angle)*deltaY);
+	c.stroke();
+}
+
+/*
+2. TEXT
+*/
+
+function drawText(txt, x, y, w) {
+	var arr = textFormatter.formatText(txt, w);
+	for(var i=0; i<arr.length; i++) {
+		c.fillText(arr[i], x, y+font.size*(i+1));
+	}
+}
+
+function TextFormatter() {
+	this.arr;
+	this.bad;
+	this.formatText = function(txt, width) {
+		this.arr = txt.split(" ");
+		this.precalculateLengths();
+		this.bad = new Array(this.arr.length);
+		for(var i=this.arr.length-1; i>=0; i--) {
+			this._subFunc(i, width);
+		}
+		
+		var rtn = new Array();
+		var start = 0;
+		var i;
+		/*
+			first	288.000006387
+			middle	28.800000639
+			last	547.200012136
+			space	28.800010681
+		*/
+		this.bad.push(0);
+		while(true) {
+			var bestValue = 1e300;
+			var bestOption = -1;
+			for(i=start; i<this.arr.length; i++) {
+				lineLen = this.lengthOfArray(start, i);
+				var line = this.penaltyFunction(lineLen, width);
+				var magic = this.bad[i+1];
+				newValue = this.combineFunction(line, magic);
+				if(newValue < bestValue) {
+					bestValue = newValue;
+					bestOption = i;
+				}
+			}
+			rtn.push(this.joinArray(start, bestOption));
+			start = bestOption+1;
+			if(start == this.arr.length) {
+				return rtn;
+			}
+		}
+	}
+
+	this.penaltyFunction = function(lineLen, width) {
+		if(lineLen > width) {
+			return 1e300;
+		}
+		return Math.pow(Math.abs(lineLen-width),2);
+	}
+
+	this.combineFunction = function(currentLine, afterBadness) {
+		return currentLine + afterBadness;
+	}
+
+	this._subFunc = function(index, width) {
+		var i;
+		var mid;
+		var newValue;
+		// this.bad[index] indicates the best-case scenario if we cut the line at index (i.e. index is the first word on a line)
+		this.bad[index] = 100000000;
+		for(i=index; i<this.arr.length; i++) {
+			var len = this.lengthOfArray(index, i);
+			// make [index, i] a line, everything after "i" gets added on
+			if(i == this.arr.length-1) {
+				if(len < width) {
+					newValue = 0;
+				}
+				else {
+					newValue = this.penaltyFunction(len,width);
+				}
+			}
+			else {
+				newValue = this.combineFunction(this.penaltyFunction(len,width), this.bad[i+1]);
+			}
+			if(newValue < this.bad[index]) {
+				this.bad[index] = newValue;
+			}
+		}
+	}
+
+	this.joinArray = function(from, to) {
+		var str = this.arr[from];
+		if(from < 0) {
+			from = 0;
+		}
+		if(to >= this.arr.length) {
+			to = this.arr.length-1;
+		}
+		for(var i=from+1; i<=to; i++) {
+			str += " " + this.arr[i];
+		}
+		return str;
+	}
+
+	this.lengthOfArray = function(from, to) {
+		if(from < 0) {
+			from = 0;
+		}
+		return this.wordLengthArr[to+1]-this.wordLengthArr[from]+lengthOfSpace*(to-from);
+	}
+
+	this.wordLengthArr;
+	this.lengthOfSpace;
+	this.precalculateLengths = function() {
+		lengthOfSpace = c.measureText(" ").width;
+		this.wordLengthArr = new Array(this.arr.length+1);
+		this.wordLengthArr[0] = 0;
+		for(var i=1; i<this.wordLengthArr.length; i++) {
+			this.wordLengthArr[i] = c.measureText(this.arr[i-1]).width;
+		}
+		for(var i=1; i<this.wordLengthArr.length; i++) {
+			this.wordLengthArr[i] += this.wordLengthArr[i-1];
+		}
+	}
+}
+
+/*
+3. STATS
+*/
+
+var _histogramRandomArr = new Array(0);
+
+function reRandomizeHistogram() {
+	_histogramRandomArr = new Array(0);
+}
+
+function drawHistorgram(x, y, width, height, n, r, stdev, arr) {
+	var i;
+	if(stdev == undefined) {
+		stdev = 1;
+	}
+
+	if(arr == undefined) {
+		arr = new Array(n);
+		var xpos;
+		for(i=0; i<n; i++) {
+			xpos = (i-(n-1)/2)/Math.sqrt(n);
+			arr[i] = Math.exp(xpos*xpos*-1*stdev);
+		}
+	}
+
+	if(r == undefined) {
+		r = 0;
+	}
+
+	var max = 0;
+	var sum = 0;
+	var count = 0;
+	for(i=0; i<n; i++) {
+		if(i >= _histogramRandomArr.length) {
+			_histogramRandomArr.push(2*Math.random()-1);
+		}
+		arr[i] *= 1+r*_histogramRandomArr[i];
+		sum += arr[i]*i;
+		count += arr[i];
+		if(arr[i] > max) {
+			max = arr[i];
+		}
+	}
+
+	for(i=0; i<n; i++) {
+		c.fillRect(x+width*i/n, y-arr[i]/max*height, width/n, arr[i]/max*height);
+	}
+
+	c.beginPath();
+	for(i=0; i<n; i++) {
+		c.moveTo(x+width*i/n, y-arr[i]/max*height);
+		c.lineTo(x+width*i/n + width/n, y-arr[i]/max*height);
+		c.lineTo(x+width*i/n + width/n, y);
+		c.lineTo(x+width*i/n, y);
+		c.lineTo(x+width*i/n, y-arr[i]/max*height);
+	}
+	c.stroke();
+
+	return x + (sum/count+0.5)*width/n;
+}
+
+/*
+4. FONT
+*/
+
+function Font() {
+	this.emphasis = "Bold";
+	this.size = 30;
+	this.font = "Arial";
+
+	this.setEmphasis = function(newEmphasis) {
+		this.emphasis = newEmphasis;
+		c.font = this.toString();
+	}
+
+	this.setSize = function(newSize) {
+		this.size = newSize;
+		c.font = this.toString();
+	}
+
+	this.setFont = function(newFont) {
+		this.font = newFont;
+		c.font = this.toString();
+	}
+
+	this.toString = function() {
+		var str = "";
+		if(this.emphasis == "") {
+			str += "lighter ";
+		}
+		else {
+			str += this.emphasis + " ";
+		}
+		str += this.size + "px ";
+		str += this.font;
+		return str;
+	}
+
+	c.font = this.toString();
+}
+
+</script>
+</head>
+<body onload="Start();">
+<canvas id="cvs" width=600 height=600 style="border:solid;border-width:1px;">
+</canvas>
+</body>
+</html>

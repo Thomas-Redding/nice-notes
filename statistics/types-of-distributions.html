@@ -1,0 +1,142 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Types of Distributions</h1>
+<h3>Discrete Distributions</h3>
+<table width=100%>
+<tr><td colspan=2><b><u>Benroulli Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$0\le p\le 1, q=1-p$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left(k\right) = \left\{
+     \begin{array}{lr}
+       q & : k=0\\
+       p & : k=1\\
+       0 & : k\ne 0, x\ne 1
+     \end{array}
+   \right.\\$</td></tr>
+<tr><td><b>CDF</b></td><td>$F\left(k\right) = \left\{
+     \begin{array}{lr}
+       0 & : k\lt 0\\
+       q & : k=0\\
+       1 & : k\ge 1
+     \end{array}
+   \right.\\$</td></tr>
+<tr><td><b>Expectation</b></td><td>$p$</td></tr>
+<tr><td><b>Variance</b></td><td>$pq$</td></tr>
+<tr><td><b>Where</b></td><td>The Benroulli distribution is usually seen in situations were there are only two outcomes, and each outcome has a constant probability of being true.</td></tr>
+<tr><td><b>Example</b></td><td>A coin toss, fair or unfair.</td></tr>
+</table>
+<br><br>
+
+
+<table width=100%>
+<tr><td colspan=2><b><u>Binomial Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$0\le p\le 1, 0\lt n, q=1-p$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left( k \right) = \left(\begin{matrix} n \\ r \end{matrix}\right)p^kq^{n-k}$</td></tr>
+<tr><td><b>CDF</b></td><td>$F(k)=I_{1-p}\left(n-k, 1+k\right)$</td></tr>
+<tr><td><b>Expectation</b></td><td>$p$</td></tr>
+<tr><td><b>Variance</b></td><td>$pq$</td></tr>
+<tr><td><b>Where</b></td><td>The binomial distribution emerges when a variable is determined by adding up a bunch of identical and independent Benroulli distributions.</td></tr>
+<tr><td><b>Example</b></td><td>How many heads will be tossed in 10 coin flips.</td>
+</table>
+<br><br>
+
+
+
+<table width=100%>
+<tr><td colspan=2><b><u>Uniform Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$a, b>a, n=b-a$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left(k\right) = \frac1n, a \lt x \lt b$</td></tr>
+<tr><td><b>CDF</b></td><td>$F\left(k\right) = \left\{
+     \begin{array}{lr}
+       0 & : k\le a\\
+       \frac{k-a+1}n & : a \le k \le b\\
+       1 & : k\ge b
+     \end{array}
+   \right.\\$</td></tr>
+<tr><td><b>Expectation</b></td><td>$\frac{a+b}{2}$</td></tr>
+<tr><td><b>Variance</b></td><td>$\frac{n^2-1}{12}$</td></tr>
+<tr><td><b>Where</b></td><td>The uniform distribution describes cases where each of a set of possible outcomes are equally likely</td></tr>
+<tr><td><b>Example</b></td><td>A fair dice roll.</td>
+</table>
+<br><br>
+
+
+<table width=100%>
+<tr><td colspan=2><b><u>Poisson Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$\lambda \gt 0$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left(k\right) = \frac{e^{-\lambda}\lambda^k}{k!}, k \ge 0$</td></tr>
+<tr><td><b>CDF</b></td><td>$F\left(k\right) = \frac{\Gamma\left(\left\lfloor k+1 \right\rfloor ,\lambda\right)}{\left\lfloor k \right\rfloor !}, k \ge 0$</td></tr>
+<tr><td><b>Expectation</b></td><td>$\lambda$</td></tr>
+<tr><td><b>Variance</b></td><td>$\lambda$</td></tr>
+<tr><td><b>Where</b></td><td>The Poisson distribution emerges when you have a very large number of times an event could happen and the event has a very small possibility of happening. It is actually a special case of the binomial distribution.</td></tr>
+<tr><td><b>Example</b></td><td>The number of people struck by lightning each year.</td>
+</table>
+
+
+<h3>Continuous Distributions</h3>
+<br><br>
+<table width=100%>
+<tr><td colspan=2><b><u>Uniform Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$a, b>a$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left(x\right) = \frac{1}{b-a}, a \lt x \lt b$</td></tr>
+<tr><td><b>CDF</b></td><td>$F\left(x\right) = \left\{
+     \begin{array}{lr}
+       0 & : x\le a \\
+       \frac{x-a}{b-a} & : a \le x \le b\\
+       1 & : x\ge b
+     \end{array}
+   \right.\\$</td></tr>
+<tr><td><b>Expectation</b></td><td>$\frac{a+b}{2}$</td></tr>
+<tr><td><b>Variance</b></td><td>$\frac{\left(b-a\right)^2}{12}$</td></tr>
+<tr><td><b>Where</b></td><td>When every outcome is equally likely.</td></tr>
+<tr><td><b>Example</b></td><td>Uniform distributions are used in <a href="http://en.wikipedia.org/wiki/Monte_Carlo_method" class="external">Monte Carlo</a> sampling. Moreover, the uniform distribution is often considered the best prior distribution in Bayesian statistics, because it implies that you have 0 information.</td>
+</table>
+<br><br>
+
+
+<table width=100%>
+<tr><td colspan=2><b><u>Exponential Distribution</u></b></td></tr
+<tr><td><b>Parameters</b></td><td>$\lambda \gt 0$</td></tr>
+<tr><td><b>PDF</b></td><td>$f\left(x\right) = \lambda e^{-\lambda x}$</td></tr>
+<tr><td><b>CDF</b></td><td>$F\left(x\right) = \left\{
+     \begin{array}{lr}
+       0 & : x\le 0 \\
+       1-e^{-\lambda x} & : x\gt 0 \le b
+     \end{array}
+   \right.\\$</td></tr>
+<tr><td><b>Expectation</b></td><td>$\frac{1}{\lambda}$</td></tr>
+<tr><td><b>Variance</b></td><td>$\frac{1}{\lambda^2}$</td></tr>
+<tr><td><b>Where</b></td><td>This is the continuous equivalent to the Poisson distribution. It occurs when there are a large number of potential times an event could happen, but the odds of the event happening at any given time are low and independent of each other.</td></tr>
+<tr><td><b>Example</b></td><td>How long you have to wait for the subway train (assuming really bad scheduling).</td>
+</table>
+<br><br>
+
+
+<table width=100%>
+<tr><td colspan=2><b><u>Normal (Gaussian) Distribution</u></b></td></tr>
+<tr><td><b>Parameters</b></td><td>$\mu, \lambda \gt 0$</td></tr>
+<tr><td><b>PDF</b></td><td>$f(x)=\frac{e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}}{\sigma \sqrt{2\pi}}$</td></tr>
+<tr><td><b>CDF</b></td><td>$F(x)=\frac{1}{2}\left[1+erf\left(\frac{x-\mu}{\sigma\sqrt{2}}\right)\right]$</td></tr>
+<tr><td><b>Expectation</b></td><td>$\mu$</td></tr>
+<tr><td><b>Variance</b></td><td>$\sigma^2$</td></tr>
+<tr><td><b>Where</b></td><td>The normal distribution occurs whenever the number in question is generated by averaging a large number of other numbers.</td></tr>
+<tr><td><b>Example</b></td><td>Intelligence and height, both of which are the result of a large number of genes</td></tr>
+</table>
+</main>
+</body>
+</html>

@@ -151,7 +151,7 @@ V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]);
     Here <code>game</code> is an object that encodes the game we're playing, <code>alpha</code> is a number between 0 and 1 representing the learning rate, and <code>gamma</code> is a number between 0 and 1 representing the discount rate. One thing to realize is that <code>max_q(g, Q, s)</code> returns our estiamte of the expected utility of pursuing the optimal policy at state <code>s</code>, so <code>max_q(g, Q, s)</code> can be thought of as our estimate for $V^*(s)$.
 </p>
 <p>
-    One simple <code style="color: red">select_action</code> function is to choose some $epsilon$ between 0 and 1. Then, choose the action with highest expected value with probability $1-\epsilon$ and choose a random action with probability $\epsilon$. It turns out that this is sufficient to guarantee our estimates of $Q$ converge to the correct values, so let's consider this special, simple case in more detail.
+    One simple <code style="color: red">select_action</code> function is to choose some $\epsilon$ between 0 and 1. Then, choose the action with highest expected value with probability $1-\epsilon$ and choose a random action with probability $\epsilon$. It turns out that this is sufficient to guarantee our estimates of $Q$ converge to the correct values, so let's consider this special, simple case in more detail.
 </p>
 <p>
     The key is the line
@@ -167,9 +167,34 @@ V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]);
 <p>
     As with TD-learning, when we choose some other value for <code>alpha</code>, this causes smoothing. This is important for Q-learning, because actions don't always result in the same next-state, so we need some smoothing to make this algorithm work well.
 </p>
-<h2>Policy Search</h2>
+<h3>Other Exploration Functions</h3>
 <p>
-    todo
+    Another exploration function is to choose action $a$ (in state $s$) with probability proportional to
+</p>
+$$Q(s,a) + \frac{k}{N(s,a)}$$
+<p>
+    where $k$ is some constant, and $N(s,a)$ is th number of times that action has been performed in that state. Hence, unlike the $\epsilon$-method above, this method
+    <ol>
+        <li>is more likely to explore poorly-explored actions</li>
+        <li>changes how likely it is to explore (v. exploit) as it gains more information.</li>
+    </ol>
+    It thus works better than the $\epsilon$-method in practice.
+</p>
+<h2>Approximate Q-Learning</h2>
+<p>
+    If we have a very large number of state-action pairs, then regular Q-learning will converge very slowly. In this case, it is often better to use <em>approximate Q-learning</em>. Using this method, the programmer extracts features from the state-action pairs. Next, we assume that the value of taking an action, $a$, in a state, $s$, is a linear combination of these features, $f$, with weights $w$:
+    $$Q(s,a) = \sum_i^n{w_i \cdot f_i(s,a)}$$
+</p>
+<h2>Online Learning</h2>
+<p>
+    Online learning is generally separated into two approaches:
+    <ol>
+        <li>Model-based approach</li>
+        <li>Model-free approach</li>
+    </ol>
+</p>
+<p>
+    <em>Model-based learning</em> tries out actions in different states, and then tries to estimate both the transition function, $T(s,a,s')$, and also the reward function, $R(s,a,s')$. It does this by walking around and observing these values, and then using value- or policy-iteration to find the optimal policy.
 </p>
 </main>
 </body>

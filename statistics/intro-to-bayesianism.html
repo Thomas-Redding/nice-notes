@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Intro to Bayesianism</h1>
+<h3>General Idea</h3>
+All of frequentist statistics is based on the idea of considering the sampling distribution of some parameter, $\hat{\theta}$, and then determining how ulnikely the observed value of $\hat{\theta}$ is given this distribution. In other words, frequentist statistics centers around the notion of a p-value, essentially P(Evidence|Theory).
+<br><br>
+Bayesian statistics centers around Bayes' theorem:
+
+$$P(T|E)=\frac{P(E|T)P(T)}{P(E)}$$
+
+If we're talking specifically about paramter values, we can write this as
+
+$$P(\theta=x|E)=\frac{P(E|\theta=x)P(\theta=x)}{P(E)}$$
+
+A frequentist argue that $P(\theta=x)$ should simply be 0 or 1, because either $\theta$ equals $x$ or it does not. Similarly, a flipped but unseen coin is either heads or tails.
+<br><br>
+A Bayesian would argue that if we don't know the parameter's true value, then, we relaly should asisgn it a probability of being true, because probabilities are measures of degrees of belief. Likewise, if I haven't seen the coin, I will have some degree of belief in the statement "the coin is heads up" - this degree of belief is a probability.
+
+<h3>Example</h3>
+
+Alice, Bob, and Carol tell you that a coin's odds of landing on its edge are ${10}^{-10}$, ${10}^{-11}$, and ${10}^{-12}$, respectively. Based on how trustworthy you think these people are, you assign the following probabilities to these theories:
+
+$$P\left(\theta={10}^{-10}\right)=\frac{4}{8}$$
+$$P\left(\theta={10}^{-11}\right)=\frac{3}{8}$$
+$$P\left(\theta={10}^{-12}\right)=\frac{1}{8}$$
+
+These are called <b>prior probabilities</b>.
+<br><br>
+You flip the coin and it lands on its edge ($E$). We can now compute the <b>likelihood</b> given by each theory:
+
+$$P\left(E|\theta={10}^{-10}\right)={10}^{-10}$$
+$$P\left(E|\theta={10}^{-11}\right)={10}^{-11}$$
+$$P\left(E|\theta={10}^{-12}\right)={10}^{-12}$$
+
+Next, based on the Law of Total Probaiblity, we can compute the probability of the coin landing on its edge:
+
+$$P\left(E\right)=P\left(E | \theta={10}^{-10}\right)P\left(\theta={10}^{-10}\right) + P\left(E | \theta={10}^{-11}\right)P\left(\theta={10}^{-11}\right) + P\left(E | \theta={12}^{-10}\right)P\left(\theta={10}^{-12}\right)$$
+
+By substitution:
+
+$$P\left(E\right)={10}^{-10} \cdot \frac{4}{8} + {10}^{-11} \cdot \frac{3}{8} + {10}^{-12} \cdot \frac{1}{8} = 5.39 \cdot {10}^{-11}$$
+
+By Bayes' theorem, we can therefore deduce:
+
+$$P\left(\theta={10}^{-10}\right)=0.9281$$
+$$P\left(\theta={10}^{-11}\right)=0.0696$$
+$$P\left(\theta={10}^{-12}\right)=0.0023$$
+
+In other words, we are now 92.81% sure that $\theta={10}^{-10}$, 6.96% sure that $\theta={10}^{-11}$, and 0.23% sure that $\theta={10}^{-12}$. These are called our <b>posterior probabilities</b>.
+
+<h3>Example #2</h3>
+Some proportion, $p$, of marbles in a bag are red. Before you draw out any marbles, you assign a uniform prior distribution to $p$ between 0 and 1. Next, you draw out a red ($R$) marble. What is your posterior distribution of $p$?
+<br><br>
+
+$$L\left(R|p=x\right)=x$$
+
+Because our prior distribution is uniform, this gives us the following posterior distribution:
+
+$$f(p)=\frac{x}{\int_0^1{x}\;dx}=2x$$
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<hr>
+<dl>
+<di></di>
+<dd></dd>
+</dl>
+</main>
+</body>
+</html>

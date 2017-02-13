@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>T-Testing</h1>
+It might be a good idea to review <a href="Probability Distributions">Probability Distributions</a> and <a href="Types of Distributions.html">Types of Distributions</a> before continuing.
+<h3>General Idea</h3>
+With sufficiently large samples, the central limit theorem states that the means of these samples will follow a normal distribution with
+$$\mu = \mu_{pop}$$
+$$\sigma = \frac{\sigma_{pop}}{\sqrt{n}}$$
+<h3>Example: One Population</h3>
+Your friend says that the average male height is 6' (72") even. You take a sample of 100 random men and find a mean of 5'10" (70") and a standard deviation of 3". What are the odds of this distribution or something more extreme, given that your friend is telling the truth (the null-hypothesis)? We will use a two-tailed test.
+<br><br>
+Assuming null-hypothesis, the distribution of sample means should follow a normal distribution with
+$$\mu = \mu_{pop} = 70$$
+$$\sigma = \frac{\sigma_{pop}}{\sqrt{n}} = \frac{3}{\sqrt{100}} = 0.3$$
+<br><br>
+This particular sigma is known as the <b>standard error</b>. Thus, the z-score of your sample is
+$$\frac{70-72}{0.3} \approx 6.67$$
+<br><br>
+However, it turns out we can't use a z-score with a normal distribution to calculate a p-value. Ther reason for this is that the null-hypothesis makes no claim about the population's standard deviation - we infer that from the data. Because of this, we must us a slighty modified distribution: the t-distribution.
+<br><br>
+The t-distribution has degrees of freedom equal to the sample size minus the number of parameters estimated (in this case $\sigma$). Thus, we have 99 degrees of freedom. Fortunately, our test-statistic is calculated just like our z-score, but is called a <b>t-score</b>.
+<br><br>
+Pluging this into R (doubling because our test is two-tailed):
+<p>2*dt(6.67, 99)</p>
+yields a p-value of 6.95e-9. Thus, we can reject the null-hypothesis and conclude that this is evidence that your friend is wrong and that the mean height of men is not 6'.
+<br><br>
+<h3>Generalization</h3>
+Using some probability theory, we can generalize this method to test hypotheses that make claims about the difference in two different populations.
+<h3>Example: Two Populations</h3>
+Your friend, embarrased by his earlier claim now claims that the difference in heights between the average heighst of men and women is 6 inches. So, we sample 30 men and 40 women and find that the mean have a mean height of 5'10" (70") with a standard deviation of 3", while the women have a mean height of 5'5" (65") with a standard deviation of 2.5". The formula for computing the standard error in this case is:
+$$SE=\sqrt{\frac{s_1^2}{n_1}+\frac{s_1^2}{n_2}}=\sqrt{\frac{3^2}{30}+\frac{2.5^2}{40}} \approx 0.675$$
+The mean difference between our samples is 5". We can now compute the test statistic:
+$$t=\frac{5-6}{0.675} \approx -1.48$$
+The degrees of freedom of this t-test can be approximated by taking samller sample size and subtracting 1 (the exact calculation is complex). Thus, we have about 29 degrees of freedom. Plugging this into R:
+<p>2*dt(-1.48, 29)</p>
+yields a p-value of 0.265. This does not allow us to reject the null-hypothesis.
+<h3>Assumptions</h3>
+The central limit theorem states that as sample sizes go to infinity, the sample means approaches a normal distribution. In practice, it is generally fine to assume that the sample means follow a normal distribution when $n>30$.
+<hr>
+<dl>
+<di>standard error</di>
+<dd>a measure of how spread out we should expect sample means to be</dd>
+<di>t-score</di>
+<dd>The test statistic used in a t-test</dd>
+</dl>
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Hypothesis Testing</h1>
+<h3>General Idea</h3>
+So, you've painstakeningly collected data about a group and you want to know whether this group supports your theory. How, exactly, can you go about doing that? One general way is hypothesis testing. The basic idea behind hypothesis testing is to give the benefit of the doubt to one hypothesis and then see if we have enough evidence to reject it. In hypothesis testing, we call the hypothesis being given the benefit of the doubt the <b>null hypothesis</b> (<b>H<sub>0</sub></b>). Then, assuming this is false, we calculate what the odds are that our data (or more extreme data) would have been produced, assuming that H<sub>0</sub> is correct. If this probability is low enough, then we can confidently reject the null hypothesis.
+<h3>Example: One-Tailed Hypothesis Testing</h3>
+For instance, let's imagine that we have a coin, and we want to determine whether it is biased towards heads. We flip it 40 times and get 25 heads and 15 tails. The question posed by null-hypothesis testing is <u>"What are the odds that this (or something more extreme) would have happened assuming H<sub>0</sub>."</u>
+<br><br>
+So, first we just assume (for sake of argument) that the null-hypothesis is true. Using this assumption, we can calculate the odds of the outcome (or a more extreme one) we just witnessed. In this case, the calculations are relatively straightforward. Using a binomial distribution's cdf:
+<p>pbinom(40, 40, 0.5)-pbinom(25, 40, 0.5)</p>
+This turns out to be 4.03%, illustrated by the blue area.
+<img src="one-tail test.png">
+<br>
+If the null-hypothesis were different, we would use a different distribution. The point to remember is that H<sub>0</sub> is <u>not just a number</u> - it is a full model. It could, for instance, be normal or it could follow no standard distribution at all! There are ways to deal with this problem, but the point to keep in mind is that the only reason we are using a binomial model in this case is that it happens to always result from independent and equally-likely coin tosses.
+We can calls this our p-value. The next step is to compare this p-value to a predetermined <b>signifiance level</b>, the most common one is 5%. Because 4.03% is less than 5%, we can "reject the null-hypothesis", which essentially means that we have some fairly strong evidence that H<sub>0</sub> is false. In this case it means we have some fairly strong evidence that the coin isn't fair and is probably biased towards heads. However, if we had no reason to doubt the fairness of the coin in the first place, it is still entirely reasonable to suspect that the coin is fair - after all, the vast majority of coins are. Rejecting the null-hypothesis is <u>not</u> the "be-and-end-all", it is just another tool in our belt for using evidence.
+<br><br>
+This represents one of the two main problems with null-hypothesis testing: the odds of getting a false positive are equal to your significance threshold - this is known as <b>Type I error</b>. The naive solution is to simply lower our signifiance threshold to a really small number like 0.001%. However, this illustrates the second problem with null-hypothesis testing: returning false negatives (<b>Type II error</b>). For instance, if our coin really was biased and our threshold was 0.001%, it would be difficult to reject H<sub>0</sub> (that our coin is biased). In real life, the only way to get extremely low p-values is to have very large sample sizes, which is often a practical limitation.
+<h3>Example: Two-Tailed Hypothesis Testing</h3>
+Let's imagine that we have another coin and we want to determine whether its fair. We flip it 40 times and get 25 heads and 15 tails. Again, the null-hypothesis asks "What are the odds of this result or something more extreme if the null-hypothesis is true?" However, there is one very important difference between this example and the last one. In the last example, we wanted to know "whether it is biased towards heads." In this example, we want to know "whether its far."
+<br><br>
+Last time, we interpreted "more extreme" to mean "more X heads", because we wanted to know if it was biased towards heads. This time, we need to interpret "more extreme" to mean "more than X heads or more than X tails". Because we didn't enter our analysis with an eye towards one side of the coin, we would consider 15 tails to be just as suspicious as 15 heads. Thus, we need to add both probabilities together to compute our p-value: 8.07%:
+<img src="two-tail test.png">
+<br><br>
+Again, just like last time, we compare this to our significance threshold of 5%, but this time we must conclude that we do <u>not</u> have enough evidence to reject the null-hypothesis.
+<br><br>
+The first example is called <b>one-tailed hypothesis testing</b>, because we are only looking to see what the odds are of the evidence begin more extreme in one direction (towards one tail). Likewise, the second example is called <b>two-tailed hypothesis testing</b>, because we are looking to see what the odds are of the evidnece being more extreme in either direction.
+<h3>Generalization</h3>
+The first thing to note is that the p-value is <u>not</u> the probability that H<sub>0</sub> is true. To reiterate, the p-value is the likelihood of obtaining our data assuming H<sub>0</sub> is true.
+<br><br>
+H<sub>0</sub> is much more than just a number, it must be an entire model. In the two examples above, we assumed that the null hypothesis was that the coin was fair - that is, heads had exactly a 50% chance of being tossed and each toss was independent. Because this is described by a Bernoulli distribution, that is what we used for H<sub>0</sub>.
+<br><br>
+One minor point to keep in mind is a null-hypothesis might be testable using multiple test statistics. For instance, if I assumed that the weight of Amerians was normally distribued, my null-hypothesis might be
+<ol>
+<li>men and women have the same mean weight</li>
+<li>men and women have the same median weight</li>
+<li>men and women have the same trimmed mean weight</li>
+</ol>
+It is dishonest to test all four of these hypotheses with a p-value of 0.05 and then just report that this hypothesis was rejected, because, we'd expect to reject the null-hypothesis 5% of the time that it was true. Thus, testing a bunch of hypotheses trying to reject the null-hypothesis makes you more likely to do so and biases your analysis. There are unbiased ways to do multiple tests (see <a href="http://en.wikipedia.org/wiki/%C5%A0id%C3%A1k_correction" class="external">&#352;id&aacute;k correction</a>).
+<h3>Assumptions</h3>
+In general, null-hypothesis testing makes just one assumption: that the null-hypothesis is true. However, there can be a lot hidden in that. For instance, as mentioned before, the coin tosses had to all have both equal probablity of being heads and be independet of each other.
+<hr>
+<dl>
+<di>null hypothesis</di>
+<dd>The "nothing" hypothesis we try to reject</dd>
+<di>Type I Error</di>
+<dd>The odds of getting a false positive (rejecting a true null-hypothesis)</dd>
+<di>Type II Error</di>
+<dd>The odds of getting a false negative (failing to reject a false null-hypothesis)</dd>
+<di>One-Tailed Hypothesis Testing</di>
+<dd>A null-hypothesis test that defines "more extreme" on one side of the null-hypothesis</dd>
+<di>Two-Tailed Hypothesis Testing</di>
+<dd>A null-hypothesis test that defines "more extreme" on both sides of the null-hypothesis</dd>
+</dl>
+</main>
+</body>
+</html>
