@@ -18,7 +18,7 @@ MathJax.Hub.Config({
 <main>
 <h1>First Order Logic</h1>
 First order logic consists of a set of legal strings of symbols, partitioned into two disjoint sets: formulas and <b>terms</b>.
-<h3>Logical Symbols</h3>
+<h2>Logical Symbols</h2>
 The usual logical symbols in first order logic are:
 <ul>
 <li>quantifiers: $\exists$, $\forall$</li>
@@ -28,7 +28,7 @@ The usual logical symbols in first order logic are:
 <li>equality: $=$</li>
 </ul>
 It turns out that we can give up one of the quantifiers, $\vee$, $\Rightarrow$, and $\Leftrightarrow$
-<h3>Non-Logical Symbols</h3>
+<h2>Non-Logical Symbols</h2>
 Non-logical symbosl are defined via the system's signature. The traditional approach is to have one, infinite set of non-logical symbols for all applications, however contemporary mathematical logic has relaxed this idea and lets the signature vary by algebra.
 <br><br>
 In first-order logic, every non-logical symbol is one of the following types:
@@ -44,17 +44,17 @@ In first-order logic, every non-logical symbol is one of the following types:
 <li>function symbols (arity&ge;1) - these take terms and return terms</li>
 </ul>
 </ol>
-<h3>Formation Rules</h3>
+<h2>Formation Rules</h2>
 The formation rules of first-order logic are usually <b>context-free</b>, meaning that each rule takes the form
 $$V \rightarrow w$$
 where $V$ is a single nontermainal symbol and w is a string of symbols, which can be either terminal or nonterminal ($w$ can also be empty).
-<h3>Terms</h3>
+<h2>Terms</h2>
 Terms are defined inductively
 <ol>
 <li>any variable is a term</li>
 <li>any expression $f\left(t_1,...t_n\right)$ (where $f$ is a function of arity $n$ adn each argument $t_i$ is a term) is a term.
 </ol>
-<h3>Well-Formed Formulas</h3>
+<h2>Well-Formed Formulas</h2>
 The set of well-formed formulas (wff) is defined inductively as
 <ol>
 <li>For any predicate symbol, $P$, with arity $n$ and for any set of terms $t_1,...t_n$, $P\left(t_1,...t_n\right)$ is a wff.</li>
@@ -64,7 +64,7 @@ The set of well-formed formulas (wff) is defined inductively as
 <li>If $\phi$ is a wff and $x$ is a variable, then $\forall x \rho$ and $\exists x \rho$ are both wff
 </ol>
 Well-formed formulas obtained only through rules #1 and #2 are considered atomic formulas. Because of the use of parantehses, first-order logic's set of formulas have <b>unique readability</b>, meaning that any formula can be obtained in one and only one way via the inductive definition.
-<h3>Free and Bound Variables</h3>
+<h2>Free and Bound Variables</h2>
 A variable is considered <b>free</b> if it is not attached to a quantifier; otherwise, it is considered <b>bound</b>. For instance in
 $$\forall x P\left(x,y\right)$$
 $x$ is free and $y$ is bound.
@@ -77,7 +77,7 @@ More formally, free and bound variables are defined inductively:
 <li>$x$ is free in $\forall y \phi$ if and only if $x$ is free in $\phi$ and $x$ is a different symbol from $y$. Likewise for bound variales and with $\exists$.</li>
 </ol>
 A well-formed formula in first-order logic with no free variables is called a <b>first-order sentence</b>. This is equal to the set of all well-formed formulas with truth values under an interpretation.
-<h3>Semantics</h3>
+<h2>Semantics</h2>
 An interpretaiton of a first-order language
 <ol>
 <li>determines the <b>domain of discourse</b> (the universe the quantifiers quantify over)</li>

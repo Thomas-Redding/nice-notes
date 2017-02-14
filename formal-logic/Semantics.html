@@ -1,29 +1,18 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        processEscapes: true
-    },
-    TeX: { equationNumbers: { autoNumber: "AMS"} }
-});
-</script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 <main>
 <h1>Semantics</h1>
-<h3>Interpretation</h3>
+<h2>Interpretation</h2>
 Interpretation is the assignment of meaning to well-formed formulas. In the context of propositional and predicate logic, an interpretation is a function that provides an extension of strings of an object language. An interpretation often provides a way to determine the truth values of a well-formed formula in a language. In this case, the formula is called a <b>sentence</b>. If interpretation I assigns "true" to sentence S, then I is a <b>model</b> of S.
 <br><br>
 The <b>logical form</b> of a sentence is taken by abstracting some of its components, essentially by considering only syntax. For instance,
-<h3>The Alphabet</h3>
+<h2>The Alphabet</h2>
 The alphabet consists of <b>logical constants</b>, <b>non-logical constants</b> and <b>variables</b>. A logical constant is a symbol with the same semantic value under every interpretation. In predicate logic, they include logical connectives, quantifiers, and often equality. Non-logical constants are symbols assigned meaning by an interpretation. In predicate logic, they include predicates and <b>individual constants</b>, which must be interpreted as specific, individual things. A variable doesn't isn't interpreted as a specific, individual thing. In predicate logic, this includes any symbol preceded by a quantifier.
-<h3>Validity and Soundness</h3>
+<h2>Validity and Soundness</h2>
 It is an unfortunate consequence of not being perfect, that we often mistake certain sequences of well-formed formulas for proofs even when they are not. Such an argument is <b>valid</b> if the final theorem follows from the premises. An argument is <b>sound</b> if
 <ol>
 <li>it is valid</li>

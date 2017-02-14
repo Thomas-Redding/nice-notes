@@ -1,23 +1,12 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        processEscapes: true
-    },
-    TeX: { equationNumbers: { autoNumber: "AMS"} }
-});
-</script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 <main>
 <h1>Syntax</h1>
-<h3>Formal Grammar</h3>
+<h2>Formal Grammar</h2>
 An <b>alphabet</b> is a non-empty set of symbols. We can put these symbols together to form <b>formulas</b>.
 <br><br>
 If we have a set of <b>formation rules</b> (called a <b>formal grammar</b>), we can call the set of formulas that conform to these rules <b>well-formed formulas</b> and the set of all these formulas a <b>formal language</b>.
@@ -34,7 +23,7 @@ Let a formal grammar be defined by
 <li>x can become a</li>
 </ol>
 "a" is a terminal symbol, because no rule exists which would change it into something else. "x" is a nonterminal symbol, because rules exist
-<h3>Axiom Schemata</h3>
+<h2>Axiom Schemata</h2>
 An axiom schema generalizes the notion of axiom and is a formula in the language of an axiomatic system in which one or more <b>schematic variables</b> appear. Schematic variables are metalinguistic constructs that stand for any subformula or term of the system, which may or may not be required to satisfy certain conditions (e.g. certain variables may need to be free or not appear in the subformula or term). A subformula is any part of the input formula
 <br><br>
 The set of terms is defined inductively as
@@ -48,13 +37,13 @@ The set of terms is defined inductively as
 <li>The induction schema that is part of Peano's axioms</li>
 <li>The axiom schema of replacement that is part of the ZFC axioms</li>
 </ul>
-<h3>Rules of inference</h3>
+<h2>Rules of inference</h2>
 A <b>rule of inference</b> is a logical form consisting of a function that takes premises, analyzes their syntax, and returns a conclusion. Typically, a rule of inference will preserve the semantic property of truth.
 <br><br>
 <b>Example:</b>
 <br>
 "ModusPonens(P&rArr;Q, P)" returns "Q"
-<h3>Formal Systems</h3>
+<h2>Formal Systems</h2>
 A <b>deductive system</b> consists of
 <ol>
 <li>a set of well-formed axioms or axiom schemata</li>
@@ -65,13 +54,13 @@ A formal system consists of
 <li>a formal grammar</li>
 <li>a deductive system</li>
 </ol>
-<h3>Recursion</h3>
+<h2>Recursion</h2>
 A formal system is <b>recursive</b> (i.e. <b>effective</b>) if the set of axioms and rules of inference are <b>decidable</b> sets or <b>semidecidable</b> sets, according to context.
 <br><br>
 A set is decidable (i.e. recursive or <b>computable</b>) if there is an algorithm that terminates after a finite amount of time and correctly decides whether or not a given number belongs to the set.
 <br><br>
 A set is semidecidable (i.e. <b>recursively enumerable</b>, <b>computably enumerable</b>, <b>provable</b>, or <b>Turing-recognizable</b>) if there is an algorithm that enumerates the members of S (possibly in infinite time). Equivalently, there could be an algorithm that correctly decides whether an element is in the set, but might give no answer (but not the wrong answer) for elements not in the set.
-<h3>Formal Proofs</h3>
+<h2>Formal Proofs</h2>
 A <b>formal proof</b> is a sequence of well-formed formulas such that each well-formed formula in the sequence is either
 <ol>
 <li>an axiom</li>
@@ -80,7 +69,7 @@ A <b>formal proof</b> is a sequence of well-formed formulas such that each well-
 The last well-formed formula in the sequence is called a theorem. Thus, a <b>theorem</b> is any well-formed formula that can be proven.
 <br><br>
 If we can prove theorem Q by starting with axiom P, then we say that "P entails Q" or that "Q is a logical consequence of P" (P&#8866;Q).
-<h3>Random Tidbits</h3>
+<h2>Random Tidbits</h2>
 A formal system is <b>countable</b> if the number of statements is equinumerous to the natural numbers.
 </main>
 </body>

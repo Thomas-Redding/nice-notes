@@ -1,23 +1,12 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        processEscapes: true
-    },
-    TeX: { equationNumbers: { autoNumber: "AMS"} }
-});
-</script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 <main>
 <h1>Modal Theory</h1>
-<h3>Basics</h3>
+<h2>Basics</h2>
 In modal theory, a <b>theory</b> is a set of sentences in a formal language. An interpretation satisfies a theory if the theory is true in that interpretation. Modal theory is, essentially, the attempt to examine semantics (e.g. true and false) using syntax.
 <br><br>
 A <b>model</b> of a theory is a mathematical structure that <b>satisfies</b> the theory. For instance, consider the theory made of these axioms:
@@ -41,7 +30,7 @@ If we want to restrict our theory to a more specific model, we can add more axio
 <li>&forall;x S(x)&ne;0</li>
 </ol>
 eliminates models (b) and (c). Many theories have an intended model (interpretation). This, it turns out is still not enough to perfectly define the natural numbers, because its possible that, in addition to the normal natural numbers, there is another natural number, x, such that S(x)=x. In order to remove this, we can accept mathematical induction as a 9<sup>th</sup> axiom. Taken together, these axioms are known as the <a href="http://en.wikipedia.org/wiki/Peano_axioms" class="external">Peano axioms</a>.
-<h3>Universal Algebra</h3>
+<h2>Universal Algebra</h2>
 Universal algebra studies <b>algebraic structures</b> (sets with operations defined on them) as opposed to examples (models) of these structures. For instance, the axioms (1-7) designate a single algebraic structure, but with multiple models (a-c).
 <br><br>
 A formal langauge's <b>signature</b> is its set of non-logical symbosl together with a set of oeprations that characterize their algebraic structure. A signature can be empty, finite, infinite, infnite, or even uncountable.
