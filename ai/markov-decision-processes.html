@@ -176,11 +176,43 @@ $$Q(s,a) + \frac{k}{N(s,a)}$$
 <p>
     The general psuedocode is
     <code class="code-block">
-        todo
+    Game game; <br/>
+    List&lt;Feature&gt; features; <br/>
+    float alpha; <br/>
+    float gamma; <br/>
+     <br/>
+    float Q(s, a) { <br/>
+    &emsp;float rtn = 0; <br/>
+    &emsp;for (i = 0; i < weights.length; ++i) { <br/>
+    &emsp;&emsp;rtn += weights[i]*features[i](s, a) <br/>
+    &emsp;} <br/>
+    &emsp;return rtn; <br/>
+    } <br/>
+     <br/>
+    while (game.alive()) {<br/>
+    &emsp;weights = [0] * features.length; <br/>
+    &emsp;s = game.state; <br/>
+    &emsp;a = <span style="color: red;">choose_move</span>(game); <br/>
+    &emsp;reward, s' = game.do(act); <br/>
+    &emsp;actions = game.get_actions() <br/>
+    &emsp;max_val = -1e300; <br/>
+    &emsp;for (a' in actions) { <br/>
+    &emsp;&emsp;val = Q(s', a') <br/>
+    &emsp;&emsp;if (val > max_val) <br/>
+    &emsp;&emsp;&emsp;max_val = val; <br/>
+    &emsp;} <br/>
+    &emsp;diff = reward + gamma * max_val - Q(s, a) <br/>
+    &emsp;for (i = 0; i < weights.length; ++i) { <br/>
+    &emsp;&emsp;weights[i] += alpha * diff * features[i](s, a); <br/>
+    &emsp;} <br/>
+    }
     </code>
 </p>
 <p>
-    It may seem perverse that we are using our "evaluation function" to predict itself. Indeed, it naively seems like just letting all the weights be 0 accomplishes this. However, the key is that you aren't <em>just</em> predicting your evaluation, you're also predicting the reward from taking the step: reqall that the expression is not just $V(s)$, it's $R(s,a,s') + \gamma V(s')$
+    In English, we perform moves and update our weights each time. In this way, our weights (and hence our Q's) become a bit better each time. We choose our moves in a way similar to vanilla Q-learning.
+</p>
+<p>
+    It may seem perverse that we are using our "evaluation function" to predict itself. Indeed, it naively seems like just letting all the weights be 0 accomplishes this. However, the key is that you aren't <em>just</em> predicting your evaluation, you're also predicting the reward from taking the step: reqall that the expression is not just $V(s)$, it's $R(s,a,s') + \gamma V(s')$. This reward anchors the weights to reality.
 </p>
 <h2>Online Learning</h2>
 <p>
