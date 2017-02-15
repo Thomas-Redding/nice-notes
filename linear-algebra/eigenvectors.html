@@ -12,6 +12,11 @@ MathJax.Hub.Config({
 </script>
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
+<script>
+window.onload = function() {
+	
+}
+</script>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -29,7 +34,15 @@ MathJax.Hub.Config({
 <figcaption>Blue is an eigenvector.  Red is not, because it changes directions.</figcaption>
 </figure>
 <h2>As A Basis</h2>
-...
+<p>
+	Let $\vec{v_1}, \vec{v_2}, ..., \vec{v_n}$ be the eigenvectors and $\lambda_1, \lambda_2, ..., \lambda_n$ be the eigenvalues of a $n \times n$ matrix $A$.
+
+	...
+
+	\[ A = VDV^{-1} \]
+
+	...
+</p>
 <h2>Iteration</h2>
 <p>
     Eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$.
@@ -38,6 +51,18 @@ MathJax.Hub.Config({
 	<img src="iterated_eigenvector.gif"/>
 	<figcaption>Applying a linear transformation to a set of points; the points converge to one of the eigenvectors</figcaption>
 </figure>
+
+<p>
+Below is a demo that lets you choose any (real) eigenvector and any (positive) eigenvalue and see what the resulting linear transformation is.  Here are some things to notice:
+<ul>
+	<li>The image of a unit circle is an ellipse centered at (0, 0)</li>
+	<li>The area of the ellipse equals the product of the eigenvalues</li>
+	<li>The vector with the bigger eigenvalue is the most important for determining how the image looks</li>
+</ul>
+</p>
+
+<iframe src="eigen_demo.html" width="400px" height="400px" style="padding:0; margin:0; overflow: hidden; border: solid 1px;"></iframe>
+
 <h3>Imaginary Eigenvectors</h3>
 <p>
 	This leads to a curious phenmenon where the eigenvector of a real matrix can be imaginary.  This means that $A^n \vec{v}$ is always real, so what does a complex eigenvector imply for its long-term behavior?
