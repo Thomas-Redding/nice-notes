@@ -80,7 +80,7 @@ MathJax.Hub.Config({
     &emsp;&emsp;s = game.current_state; <br/>
     &emsp;&emsp;a = policy[s]; <br/>
     &emsp;&emsp;reward, s' = game.do(a); <br/>
-    &emsp;&emsp;V[s] += alpha * (reward + gamma * V[s'] - V[s]); <br/>
+    &emsp;&emsp;V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); <br/>
     &emsp;} <br/>
     &emsp;return V; <br/>
     }
@@ -89,21 +89,14 @@ MathJax.Hub.Config({
     So, basically we just choose the action the policy dictates and then update our estimate for <code>V[s]</code> - otherwise known as $V^\pi(s)$. We just have to talk about why the given formula works.
 </p>
 <code class="code-block">
-V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]); 
+V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); 
 </code>
 <p>
-    Imagine, for now that <code>alpha=1</code>. In this case, the formula simplifies to
-    <code class="code-block">V[s] = V[s] + reward + gamma * V[s'] - V[s]</code>
-    which equals
-    <code class="code-block">V[s] = reward + gamma * V[s']</code>
-    So, when <code>alpha=1</code>, we basically just make our new estimate of $V^\pi(s)$ equal to a simple estimate of the value we'll get this specific time. This is very similar to the value iteration method.
-</p>
-<p>
-    If, on the other hand, <code>alpha≠1</code>, then we have:
-    <code class="code-block"> V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]); </code>
-    which expands to
-    <code class="code-block"> V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); </code>
-    All this does is smooth our estimates out, so that we're not throwing away all the previous information we found out before.
+    We want to argue that our algorithm causes <code>V[s]</code> to converge to $V^\pi(s)$ in the long-run. Recall that
+
+    $$V^\pi(s)=\sum_{s'}{T(s,\pi(s),s')(R(s,\pi(s),s')+\gamma V^\pi(s'))}$$
+
+    Hence, $V^\pi(s)$ is just an average of $R(s,\pi(s),s')+\gamma V^\pi(s')$ weighted by $T(s,\pi(s),s')$. You should be able to convince yourself that for a small enough <code>alpha</code>, the algorithm will converge correctly.
 </p>
 <h2>Q-Learning</h2>
 <p>
@@ -132,7 +125,7 @@ V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]);
     &emsp;&emsp;Action a = <span style="color: red">select_action</span>(s, actions, Q, N); <br/>
     &emsp;&emsp;++N[s, a]; <br/>
     &emsp;&emsp;(float, state) (reward, s') = game.do(a); <br/>
-    &emsp;&emsp;Q[s,a]+=alpha*(reward+gamma*max_q(game, Q, s')-Q[s,a])<br/>
+    &emsp;&emsp;Q[s,a]=(1-alpha)*Q[s,a]+alpha*(reward+gamma*max_q(game, Q, s'))<br/>
     &emsp;}
     <br/>
     } <br/>
@@ -156,16 +149,11 @@ V[s] = V[s] + alpha * (reward + gamma * V[s'] - V[s]);
 <p>
     The key is the line
     <code class="code-block">
-        Q[s,a]+=alpha*(reward+gamma*max_q(game, Q, s')-Q[s,a])
+        Q[s,a]=(1-alpha)*Q[s,a]+alpha*(reward+gamma*max_q(game, Q, s'))
     </code>
-    Like for TD-learning, let's let <code>alpha=1</code> to get
-    <code class="code-block">
-        Q[s,a] = reward+gamma*max_q(game, Q, s')
-    </code>
-    Note that <code>reward+gamma*max_q(game, Q, s')</code> is simply a guess of how much utility we'll achieve from here on out, so as with TD-learning, when <code>alpha=1</code>, we simply update our estimate for <code>Q[s,a]</code> with our new estimate at this time.
 </p>
 <p>
-    As with TD-learning, when we choose some other value for <code>alpha</code>, this causes smoothing. This is important for Q-learning, because actions don't always result in the same next-state, so we need some smoothing to make this algorithm work well.
+    As with TD-learning, <code>alpha</code> causes our estimate to behave more smoothly over time. This is important for Q-learning, because actions don't always result in the same next-state, so we need some smoothing to make this algorithm remember past results and work well.
 </p>
 <h3>Other Exploration Functions</h3>
 <p>
@@ -184,6 +172,15 @@ $$Q(s,a) + \frac{k}{N(s,a)}$$
 <p>
     If we have a very large number of state-action pairs, then regular Q-learning will converge very slowly. In this case, it is often better to use <em>approximate Q-learning</em>. Using this method, the programmer extracts features from the state-action pairs. Next, we assume that the value of taking an action, $a$, in a state, $s$, is a linear combination of these features, $f$, with weights $w$:
     $$Q(s,a) = \sum_i^n{w_i \cdot f_i(s,a)}$$
+</p>
+<p>
+    The general psuedocode is
+    <code class="code-block">
+        todo
+    </code>
+</p>
+<p>
+    It may seem perverse that we are using our "evaluation function" to predict itself. Indeed, it naively seems like just letting all the weights be 0 accomplishes this. However, the key is that you aren't <em>just</em> predicting your evaluation, you're also predicting the reward from taking the step: reqall that the expression is not just $V(s)$, it's $R(s,a,s') + \gamma V(s')$
 </p>
 <h2>Online Learning</h2>
 <p>
