@@ -1,0 +1,27 @@
+
+
+FORMULA
+valid = true in all interpretations
+satisfiable = there exists interpretations in which it is true
+unsatisfiable = there do not exist any interpretations in which it is true
+world = an interpration (assignment of T or F to variables)
+sentence = a formula with no free variables
+theorem = a sentence derived from an axiom
+
+
+LOGIC
+sound = every proposition that is provable is true
+complete = every proposition that is true is provable
+decidable = an effective procedure exists to determine the truth-value of any statement
+monotonic = if we add more sentences,, old inferences are still valid
+
+
+
+
+
+
+
+
+
+
+

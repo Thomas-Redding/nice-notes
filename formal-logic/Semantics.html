@@ -1,0 +1,35 @@
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Semantics</h1>
+<h2>Interpretation</h2>
+Interpretation is the assignment of meaning to well-formed formulas. In the context of propositional and predicate logic, an interpretation is a function that provides an extension of strings of an object language. An interpretation often provides a way to determine the truth values of a well-formed formula in a language. In this case, the formula is called a <b>sentence</b>. If interpretation I assigns "true" to sentence S, then I is a <b>model</b> of S.
+<br><br>
+The <b>logical form</b> of a sentence is taken by abstracting some of its components, essentially by considering only syntax. For instance,
+<h2>The Alphabet</h2>
+The alphabet consists of <b>logical constants</b>, <b>non-logical constants</b> and <b>variables</b>. A logical constant is a symbol with the same semantic value under every interpretation. In predicate logic, they include logical connectives, quantifiers, and often equality. Non-logical constants are symbols assigned meaning by an interpretation. In predicate logic, they include predicates and <b>individual constants</b>, which must be interpreted as specific, individual things. A variable doesn't isn't interpreted as a specific, individual thing. In predicate logic, this includes any symbol preceded by a quantifier.
+<h2>Validity and Soundness</h2>
+It is an unfortunate consequence of not being perfect, that we often mistake certain sequences of well-formed formulas for proofs even when they are not. Such an argument is <b>valid</b> if the final theorem follows from the premises. An argument is <b>sound</b> if
+<ol>
+<li>it is valid</li>
+<li>the axioms are true</li>
+</ol>
+A single well-formed formula (as opposed to a sequence of them) is considered <b>valid</b> if it is true in every interpretation. One might think that no formula can exist that is true in literally every interpretation, but this idea turns out to be wrong. A simple counter example in propositional logic is (A&or;&not;A). On a related note a well-formed formula is <b>satisfiable</b> if there exists at least one interpretation in which it is true.
+<br><br>
+Remember that "P&#8866;Q" means that if we assume P we can use some axioms and rules of replacement to obtain Q. A similar but very different statement is "P&#8872;Q". This means that if P is true, then Q must be true. It is common practice when talking about a formal system to omit the axioms and rules of inference when they are used in these kinds of statements. Thus "&#8866;P" means that P is provable from the axioms and rules of inference, and "&#8872;P" means that P is true whenever the axioms are true.
+<br><br>
+Now, it would be really nice is (&#8866;P)&hArr;(&#8872;P). This statement breaks down into two parts:
+<ol>
+<li><b>Sound:</b> (&#8866;P)&rArr;(&#8872;P)</li>
+<li><b>Complete:</b> (&#8872;P)&rArr;(&#8866;P)</li>
+</ol>
+As a sidenote, a system is <b>consistent</b> if it lacks a contradiction.
+<br><br><center>&forall;P &not;(P &and; &not;P)</center><br>
+Now, this says nothing about whether the system can prove whether P is true or false in the first place. The claim is just that <i>if</i> we can prove P, then we can't prove &not;P.
+</main>
+</body>
+</html>

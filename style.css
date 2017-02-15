@@ -1,14 +1,47 @@
-@font-face {
+/*@font-face {
     font-family: cmunrm;
     src: url('cmunrm.ttf');
+}
+*/
+
+body {
+    font-family: serif;
 }
 
 main {
     width: 95%;
     max-width: 34em;
     margin: 0 auto;
-    font-family: serif;
 }
+
+
+
+
+
+/* http://www.2ality.com/2012/01/numbering-headingshtml.html */
+
+body, h1 {
+    counter-reset: h2counter h3counter;
+}
+
+h2:before {
+    content: counter(h2counter) "\0000a0\0000a0";
+    counter-increment: h2counter;
+    counter-reset: h3counter;
+}
+
+h3:before {
+    content: counter(h2counter) "." counter(h3counter) "\0000a0\0000a0";
+    counter-increment: h3counter;
+}
+
+h1, h2, h3 {
+    color: hsl(0, 0%, 25%);
+}
+
+
+
+
 
 /* http://stackoverflow.com/questions/1632005/ordered-list-html-lower-alpha-with-right-parentheses */
 
@@ -26,21 +59,9 @@ ol > li:before {
     counter-increment: list;
 }
 
-/* http://www.2ality.com/2012/01/numbering-headingshtml.html */
 
-body, h1 {
-    counter-reset: h2counter h3counter;
-}
-h2:before {
-    content: counter(h2counter) "\0000a0\0000a0";
-    counter-increment: h2counter;
-    counter-reset: h3counter;
-}
 
-h3:before {
-    content: counter(h2counter) "." counter(h3counter) "\0000a0\0000a0";
-    counter-increment: h3counter;
-}
+
 
 .code-block {
     background-color: hsl(0, 0%, 90%);
@@ -69,4 +90,12 @@ img {
 figcaption {
     text-align: center;
     margin: 1em auto;
+}
+
+a {
+    color: hsl(240, 100%, 50%);
+}
+
+a.incomplete {
+    color: red;
 }

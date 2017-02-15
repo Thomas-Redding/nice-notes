@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Data Collection</h1>
+Most of statistics deals with drawing conclusions about a large set of entitites (the <b>population</b>) based on observing a subset (the <b>sample</b>). This is done because it is often very costly (if not impossible) to observe every entity in the population. Next, we take the data recorded from our sample and form a mathematical model that hopefully accurately describes the population using a set of numbers (<b>parameters</b>). Then, we estimate these parameters' values based on our sample. Finally, we infer that the population's parameters are probably close to our estimates.
+<img src="Data Collection.png" style="width:400px">
+For reasons we'll get into later, we usually <a href="Sampling.html">randomly select</a> members such that each member of the population is equally likely to be sampled. Basically, the fact that each person in a population is equally likely to be in our sample lets us prove certain things to justify the conclusions we draw.
+<br><br>
+For instance, let's say there is a lottery to raise money at a local school. They are selling tickets and you would like to know how many tickets have been sold so far, so you know what your chances are of winning. Convienently, you are told that the i<sup>th</sup> ticket sold is given the number $i$. This means we should expect the ticket numbers to follow a <b>uniform distribution</b> with minimum 1 and some unknown maximum. You randomly sample 30 people in the crowd and get data that looks something like this:
+<table>
+<tr><td><b>Name</b></td><td><b>Ticket #</b></td></tr>
+<tr><td>Alice</td><td>47</td></tr>
+<tr><td>Bob</td><td>77</td></tr>
+<tr><td>Carol</td><td>224</td></tr>
+<tr><td>Dan</td><td>166</td></tr>
+<tr><td>...</td><td>...</td></tr>
+</table>
+<br>
+We will use this <a href="ticket dataset.txt">dataset</a> a couple more times.
+<br><br>
+We refer to each row as an "observation" or "case" - each represents a member of our sample, and therefore the population. Each column is referred to as a variable and represents some characteristic each case has.
+<br><br>
+As we mentioned, our model for this population is a uniform distribution:
+$$Unif(1, b)$$
+where $b$ is the unknown parameter (the number of tickets). As we learn more in the future, basically all of statistics boils down to taking the data we have collected and trying to make an educated guess of $b$'s value.
+<hr>
+<dl>
+<dt>population</dt>
+<dd>the set of entities about which you want to learn</dd>
+<dt>sample</dt>
+<dd>a subset of the population which you use to learn about the population</dd>
+<dt>parameters</dt>
+<dd>values describing the population</dd>
+</dl>
+</main>
+</body>
+</html>

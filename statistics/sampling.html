@@ -1,0 +1,62 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Sampling</h1>
+<h3>Why use Randomness?</h3>
+Before we consider why to use randomness in the first place in statistics, we should consider just what randomness is. The essence of randomness if lack of predictability. In other words, a variable is completely random if and only if it is independent of every other variable.
+<br><br>
+Of course, even if we have a truly random variable, we will often find some apparent connection between it and other variables if our sample size is small enough. The point is that as our sample's size approaches infinity, our random variable is found to be unassociated with any other variable.
+<br><br>
+Of course, in real life, some people doubt the existence of truly random variables, but mathematically, it is up to the statistician to provide a variable unassociated with any other variables. This is generally considered trivial: flip a coin, roll a dice, run a random-number generator, etc. We can be reasonably sure that whether this coin flips heads or tails is independent with whether this drug will give you cancer.
+<br><br>
+And this brings us to why we use randomness. We don't want any variable with unknown properties messing with our sample/experiment. We want to be able to know exactly how uncertain we are about the population after learning about the sample. Randomness has the theoretical property of "independent with everything" that gives us solid theoretical (and practical) footing to pursue statistical inquery.
+<h3>Types of Sampling</h3>
+<div class="grey">
+<table>
+<tr><td colspan=2><b><u>Simple Random Sampling With Replacement</u></b></td></tr>
+<tr><td><b>Description</b></td><td>Randomly select one individual from the population. Repeat.</td></tr>
+<tr><td><b>Example</b></td><td>Shuffle the deck. Draw a card. Return the card. Repeat.</td></tr>
+</table>
+</div>
+<br><br>
+<div class="grey">
+<table>
+<tr><td colspan=2><b><u>Simple Random Sampling Without Replacement</u></b></td></tr>
+<tr><td><b>Description</b></td><td>Randomly select one individual from the proportion of the population who has not yet been selected.</td></tr>
+<tr><td><b>Example</b></td><td>Shuffle the deck. Draw a card. Do <u>not</u> return it. Repeat.</td></tr>
+</table>
+</div>
+<br><br>
+<div class="grey">
+<table>
+<tr><td colspan=2><b><u>Stratified Random Sampling</u></b></td></tr>
+<tr><td><b>Description</b></td><td>Divide the population into non-overlapping subsets. Randomly take a simple random sample of each subset.</td></tr>
+<tr><td><b>Example</b></td><td>Divide the deck into the 4 suits. Conduct a simple random sample of each suit.</td></tr>
+</table>
+</div>
+<br><br>
+<div class="grey">
+<table>
+<tr><td colspan=2><b><u>Random Cluster Sampling</u></b></td></tr>
+<tr><td><b>Description</b></td><td>Divide the population into non-overlapping subsets. Randomly select a group of these subsets. Complete a census of each subset in this group.</td></tr>
+<tr><td><b>Example</b></td><td>Divide the deck into the 4 suits. Conduct a simple random sample of each suit.</td></tr>
+</table>
+</div>
+</main>
+</body>
+</html>

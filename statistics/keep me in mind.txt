@@ -1,0 +1,7 @@
+1. very concrete example
+2. general ideas
+3. example
+4. generalization/formalization
+5. assumptions
+6. proof (optional)
+

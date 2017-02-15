@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Mean Square Error</h1>
+<div class="grey">
+<ol>
+</ol>
+</div>
+<h3 id="General Idea">General Idea</h3>
+So, we're looking for some way to determine which of a set of estimators is the "best". While their is no objective way to measure this "goodness" ("goodness" being inherently subjective), there is a commonly accepted one: <b>mean square error</b>.
+
+$$MSE=E\left[\left(\hat{\theta}-\theta\right)^2\right]$$
+
+The principle behind mean square error is that how "bad" an estimate of something is is proportional to the square of its distance from the actual value. That is, if some parameter is 10 and I estimate its 6, this is four times worse than estimating that its value is 8. Why square? Why not the absolute value of the difference? Basically, because its easier to work with mathematically.
+<br><br>
+We'll leave this as an exercise for the reader, but it turns out that we can prove
+
+$$MSE=Var\left[\hat{\theta}\right]+Bias\left(\hat{\theta},\theta\right)^2$$
+
+<h3>Continuous Uniform Distribution</h3>
+This <a href="Efficiency.html#Example: Uniform Distribution">brings us back</a> to the continuous uniform distribution from 0 to $b$. We have three estimators, each with a known variance and bias. Using this knowledge and the definition and what we know about mean-square error, we can compute the mean-square error of each estimator:
+
+<table>
+<tr><td><b>Estimator</b></td><td><b>Bias</b></td><td><b>Variance</b></td><td><b>MSE</b></td></tr>
+<tr><td>$m$</td><td>$\frac{-b}{n+1}$</td><td>$\frac{nb^2}{(n+1)^2(n+2)}$</td><td>$\frac{2b^2}{(n+1)(n+2)}$</td></tr>
+<tr><td>$2\bar{x}$</td><td>0</td><td>$\frac{b^2}{12n}$</td><td>$\frac{b^2}{12n}$</td></tr>
+<tr><td>$\frac{n+1}{n}m$</td><td>0</td><td>$\frac{b^2}{n(n+2)}$</td><td>$\frac{b^2}{n(n+2)}$</td></tr>
+</table>
+
+In order to compare the mean-square errors, we will divide each by $b^2$:
+
+<table>
+<tr><td><b>Estimator</b></td><td><b>MSE</b></td></tr>
+<tr><td>$m$</td><td>$\frac{2}{(n+1)(n+2)}$</td></tr>
+<tr><td>$2\bar{x}$</td><td>$\frac{1}{12n}$</td></tr>
+<tr><td>$\frac{n+1}{n}m$</td><td>$\frac{1}{n(n+2)}$</td></tr>
+</table>
+
+If you graph these out, it becomes quite clear that, unless $n$ is very small,
+
+$$\frac{1}{n(n+2)} \leq \frac{2}{(n+1)(n+2)} \leq \frac{1}{12n}$$
+
+Hence, we can conclude that, of these three estimators for $b$, the "best" is $\frac{n+1}{n}m$.
+</main>
+</body>
+</html>

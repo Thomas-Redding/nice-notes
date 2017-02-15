@@ -1,0 +1,368 @@
+<html>
+<head>
+<script>
+var cvs;
+var c;
+var font;
+
+function Start()
+{
+	cvs = document.getElementById("cvs");
+	c = cvs.getContext("2d");
+	font = new Font();
+
+	font.setFont("Times New Roman");
+	font.setSize(40);
+	font.setEmphasis("Bold");		// "bold", "italic", or ""
+
+	c.globalAlpha = 0.5;
+
+	setFillColor(255, 0, 0);
+	drawCircle(190, 200, 180, true);
+	setFillColor(0, 255, 0);
+	drawCircle(690, 200, 100, true);
+	setFillColor(0, 0, 255);
+	drawBox(620, 620, 140, 140, 10, true);
+	setFillColor(255, 0, 255);
+	drawBox(90, 620, 200, 140, 10, true);
+	
+	var i, x, y;
+	var arr = new Array(10);
+	for(i=0; i<arr.length; i+=2) {
+		x = 2*Math.random()-1;
+		y = 2*Math.random()-1;
+		arr[i] = x;
+		arr[i+1] = y;
+		if(x*x+y*y > 0.9) {
+			i -= 2;
+		}
+		else if(Math.abs(y) < 0.4) {
+			i -= 2;
+		}
+	}
+
+	setFillColor(255, 255, 0);
+	for(i=0; i<arr.length; i+=2) {
+		drawCircle(arr[i]*180+190, arr[i+1]*180+200, 10, true);
+	}
+
+	c.globalAlpha = 1;
+	c.lineWidth = 2;
+	setFillColor(0, 0, 0);
+	for(i=0; i<arr.length; i+=2) {
+		r = 180*Math.random();
+		theta = 2*Math.PI*Math.random();
+		x = Math.cos(theta) * r;
+		y = Math.sin(theta) * r;
+		drawArrow(180*arr[i]+190, 180*arr[i+1]+200, arr[i]*100+690, arr[i+1]*100+200, 4);
+	}
+
+	setFillColor(0, 255, 255);
+	setStrokeColor(0, 255, 255);
+	c.lineWidth = 50;
+	drawArrow(380, 200, 580, 200, 30);
+	drawArrow(690, 310, 690, 610, 30);
+	drawArrow(610, 690, 300, 690, 30);
+
+	// setFillColor(255, 255, 255);
+	setFillColor(0, 0, 0);
+	drawLabel("sampling", 470, 200);
+	drawLabel("modeling", 690, 450, Math.PI/2);
+	drawLabel("infering", 470, 690);
+	drawLabel("stats", 690, 690);
+	drawLabel("parameters", 190, 690);
+	drawLabel("Population", 190, 200);
+	drawLabel("Sample", 690, 200);
+
+	setStrokeColor(0, 0, 0);
+	drawArrow(190, 500, 190, 610, 30);
+	drawArrow(190, 500, 190, 390, 30);
+	setFillColor(255, 255, 255);
+	drawLabel("morphism", 190, 500, Math.PI/2);
+}
+
+/*
+every function starts with "draw" or "set"
+*/
+
+function drawBox(x, y, w, h, r, filled) {
+	var cX, cY, i;
+	c.beginPath();
+	c.moveTo(x, y+r);
+	cX = x+r;
+	cY = y+r;
+	for(i=Math.PI; i<3*Math.PI/2; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+w-r, y);
+	cX = x+w-r;
+	cY = y+r;
+	for(i=3*Math.PI/2; i<2*Math.PI; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+w, y+h-r);
+	cX = x+w-r;
+	cY = y+h-r;
+	for(i=0; i<Math.PI/2; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x+r, y+h);
+	cX = x+r;
+	cY = y+h-r;
+	for(i=Math.PI/2; i<Math.PI; i+=0.1) {
+		c.lineTo(Math.cos(i)*r+cX, Math.sin(i)*r+cY);
+	}
+	c.lineTo(x, y+r)
+	if(filled) {
+		c.fill();
+	}
+	else {
+		c.stroke();
+	}
+}
+
+function setFillColor(r, g, b) {
+	c.fillStyle = "rgb("+r+","+g+","+b+")";
+}
+
+function setStrokeColor(r, g, b) {
+	c.strokeStyle = "rgb("+r+","+g+","+b+")";
+}
+
+function drawGrid(stepSize) {
+	c.beginPath();
+	for(var i=0; i<cvs.width; i += stepSize) {
+		c.moveTo(i, 0);
+		c.lineTo(i, cvs.height);
+	}
+	for(var i=0; i<cvs.height; i += stepSize) {
+		c.moveTo(0, i);
+		c.lineTo(cvs.width, i);
+	}
+	c.stroke();
+}
+
+// draws str centered at (x,y) with an optional angle (radians)
+function drawLabel(str, x, y, angle) {
+	if(angle == undefined || angle == 0) {
+		c.fillText(str, x-c.measureText(str).width/2, y+font.size/4);
+	}
+	else {
+		c.translate(x,y);
+		c.rotate(angle);
+		c.fillText(str,-0.5*c.measureText(str).width,font.size/4);
+		c.rotate(-1*angle);
+		c.translate(-1*x,-1*y);
+	}
+}
+
+function drawCircle(x, y, radius, fill) {
+	c.beginPath();
+	c.arc(x,y,radius,0,2*Math.PI);
+	if(!fill)
+	{
+		c.stroke();
+	}
+	else
+	{
+		c.fill();
+	}
+}
+
+function drawCurlyBracket(x, y, width, height, radius, angle) {
+	var aX = height;
+	var aY = -1*width/2;
+	var bX = height/2;
+	var bY = -1*width/2;
+	var cX = height/2;
+	var cY = -1*width/4;
+	var dX = height/2;
+	var dY = 0;
+	var eX = 0;
+	var eY = 0;
+	var fX = height/2;
+	var fY = width/4;
+	var gX = height/2;
+	var gY = width/2;
+	var hX = height;
+	var hY = width/2;
+
+	c.translate(x,y);
+	c.rotate(angle);
+	drawCorner(aX,bY,bX,bY,cX,cY,radius);
+	drawCorner(cX,cY,dX,dY,eX,eY,radius);
+	drawCorner(fX,fY,dX,dY,eX,eY,radius);
+	drawCorner(fX,fY,gX,gY,hX,hY,radius);
+	c.rotate(-1*angle);
+	c.translate(-1*x,-1*y);
+}
+
+function drawLine(x1, y1, x2, y2) {
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2,y2);
+	c.stroke();
+}
+
+function drawLabeledLine(str, x1, y1, x2, y2, isAbove, isMirror) {
+	var theta = Math.atan(0.25);
+	if(isMirror) {
+		theta += Math.PI;
+	}
+	var midX = (x2+x1)/2;
+	var midY = (y2+y1)/2;
+	var perpX = y1-y2;
+	var perpY = x1-x2;
+	var perpLen = Math.sqrt(perpX*perpX + perpY*perpY);
+	perpX /= perpLen;
+	perpY /= perpLen;
+	perpX *= font.size/2;
+	perpY *= font.size/2;
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2,y2);
+	c.stroke();
+
+	if(isAbove == undefined || isAbove) {
+		drawLabel(str, midX-perpX, midY+perpY, theta);
+	}
+	else {
+		drawLabel(str, midX+perpX, midY-perpY, theta);
+	}
+}
+
+// draws a box with rounded corners and rotated around its center
+function drawAdvancedBox(x, y, width, height, radius, rotation) {
+	c.translate(x,y);
+	c.rotate(rotation);
+	drawCorner(width/-2,0,width/-2,height/-2,0,height/-2,radius);
+	drawCorner(width/-2,0,width/-2,height/2,0,height/2,radius);
+	drawCorner(width/2,0,width/2,height/2,0,height/2,radius);
+	drawCorner(width/2,0,width/2,height/-2,0,height/-2,radius);
+	c.rotate(-1*rotation);
+	c.translate(-1*x,-1*y);
+}
+
+// draws a rounded corner
+function drawCorner(x1, y1, x2, y2, x3, y3, radius) {
+	if(!radius)
+	{
+		radius = 0;
+	}
+	var vectorAngle = Math.acos(((x1-x2)*(x3-x2)+(y1-y2)*(y3-y2))/Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))/Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2)));
+	var angle = (Math.PI-vectorAngle)/2;
+	if((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)<radius*radius)
+	{
+		radius = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+	}
+	if((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2)<radius*radius)
+	{
+		radius = Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2))
+	}
+	c.beginPath();
+	c.moveTo(x1,y1);
+	var t = 1-Math.tan(angle)*radius/Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+	var Ax = (x2-x1)*t+x1;
+	var Ay = (y2-y1)*t+y1
+	c.lineTo(Ax,Ay);
+	c.moveTo(x3,y3);
+	t = 1-Math.tan(angle)*radius/Math.sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2));
+	var Bx = (x2-x3)*t+x3;
+	var By = (y2-y3)*t+y3;
+	c.lineTo(Bx,By);
+	c.stroke();
+	t = ((x3-x2)*(Ax-Bx) - (Ay-By)*(y2-y3))/((x1-x2)*(y2-y3) - (x3-x2)*(y2-y1));
+	var xc = (y2-y1)*t+Ax;
+	var yc = (x1-x2)*t+Ay;
+	var bisVectX = xc-x2;
+	var bisVectY = yc-y2;	
+	c.strokeStyle = "black";
+	c.beginPath();
+	var q;
+	if(bisVectX==0 && bisVectY==0)
+	{
+		q = false;
+	}
+	if(bisVectX>=0)
+	{
+		q = Math.atan(bisVectY/bisVectX);
+	}
+	else if(bisVectY>0)
+	{
+		q = Math.PI+Math.atan(bisVectY/bisVectX);
+	}
+	else
+	{
+		q = Math.atan(bisVectY/bisVectX)-Math.PI;
+	}
+	q += Math.PI;
+	c.arc(xc,yc,radius,q-angle,q+angle,false);
+	c.stroke();
+}
+
+function drawArrow(x1, y1, x2, y2, scale) {
+	var deltaX = x2-x1;
+	var deltaY = y2-y1;
+	var oldLen = Math.sqrt(deltaX*deltaX+deltaY*deltaY);
+	var angle = 0.523598776;
+	deltaX *= scale/oldLen*3;
+	deltaY *= scale/oldLen*3;
+
+	// draw head
+	c.beginPath();
+	c.moveTo(x2,y2);
+	c.lineTo(x2-Math.sin(angle)*deltaY-Math.cos(angle)*deltaX,y2+Math.sin(angle)*deltaX-Math.cos(angle)*deltaY);
+	c.lineTo(x2+Math.sin(angle)*deltaY-Math.cos(angle)*deltaX,y2-Math.sin(angle)*deltaX-Math.cos(angle)*deltaY);
+	c.fill();
+
+	// draw line
+	c.beginPath();
+	c.moveTo(x1,y1);
+	c.lineTo(x2 - Math.cos(angle)*deltaX,y2 - Math.cos(angle)*deltaY);
+	c.stroke();
+}
+
+function Font() {
+	this.emphasis = "";
+	this.size = 30;
+	this.font = "Arial";
+
+	this.setEmphasis = function(newEmphasis) {
+		this.emphasis = newEmphasis;
+		c.font = this.toString();
+	}
+
+	this.setSize = function(newSize) {
+		this.size = newSize;
+		c.font = this.toString();
+	}
+
+	this.setFont = function(newFont) {
+		this.font = newFont;
+		c.font = this.toString();
+	}
+
+	this.toString = function() {
+		var str = "";
+		if(this.emphasis == "") {
+			str += "lighter ";
+		}
+		else {
+			str += this.emphasis + " ";
+		}
+		str += this.size + "px ";
+		str += this.font;
+		return str;
+	}
+
+	c.font = this.toString();
+}
+
+
+</script>
+</head>
+<body onload="Start();">
+<canvas id="cvs" width=800 height=800 style="border:solid;border-width:1px;">
+</canvas>
+</body>
+</html>

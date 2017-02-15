@@ -1,0 +1,90 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>First Order Logic</h1>
+First order logic consists of a set of legal strings of symbols, partitioned into two disjoint sets: formulas and <b>terms</b>.
+<h2>Logical Symbols</h2>
+The usual logical symbols in first order logic are:
+<ul>
+<li>quantifiers: $\exists$, $\forall$</li>
+<li>logical connectives: $\neg$, $\wedge$, $\vee$, $\Rightarrow$, and $\Leftrightarrow$</li>
+<li>infinite set of variables: $\left\{x_0, x_1, x_2, ...\right\}$</li>
+<li>parantheses: $($, $)$</li>
+<li>equality: $=$</li>
+</ul>
+It turns out that we can give up one of the quantifiers, $\vee$, $\Rightarrow$, and $\Leftrightarrow$
+<h2>Non-Logical Symbols</h2>
+Non-logical symbosl are defined via the system's signature. The traditional approach is to have one, infinite set of non-logical symbols for all applications, however contemporary mathematical logic has relaxed this idea and lets the signature vary by algebra.
+<br><br>
+In first-order logic, every non-logical symbol is one of the following types:
+<ol>
+<li>A predicate symbol with some arity&ge;0.</li>
+<ul>
+<li>Propositional Variables (arity = 0) - these are true or false</li>
+<li>Predicate Variables (arity &ne; 1) - these take terms and return true or false</li>
+</ul>
+<li>a function symbol with some arity&ge;0</li>
+<ul>
+<li>constant symbols (arity = 0) - these stand for specific terms</li>
+<li>function symbols (arity&ge;1) - these take terms and return terms</li>
+</ul>
+</ol>
+<h2>Formation Rules</h2>
+The formation rules of first-order logic are usually <b>context-free</b>, meaning that each rule takes the form
+$$V \rightarrow w$$
+where $V$ is a single nontermainal symbol and w is a string of symbols, which can be either terminal or nonterminal ($w$ can also be empty).
+<h2>Terms</h2>
+Terms are defined inductively
+<ol>
+<li>any variable is a term</li>
+<li>any expression $f\left(t_1,...t_n\right)$ (where $f$ is a function of arity $n$ adn each argument $t_i$ is a term) is a term.
+</ol>
+<h2>Well-Formed Formulas</h2>
+The set of well-formed formulas (wff) is defined inductively as
+<ol>
+<li>For any predicate symbol, $P$, with arity $n$ and for any set of terms $t_1,...t_n$, $P\left(t_1,...t_n\right)$ is a wff.</li>
+<li>For any terms $t_1$ and $t_2$, $t_1=t_2$ is a wff</li>
+<li>For any wff $\phi$, $\neg \phi$ is a wff.</li>
+<li>For any wffs $\phi$ and $\psi$, $\phi \Rightarrow \psi$ is a wff. Similarly for the other binary logical connectives</li>
+<li>If $\phi$ is a wff and $x$ is a variable, then $\forall x \rho$ and $\exists x \rho$ are both wff
+</ol>
+Well-formed formulas obtained only through rules #1 and #2 are considered atomic formulas. Because of the use of parantehses, first-order logic's set of formulas have <b>unique readability</b>, meaning that any formula can be obtained in one and only one way via the inductive definition.
+<h2>Free and Bound Variables</h2>
+A variable is considered <b>free</b> if it is not attached to a quantifier; otherwise, it is considered <b>bound</b>. For instance in
+$$\forall x P\left(x,y\right)$$
+$x$ is free and $y$ is bound.
+<br><br>
+More formally, free and bound variables are defined inductively:
+<ol>
+<li>If $\phi$ is an atomic formula, then $x$ is free if and only if $x$ occurs in $\phi$. There are no bound variables in any atomic formula.</li>
+<li>$x$ is free in $\neg \phi$ if and only if $x$ is free in $phi$. Likewise for if $x$ is bound.</li>
+<li>$x$ is free in $\phi \rightarrow \psi$ if and only if $x$ is free in either $\phi$ or $\psi$. Likewise for bound and likewise for other binary connectives.</li>
+<li>$x$ is free in $\forall y \phi$ if and only if $x$ is free in $\phi$ and $x$ is a different symbol from $y$. Likewise for bound variales and with $\exists$.</li>
+</ol>
+A well-formed formula in first-order logic with no free variables is called a <b>first-order sentence</b>. This is equal to the set of all well-formed formulas with truth values under an interpretation.
+<h2>Semantics</h2>
+An interpretaiton of a first-order language
+<ol>
+<li>determines the <b>domain of discourse</b> (the universe the quantifiers quantify over)</li>
+<li>assign a meaning to each non-logical constant</li>
+<li>assigns each sentence a truth value</li>
+</ol>
+The most common way to specify an interpretation is to specify a model (i.e. mathematical structure) consisting of a domain of discourse (a nonempty set) and an interpretation of the non-logical terms of the signature. The interpretation itself is treated as a function.
+</main>
+</body>
+</html>
