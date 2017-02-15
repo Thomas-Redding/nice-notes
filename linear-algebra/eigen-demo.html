@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Eigenvectors Demo</title>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+}
+div {
+	cursor: default;
+	background-color: white;
+	width: 128px;
+}
+table > * > tr > td {
+	width: 40px;
+}
+table > * > tr {
+	width: 128px;
+}
+table {
+	width: 128px;
+}
+</style>
+<script src="Matrix.js"></script>
+<script>
+
+var V = new Matrix([
+	[1.0, 1.0],
+	[-0.5, 1.0]
+]);
+
+var D = new Matrix([
+	[1.12, 0],
+	[0, 1.41]
+]);
+
+function draw_arrow(c, x, y, dx, dy, head_size, sharpness) {
+	var vx = dx * head_size / Math.sqrt(dx * dx + dy * dy);
+	var vy = dy * head_size / Math.sqrt(dx * dx + dy * dy);
+	var px = -vy / sharpness;
+	var py = vx / sharpness;
+	c.beginPath();
+	c.moveTo(x, y);
+	c.lineTo(x + dx * .96, y + dy * .96);
+	c.stroke();
+	c.moveTo(x + dx, y + dy);
+	c.lineTo(x + dx + px - vx, y + dy + py - vy);
+	c.lineTo(x + dx - px - vx, y + dy - py - vy);
+	c.lineTo(x + dx, y + dy);
+	c.fill();
+}
+
+function fromx(x) {
+	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	return (x - cvs.width / 2) / s;
+}
+function fromy(y) {
+	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	return (y - cvs.height / 2) / -s;
+}
+
+function tox(x) {
+	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	return cvs.width / 2 + x * s;
+}
+function toy(y) {
+	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	return cvs.height / 2 - y * s;
+}
+
+function render_linear_transform(V, D) {	
+
+	cvs.width = 400;
+	cvs.height = 400;
+
+	var A = V.times(D).times(V.inverse());
+
+	matrix_div.innerHTML = "Matrix:" + A.toHTML();
+	eigen_div.innerHTML = `
+	<table>
+		<thead>
+			<tr>
+				<td><b>x</b></td>
+				<td><b>y</b></td>
+				<td><b>value</b></td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>` + V.get(0, 0) + `</td>
+				<td>` + V.get(1, 0) + `</td>
+				<td>` + num2str(D.get(1, 1)) + `</td>
+			</tr>
+			<tr>
+				<td>` + V.get(0, 1) + `</td>
+				<td>` + V.get(1, 1) + `</td>
+				<td>` + num2str(D.get(1, 1)) + `</td>
+			</tr>
+		</tbody>
+	</table>
+	`;
+
+	var n = 256;
+	var from = new Matrix(2, n);
+	for (var i = 0; i < n; ++i) {
+		var theta = Math.PI * 2 * i / n;
+		from.set(0, i, Math.cos(theta));
+		from.set(1, i, Math.sin(theta));
+	}
+
+	var to = A.times(A.times(from));
+
+	var c = cvs.getContext("2d");
+	c.strokeStyle = "red";
+	c.fillStyle = "red";
+	for (var i = 0; i < from.width; i += Math.floor(from.width / 32)) {
+		// for (var i = 0; i < from.width; ++i) {
+		c.beginPath();
+		var x = tox(from.get(0, i));
+		var y = toy(from.get(1, i));
+		x = tox(0);
+		y = toy(0);
+		var dx = tox(to.get(0, i)) - x;
+		var dy = toy(to.get(1, i)) - y;
+		draw_arrow(c, x, y, dx, dy, 5, 1);
+	}
+
+	// draw circle
+	c.strokeStyle = "black";
+	c.beginPath();
+	c.arc(tox(0), toy(0), tox(1) - tox(0), 0, 6.28, false);
+	c.stroke();
+
+	// draw circle
+	c.strokeStyle = "black";
+	c.lineWidth = 3;
+	c.beginPath();
+	c.moveTo(tox(to.get(0, 0)), toy(to.get(1, 0)));
+	for (var i = 1; i < to.width; ++i) {
+		c.lineTo(tox(to.get(0, i)), toy(to.get(1, i)));
+	}
+	c.lineTo(tox(to.get(0, 0)), toy(to.get(1, 0)));
+	c.stroke();
+
+	// draw eigen vectors
+	c.lineWidth = 4;
+	c.strokeStyle = "#0f0";
+	c.fillStyle = "#0f0";
+	draw_arrow(c, tox(0), toy(0), tox(V.get(0, 0)) - tox(0), toy(V.get(1, 0)) - toy(0), 10, 1);
+	draw_arrow(c, tox(0), toy(0), tox(V.get(0, 1)) - tox(0), toy(V.get(1, 1)) - toy(0), 10, 1);
+	c.beginPath();
+	c.arc(tox(0), toy(0), 5, 0, 6.28, false);
+	c.fill();
+}
+
+var dragging = undefined;
+var drag_offset = {"x": 0, "y": 0};
+window.onmousedown = function(e) {
+	var x = e.clientX - 8;
+	var y = e.clientY - 8;
+	var dx = tox(V.get(0, 0)) - x;
+	var dy = toy(V.get(1, 0)) - y;
+	if (Math.sqrt(dx * dx + dy * dy) < 20) {
+		dragging = 0;
+		drag_offset["x"] = dx;
+		drag_offset["y"] = dy;
+		return;
+	}
+
+	dx = tox(V.get(0, 1)) - x;
+	dy = toy(V.get(1, 1)) - y;
+	if (Math.sqrt(dx * dx + dy * dy) < 20) {
+		dragging = 1;
+		drag_offset["x"] = dx;
+		drag_offset["y"] = dy;
+	}
+
+}
+
+window.onmousemove = function(e) {
+	if (dragging == undefined) return;
+
+	if (dragging == 0) {
+		V.set(0, 0, Math.round(fromx(e.clientX - 8 + drag_offset["x"]) * 20) / 20);
+		V.set(1, 0, Math.round(fromy(e.clientY - 8 + drag_offset["y"]) * 20) / 20);
+		D.set(0, 0, Math.round(Math.sqrt(V.column(0).sum_of_squares()) * 20) / 20);
+
+		if (D.get(0, 0) > 1.5) {
+			var s = 1.5 / D.get(0, 0);
+			D.set(0, 0, 1.5);
+			V.set(0, 0, Math.round(V.get(0, 0) * s * 20) / 20);
+			V.set(1, 0, Math.round(V.get(1, 0) * s * 20) / 20);
+		}
+
+		render_linear_transform(V, D);
+	}
+	else if (dragging == 1) {
+		V.set(0, 1, Math.round(fromx(e.clientX - 8 + drag_offset["x"]) * 20) / 20);
+		V.set(1, 1, Math.round(fromy(e.clientY - 8 + drag_offset["y"]) * 20) / 20);
+		D.set(1, 1, Math.round(Math.sqrt(V.column(1).sum_of_squares()) * 20) / 20);
+
+		if (D.get(1, 1) > 1.5) {
+			var s = 1.5 / D.get(1, 1);
+			D.set(1, 1, 1.5);
+			V.set(0, 1, Math.round(V.get(0, 1) * s * 20) / 20);
+			V.set(1, 1, Math.round(V.get(1, 1) * s * 20) / 20);
+		}
+
+		render_linear_transform(V, D);
+	}
+}
+
+window.onmouseup = function(e) {
+	dragging = undefined;
+}
+
+window.onload = function() {
+	render_linear_transform(V, D);
+}
+</script>
+</head>
+<body>
+<canvas id="cvs">
+</canvas>
+<div id="matrix_div" style="position: absolute; left: 0; top: 0;"></div>
+<div id="eigen_div" style="position: absolute; right: 0; top: 0;"></div>
+</body>
+</html>
