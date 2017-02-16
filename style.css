@@ -90,6 +90,7 @@ img {
 figcaption {
     text-align: center;
     margin: 1em auto;
+    font-style: italic;
 }
 
 a {
