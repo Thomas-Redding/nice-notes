@@ -116,12 +116,13 @@ function render_linear_transform(V, D) {
 	c.strokeStyle = "red";
 	c.fillStyle = "red";
 	for (var i = 0; i < from.width; i += Math.floor(from.width / 32)) {
+		var theta = Math.PI * 2 * i / n;
 		// for (var i = 0; i < from.width; ++i) {
 		c.beginPath();
 		var x = tox(from.get(0, i));
 		var y = toy(from.get(1, i));
-		x = tox(0);
-		y = toy(0);
+		x = tox(Math.cos(theta));
+		y = toy(Math.sin(theta));
 		var dx = tox(to.get(0, i)) - x;
 		var dy = toy(to.get(1, i)) - y;
 		draw_arrow(c, x, y, dx, dy, 5, 1);

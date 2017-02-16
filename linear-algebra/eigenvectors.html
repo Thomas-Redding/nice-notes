@@ -35,17 +35,42 @@ window.onload = function() {
 </figure>
 <h2>As A Basis</h2>
 <p>
-	Let $\vec{v_1}, \vec{v_2}, ..., \vec{v_n}$ be the eigenvectors and $\lambda_1, \lambda_2, ..., \lambda_n$ be the eigenvalues of a $n \times n$ matrix $A$.
+	Consider some $n \times n$ matrix $A$.  We can find its $n$ eigenvectors/value pairs and create two matrices: a $n \times n$ matrix $V$ whose columns are the eigenvectors, and a $n \times n$ matrix $D$ that is diagonal, with each entry on the diagonal being an eigenvalue:
 
-	...
+	\[ V = \begin{bmatrix}
+	\vdots & \vdots & \vdots & \vdots \\
+    \vec{v_1}  & \vec{v_2} & \dots & \vec{v_n} \\
+    \vdots & \vdots & \vdots & \vdots
+	\end{bmatrix}
+
+	D = \begin{bmatrix}
+	\lambda_1 & 0 & \dots & 0 \\
+    0 & \lambda_2 & \dots  & 0 \\
+    \vdots & \vdots & \ddots & 0\\
+    0 & 0 & \dots & \lambda_n \\
+	\end{bmatrix}
+	\]
+
+	Because $A\vec{v_1} = \vec{v_1}\lambda_1$, we know $AV = VD$, which can be used to derive the following identity:
 
 	\[ A = VDV^{-1} \]
 
-	...
+	This way of decomposing a matrix into its eigenvectors and eigenvalues helps to capture the relationship between the two.  When you apply $A$ to a vector $x$, what you're "really" doing is
+
+	\[ Ax = VDV^{-1}x \]
+
+	Which is intuitively
+	<ol>
+		<li>Convert from the original basis to the basis formed from the eigenvectors</li>
+		<li>Scale the point in the eigenvector basis</li>
+		<li>Convert back into the original coordinate system</li>
+	</ol>
+
 </p>
+
 <h2>Iteration</h2>
 <p>
-    Eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$.
+	As a result of this change-of-basis-and-scale behavior, eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$.
 </p>
 <figure>
 	<img src="iterated_eigenvector.gif"/>
@@ -61,7 +86,9 @@ Below is a demo that lets you choose any (real) eigenvector and any (positive) e
 </ul>
 </p>
 
-<iframe src="eigen_demo.html" width="400px" height="400px" style="padding:0; margin:0; overflow: hidden; border: solid 1px;"></iframe>
+<br>
+<iframe src="eigen-demo.html" width="400px" height="400px" style="padding:0; margin:0; overflow: hidden; border: solid 1px;"></iframe>
+<br>
 
 <h3>Imaginary Eigenvectors</h3>
 <p>

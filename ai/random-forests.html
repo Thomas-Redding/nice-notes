@@ -17,11 +17,54 @@ MathJax.Hub.Config({
 <body>
 <main>
 <h1>Random Forests</h1>
-<h2>...</h2>
-<h3>...</h3>
+
 <p>
-    ...
+Random Forests are an extremely popular machine learning model, and are commonly cited as the best out-of-the-box algorithm &mdash; that is, if you have very little prior knowledge a priori, a random forest is likely to serve you well.  This is due to their uncanny ability to not overfit, as well as their ability to capture nonlinear relationships.  They can be used for both regression and classification problems.
 </p>
+<p>
+Random Forests are commonly implemented using <a href="baggin.html">bagging</a> and <a href="boosting">boosting</a>.
+</p>
+
+<h2>Ensembles</h2>
+
+<p>
+<a href="decision-trees">Decision trees</a> are extremely powerful machine learning models, capable of representing an enormous array of relationships.  Unfortunately, their great power is their undoing, and they pay for it with a strong propensity towards overfitting, and their low training error can be exceptionally misleading as a predictor of test error.
+</p>
+<p>
+The idea of an ensemble is to aggregate the prediction of a number of models in the hopes that the resulting prediction is better than the individuals' predictions in expectation.
+</p>
+<p>
+	Random forests are a particular kind of ensemble whose constituents are decison trees.  Because decision trees have high variance, using an ensemble is a very natural idea for lowering their variance while (hopefully) maintaining their representational power.
+</p>
+<h2>Training</h2>
+<p>
+    A key idea in ensemble learning is that the constituents should strive to be reasonably independent &mdash; if all your decision trees are the same, you might as well only have one!  A fundamental idea for training a random forest is <b>bagging</b>: every decision tree is trained on a sample of the dataset, rather than the entire dataset.
+</p>
+<p>
+	For example, if you have 100 datapoints in your training set, you might train each decision tree on a random set of 80 points.  This introduces some variety in each tree, while also ensuring each tree has enough points to be reasonably accurate models.
+</p>
+<p>
+    If your training set has $N$ data points, a popular technique is to train each tree on a sample of size $N$ drawn <b>with replacement</b> from the training set.
+</p>
+<p>
+	Another common practice is to restrict which features each decision tree can see.  For example, the first decision tree might only be able to see features 1, 3, and 4, while the second decision tree might only be able to see features 1, 3, and 4.  Using this in conjunction with bagging is a pretty standard implementation:
+</p>
+<pre>
+def train_random_forest(X, number_of_trees):
+    N = length(x)     # size of training set
+    D = length(x[0])  # number of dimensions
+    forest = []    # list of trees that we'll return
+    for i in xrange(number_of_trees):
+        bagged_data = sample_with_replacement(X, N)
+        random_dimensions = sample_with_replacement(range(D), D)
+        t = train_decision_tree(bagged_data, random_dimensions)
+        forest.append(t)
+    return forest
+</pre>
+<h3>Boosting</h3>
+<h2>Missing Data</h2>
+<h2>Feature Importance</h2>
+<br><br><br><br><br><br><br>
 </main>
 </body>
 </html>
