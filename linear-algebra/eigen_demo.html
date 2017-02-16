@@ -6,6 +6,7 @@
 html, body {
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
 }
 div {
 	cursor: default;
@@ -143,7 +144,28 @@ function render_linear_transform(V, D) {
 	c.lineTo(tox(to.get(0, 0)), toy(to.get(1, 0)));
 	c.stroke();
 
+	// draw column vectors
+	c.lineWidth = 2;
+	c.strokeStyle = "#00f";
+	c.fillStyle = "#00f";
+	var dx = tox(A.get(0, 0)) - tox(0);
+	var dy = toy(A.get(1, 0)) - toy(0);
+	var mag = Math.sqrt(dx * dx + dy * dy);
+	dx *= 64 / mag;
+	dy *= 64 / mag;
+	draw_arrow(c, tox(0), toy(0), dx, dy, 5, 1);
+	dx = tox(A.get(0, 1)) - tox(0);
+	dy = toy(A.get(1, 1)) - toy(0);
+	mag = Math.sqrt(dx * dx + dy * dy);
+	dx *= 64 / mag;
+	dy *= 64 / mag;
+	draw_arrow(c, tox(0), toy(0), dx, dy, 5, 1);
+	c.beginPath();
+	c.arc(tox(0), toy(0), 5, 0, 6.28, false);
+	c.fill();
+
 	// draw eigen vectors
+	c.globalAlpha = 1;
 	c.lineWidth = 4;
 	c.strokeStyle = "#0f0";
 	c.fillStyle = "#0f0";

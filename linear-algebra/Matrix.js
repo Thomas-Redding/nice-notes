@@ -187,7 +187,8 @@ class Matrix {
 		for (var y = 0; y < this.height; y++) {
 			rtn += "<tr>"
 			for (var x = 0; x < this.width; x++) {
-				rtn += "<td style='padding:4px'>" + num2str(this.data[i++]) + "</td>";
+				// rtn += "<td style='padding:4px;'>" + num2str(this.data[i++]) + "</td>";
+				rtn += "<td style='padding: 4px;'>" + Math.round(this.data[i++] * 100) / 100 + "</td>"
 			}
 			rtn += "</tr>"
 		}
