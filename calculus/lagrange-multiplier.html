@@ -54,7 +54,7 @@ c.setLineDash([3, 3]);
 c.strokeStyle = "blue";
 c.beginPath();
 var steps = 50;
-for (var z = 0; z < 23; ++z) {
+for (var z = 0; z < 24; z += 2) {
     for (var i = 0; i <= steps; ++i) {
         var t = i/steps;
         var x = Math.sqrt(z)*Math.cos(2*Math.PI*t);
@@ -95,11 +95,49 @@ draw_label(c, "x", w-30, h/2-14);
     It turns out that $\nabla g$ yields a vector perpendicular to $g$ - though why this is the case is beyond the scope of this article. These perpendicular vectors are represented by the red arrows.
 </p>
 <p>
-    Therefore, we need to find points for which $\nabla f$ is parallel to $\nabla g$. This gives us the LM-method: find $\lambda$, $x$, and $y$ so that
-    $$\nabla f(x,y) = \lambda \nabla g$$
+    Therefore, we need to find points for which $\nabla f$ is parallel to $\nabla g$. This gives us the LM-method: find $\lambda$, $x$, $y$, and $z$ so that
+    $$\nabla f(x,y,z) = \lambda \cdot \nabla g(x,y,z)$$
 </p>
 <h2>Example</h2>
-todo
+<p>
+    Let's say you're trying to find the maximum value of $1-x^2-y^2$ along the line $y=2x+3$. Then, we can define
+    $$f(x,y)=1-x^2-y^2$$
+    and
+    $$g(x,y)=2x+3-y$$
+    So, our LM equation is
+    $$
+    \left[
+    \begin{matrix}
+    -2x \\
+    -2y
+    \end{matrix}
+    \right]
+    =
+    \lambda \cdot
+    \left[
+    \begin{matrix}
+    -2 \\
+    -1
+    \end{matrix}
+    \right]
+    $$
+</p>
+<p>
+    This gives us a system of 3 equations and 3 variables:
+    $$
+    \begin{align}
+    -2x &= -2\lambda \\
+    -2y &= -\lambda \\
+    2x+3-y &= 0
+    \end{align}
+    $$
+    Solving this yields $x=-2,y=-1,\lambda=-2$. If we plug this back into $f$, we get the extrema $(-2,-1,-4)$.
+</p>
+<h2>Multiple Constraints</h2>
+<p>
+    LM can be extended rather intuitively if you have multiple constraints. Given constraints $g$ and $h$, the equation just becomes
+    $$\nabla f(x,y,z) = \lambda \cdot \nabla g(x,y,z) + \mu \cdot \nabla h(x,y,z)$$
+</p>
 </main>
 </body>
 </html>
