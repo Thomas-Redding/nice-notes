@@ -118,7 +118,7 @@ V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);
     $$V^*(s)=\max_a{Q(s,a)}$$
 </p>
 <p>
-    Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure:
+    Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure (though the code is <a href="q-learning.py" target="_blank">here</a> if you want it):
     <code class="code-block">
     q_learn(Game game, float alpha, float gamma) { <br/>
     &emsp;Map&lt;(State, Action), float&gt; Q; <br/>
