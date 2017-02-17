@@ -33,11 +33,10 @@ window.onload = function() {
 <img src="mona-lisa.png" style="max-width: 15em;"/>
 <figcaption>Blue is an eigenvector.  Red is not, because it changes directions.</figcaption>
 </figure>
-<h2>As A Basis</h2>
-<p>
-	Consider some $n \times n$ matrix $A$.  We can find its $n$ eigenvectors/value pairs and create two matrices: a $n \times n$ matrix $V$ whose columns are the eigenvectors, and a $n \times n$ matrix $D$ that is diagonal, with each entry on the diagonal being an eigenvalue:
+<h2>Properties</h2>
+Let $\lambda_i$ be the i<sup>th</sup> eigenvalue and $\vec{v_i}$ be the i<sup>th</sup> eigenvector of some $n \times n$ matrix $A$, and let $V$ and $D$ be the eigenvector and eigenvalue matrices:
 
-	\[ V = \begin{bmatrix}
+\[ V = \begin{bmatrix}
 	\vdots & \vdots & \vdots & \vdots \\
     \vec{v_1}  & \vec{v_2} & \dots & \vec{v_n} \\
     \vdots & \vdots & \vdots & \vdots
@@ -49,28 +48,39 @@ window.onload = function() {
     \vdots & \vdots & \ddots & 0\\
     0 & 0 & \dots & \lambda_n \\
 	\end{bmatrix}
-	\]
+\]
 
-	Because $A\vec{v_1} = \vec{v_1}\lambda_1$, we know $AV = VD$, which can be used to derive the following identity:
+Finally let $B$ be another matrix with the same eigenvectors as $A$.  Then the following properties hold for eigenvectors:
+
+<style>
+ul > li {
+	padding-top: 10px;
+}
+</style>
+
+<ul>
+	<li>$A = VDV^{-1}$</li>
+	<li>$\forall_n\ |A - \lambda_n I| = 0$</li>
+	<li>det$(A) = \Pi_{i=1}^n \lambda_i$</li>
+		<ul>
+			<li>A matrix is invertible iff every eigenvalue is nonzero</li>
+		</ul>
+	<li>tr$(A) = \Sigma_{i=1}^n \lambda_i$</li>
+	<li>The eigenvectors of $A^n$ are the same as those of $A$; it's eigenvalues are $D^n$</li>
+	<li>$AB$ has the same eigenvectors as $A$, and its eigenvalues are the product of $A$ and $B$'s eigenvalues</li>
+</ul>
+<h2>As A Basis</h2>
+<p>
+	Recall the following property:
 
 	\[ A = VDV^{-1} \]
 
-	This way of decomposing a matrix into its eigenvectors and eigenvalues helps to capture the relationship between the two.  When you apply $A$ to a vector $x$, what you're "really" doing is
-
-	\[ Ax = VDV^{-1}x \]
-
-	Which is intuitively
-	<ol>
-		<li>Convert from the original basis to the basis formed from the eigenvectors</li>
-		<li>Scale the point in the eigenvector basis</li>
-		<li>Convert back into the original coordinate system</li>
-	</ol>
-
+	This demonstrates that $A$ and $D$ are similar.  That is, $D$ and $A$ capture the same linear transformation, just in different bases.  This means that $A$ can be described as changing bases, applying a scaling (since $D$ is diagonal), and then changing back.
 </p>
 
 <h2>Iteration</h2>
 <p>
-	As a result of this change-of-basis-and-scale behavior, eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$.
+	As a result of this change-of-basis-and-scale behavior, eigenvectors capture the long term behavior of applying a linear transformation repeatedly.  In other words, $AAA...AA\vec{v}$ will converge onto some eigenvector of $A$ &mdash; almost always the one with the largest eigenvector.
 </p>
 <figure>
 	<img src="iterated_eigenvector.gif"/>
@@ -78,21 +88,50 @@ window.onload = function() {
 </figure>
 
 <p>
-Below is a demo that lets you choose any (real) eigenvector and any (positive) eigenvalue and see what the resulting linear transformation is.  Here are some things to notice:
-<ul>
-	<li>The image of a unit circle is an ellipse centered at (0, 0)</li>
-	<li>The area of the ellipse equals the product of the eigenvalues</li>
-	<li>The vector with the bigger eigenvalue is the most important for determining how the image looks</li>
-</ul>
+
+Below is a demo that lets you you drag two green vectors.  These are the eigenvectors of the transformation, and their lengths are their corresponding eigenvalues.  The demo applies the transformation to every (red) vector <i>twice</i>.  Note how every vector tends to become more similar to the largest eigenvector (or its opposite) as we apply more iterations.
 </p>
 
 <br>
 <iframe src="eigen-demo.html" width="400px" height="400px" style="padding:0; margin:0; overflow: hidden; border: solid 1px;"></iframe>
 <br>
 
+<h3>Spectral Norm</h3>
+
+<p>
+The spectral norm of a matrix is defined as:
+
+\[\rho(A) = max\{|\lambda_1|, |\lambda_2|, ... ,|\lambda_n|\}\]
+
+As you have seen, the long-term behavior of applying a matrix depends almost entirely on the largest (in absolute terms) eigenvalue and its corresponding eigenvector.  In fact, we have the following theorem:
+
+\[\rho(A) < 1 \iff \lim_{n \rightarrow \infty} A^n = 0\]
+</p>
+<p>
+As well as:
+\[\rho(A) > 1 \iff \lim_{n \rightarrow \infty} ||A^n|| = \infty\]
+</p>
+<p>
+Which claims that the spectral radius determines whether the matrix will force every point to converge to zero, or to grow without bound.
+</p>
+<p>
+	Another theorem is Gelfand's Formula, which states that for any matrix norm $||\cdot||$
+</p>
+<p>
+	\[\lim_{n \rightarrow \infty} ||A^n||^{1/n}\]
+</p>
+
+<h3>Spectral Gap</h3>
+
+<p>
+The spectral <i>gap</i> of a matrix is defined as the difference between the (moduli of the) two largest values, and is useful as a measure of how long it takes for points to converge.  The larger the gap, the more quickly points will converge to the largest eigenvector.
+</p>
 <h3>Imaginary Eigenvectors</h3>
 <p>
-	This leads to a curious phenmenon where the eigenvector of a real matrix can be imaginary.  This means that $A^n \vec{v}$ is always real, so what does a complex eigenvector imply for its long-term behavior?
+	The demo above demanded real eigenvectors, but what if we have a real matrix with imaginary eigenvectors?  Every time we multiply a real vector by a real matrix, we get a real vector, so how are we ever going to converge to a complex eigenvector?
+</p>
+<p>
+	The answer is: we don't.  Instead, there is a very curious phenomenon:
 </p>
 <figure>
 	<img src="complex_iterated_eigenvector.gif"/>
@@ -101,6 +140,37 @@ Below is a demo that lets you choose any (real) eigenvector and any (positive) e
 <p>
 	The points spiral!  Depending on the exact eigenpair, the points my spiral inwards and converge on (0, 0) or diverge outwards to infinity (as shown above), but this spiraling behavior is consistent for imaginary-eigenvectored matrices.
 </p>
+
+<h2>Solving Linear Differential Equations</h2>
+<p>
+	Now let's consider a homogenous linear differential equation:
+
+	\[y'' + 3y' - y = 0\]
+
+	From this we can solve for $y''$ as a (linear) combination of $y$ and $y'$:
+
+	\[y'' = y - 3y'\]
+
+	This, in combination with the fact that $y' = y'$, allows us to represent this in matrix form:
+
+	\[
+	\begin{bmatrix}
+		1 & -3\\
+		0 & 1\\
+	\end{bmatrix}
+	\begin{bmatrix}
+		y\\
+		y'\\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		y''\\
+		y'\\
+	\end{bmatrix}
+	\]
+	TODO
+</p>
+<br><br><br><br>
 </main>
 </body>
 </html>
