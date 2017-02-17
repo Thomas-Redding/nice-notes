@@ -1,6 +1,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
     tex2jax: {
@@ -58,7 +59,7 @@ MathJax.Hub.Config({
     <li>Compute $V_2$, $V_3$, etc. until the values in $V$ stop changing by much.</li>
 </ol>
 <p>
-
+    If you want the actual code, you can find it <a href="value-iteration.py" target="_blank">here</a>.
 </p>
 <p>
     Although it may seem kind of ad-hoc, this algorithm's $V$'s <a href="http://uhaweb.hartford.edu/compsci/ccli/projects/QLearning.pdf">is guaranteed</a> to converge to $V^*$, which effectively gives us the optimal policy.
@@ -85,6 +86,9 @@ MathJax.Hub.Config({
     &emsp;return V; <br/>
     }
 </code>
+<p>
+    and <a href="td-learning.py" target="_blank">here</a> is the actual code.
+</p>
 <p>
     So, basically we just choose the action the policy dictates and then update our estimate for <code>V[s]</code> - otherwise known as $V^\pi(s)$. We just have to talk about why the given formula works.
 </p>
@@ -114,7 +118,7 @@ V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);
     $$V^*(s)=\max_a{Q(s,a)}$$
 </p>
 <p>
-    Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure:
+    Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure (though the code is <a href="q-learning.py" target="_blank">here</a> if you want it):
     <code class="code-block">
     q_learn(Game game, float alpha, float gamma) { <br/>
     &emsp;Map&lt;(State, Action), float&gt; Q; <br/>
@@ -132,7 +136,7 @@ V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);
     <br/>
     max_q(Game game, Map&lt;(State, Action), float&gt; Q, State s) { <br/>
     &emsp;rtn = -Infinity <br/>
-    &emsp;for (a in game) { <br/>
+    &emsp;for (a in game.get_actions(s)) { <br/>
     &emsp;&emsp;if (Q[(s, a)] > rtn)<br/>
     &emsp;&emsp;&emsp;rtn = Q[(s, a)] <br/>
     &emsp;} <br/>
