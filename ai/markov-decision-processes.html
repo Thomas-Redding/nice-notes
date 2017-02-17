@@ -87,6 +87,9 @@ MathJax.Hub.Config({
     }
 </code>
 <p>
+    and <a href="td-learning.py" target="_blank">here</a> is the actual code.
+</p>
+<p>
     So, basically we just choose the action the policy dictates and then update our estimate for <code>V[s]</code> - otherwise known as $V^\pi(s)$. We just have to talk about why the given formula works.
 </p>
 <code class="code-block">
@@ -133,7 +136,7 @@ V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);
     <br/>
     max_q(Game game, Map&lt;(State, Action), float&gt; Q, State s) { <br/>
     &emsp;rtn = -Infinity <br/>
-    &emsp;for (a in game) { <br/>
+    &emsp;for (a in game.get_actions(s)) { <br/>
     &emsp;&emsp;if (Q[(s, a)] > rtn)<br/>
     &emsp;&emsp;&emsp;rtn = Q[(s, a)] <br/>
     &emsp;} <br/>
