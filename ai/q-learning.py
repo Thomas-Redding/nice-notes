@@ -98,7 +98,7 @@ class Game:
 
     def get_actions(self, state):
         if state == 0:
-            return ["left"]
+            return ["right"]
         elif state == 1:
             return ["left", "right"]
         elif state == 2:
@@ -125,10 +125,5 @@ class Game:
             return (self.current_state, 3)
 
 game = Game()
-policy = {
-    0: "right",
-    1: "right",
-    2: "exit"
-}
 
 print q_learn(game, 0.1, 0.9, 1000, inverse_select)
