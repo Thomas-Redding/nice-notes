@@ -46,6 +46,24 @@ def epsilon_select(state, actions, Q, N):
                 best_act = act
         return best_act
 
+def inverse_select(state, actions, Q, N):
+    k = 1
+    probs = []
+    probs_sum = 0
+    for i in range(len(actions)):
+        act = actions[i]
+        if (state, act) not in N:
+            return actions[i]
+        value = Q[(state, act)] + k/N[(state, act)]
+        probs.append(value)
+        probs_sum += value
+
+    rand = random.random() * probs_sum
+    for i in range(len(actions)):
+        rand -= probs[i]
+        if rand <= 0:
+            return actions[i]
+
 
 """
 Imagine the world consisting of states 0, 1, and 2. 
@@ -113,4 +131,4 @@ policy = {
     2: "exit"
 }
 
-print q_learn(game, 0.1, 0.9, 1000, epsilon_select)
+print q_learn(game, 0.1, 0.9, 1000, inverse_select)
