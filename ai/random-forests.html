@@ -20,10 +20,7 @@ MathJax.Hub.Config({
 <h1>Random Forests</h1>
 
 <p>
-Random Forests are an extremely popular machine learning model, and are commonly cited as the best out-of-the-box algorithm &mdash; that is, if you have very little prior knowledge a priori, a random forest is likely to serve you well.  This is due to their uncanny ability to not overfit, as well as their ability to capture nonlinear relationships.  They can be used for both regression and classification problems.
-</p>
-<p>
-Random Forests are commonly implemented using <a href="baggin.html">bagging</a> and <a href="boosting">boosting</a>.
+Random Forests are an extremely popular machine learning model, and are commonly cited as the best out-of-the-box algorithm (particularly in conjunction with Adaboost).  This is due to their uncanny ability to not overfit, as well as their ability to capture nonlinear relationships.  They can be used for both regression and classification problems.
 </p>
 
 <h2>Ensembles</h2>
@@ -32,10 +29,13 @@ Random Forests are commonly implemented using <a href="baggin.html">bagging</a> 
 <a href="decision-trees">Decision trees</a> are extremely powerful machine learning models, capable of representing an enormous array of relationships.  Unfortunately, their great power is their undoing, and they pay for it with a strong propensity towards overfitting, and their low training error can be exceptionally misleading as a predictor of test error.
 </p>
 <p>
-The idea of an ensemble is to aggregate the prediction of a number of models in the hopes that the resulting prediction is better than the individuals' predictions in expectation.
+The idea of an ensemble is to aggregate the prediction of a number of models in the hopes that the resulting prediction is better than the individuals' predictions in expectation.  Indeed, given an ensemble of "independent" (to some degree) "weak learners" (learners that are correct $50 + \epsilon$ percent of the time), it can be proven that ensembles will converge to a strong learner.
 </p>
 <p>
 	Random forests are a particular kind of ensemble whose constituents are decison trees.  Because decision trees have high variance, using an ensemble is a very natural idea for lowering their variance while (hopefully) maintaining their representational power.
+</p>
+<p>
+    As with all ensemble learning, the ideas of bagging (training each component learner on only a subset of the data) and boosting (weighting some points more than others) are commonly used for random forests.
 </p>
 <h2>Training</h2>
 <p>
@@ -51,20 +51,70 @@ The idea of an ensemble is to aggregate the prediction of a number of models in 
 	Another common practice is to restrict which features each decision tree can see.  For example, the first decision tree might only be able to see features 1, 3, and 4, while the second decision tree might only be able to see features 1, 3, and 4.  Using this in conjunction with bagging is a pretty standard implementation:
 </p>
 <pre>
-def train_random_forest(X, number_of_trees):
+def train_random_forest(X, Y, number_of_trees):
     N = length(x)     # size of training set
     D = length(x[0])  # number of dimensions
     forest = []    # list of trees that we'll return
-    for i in xrange(number_of_trees):
-        bagged_data = sample_with_replacement(X, N)
+    for i in range(number_of_trees):
+        indices = sample_with_replacement(range(N), N)
+        bagged_x = X[indices]
+        bagged_y = Y[indices]
         random_dimensions = sample_with_replacement(range(D), D)
-        t = train_decision_tree(bagged_data, random_dimensions)
+        t = train_decision_tree(X, Y, random_dimensions)
         forest.append(t)
     return forest
 </pre>
-<h3>Boosting</h3>
-<h2>Missing Data</h2>
+<h3>Adaboost</h3>
+
+<p>
+    Adaboost is a very common and lauded modification to the naive random forest, and describes a way to reweight the importance datapoints and trees.  Adaboost was originally formulated for binary classification.
+</p>
+<p>
+    The algorithm begins by initializing the weight of every point to 1.  Every time it trains a tree, it computes the (weighted) error rate of the tree.  If we are training the m<sup>th</sup> tree and the current weights are $w_1, w_2, ..., w_N$, then we define the error rate:
+
+    \[e_m = \frac{\Sigma (w_i \cdot I(y_i \neq \hat{y_i}))}{\Sigma (w_i)} = \frac{\text{weighted sum of errors}}{\text{normalization constant}} \]
+
+    Let $\alpha_m = \frac{e_m}{1 - e_m}$.  Then, for every point that was misclassified by the most recent tree, we multiply their weights by $\alpha_m^{-1}$ (as well as renormalize, so that the weights sum up to 1).
+</p>
+<p>
+    As a sanity check, note that if $0 < e_m < 0.5$ (which should always be the case for a weak learner), then $\alpha_m^{-1} > 1$, which means that misclassified points will have their weights increased.
+</p>
+<p>
+    The final output of the whole forest is now the <i>weighted</i> sum of each tree, where each tree's weight is equal to $\alpha_m$:
+
+    \[ \hat{y}(x) = \Sigma_{m=1}^M \alpha_m \cdot g_m(x) \]
+
+    Where $g_m$ is the prediction of the m<sup>th</sup> tree.
+</p>
+
+<h2>Gradient Boosting</h2>
+<p>
+    Another common alteration to the random forest algorithm is gradient boosting, which is designed for regression.  In this case, every tree is trained on the <i>residuals</i> of the trees before it:
+</p>
+<pre>
+<b>def</b> gradient_boosting(X, Y, number_of_trees):
+    forest = []    # list of trees that we'll return
+    <b>for</b> i <b>in</b> range(number_of_trees):
+        tree = train_tree(X, Y) # train tree on residuals
+        forest.append(tree)     # add tree to forest
+        Y = Y - tree.predict(X) # update Y to be the new residuals
+    return forest
+</pre>
+<p>
+    The prediction of the entire forest is then simply the sum of its constituent trees.
+</p>
+<p>
+    This can be viewed as a form of implicit "boosting", where the 'weight' of each point is the error the forest is currently making on it.
+</p>
+
 <h2>Feature Importance</h2>
+<p>
+    TODO
+</p>
+<h2>Missing Data</h2>
+<p>
+    TODO
+</p>
 <br><br><br><br><br><br><br>
 </main>
 </body>

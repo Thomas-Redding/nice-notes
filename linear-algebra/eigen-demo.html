@@ -73,8 +73,8 @@ function toy(y) {
 
 function render_linear_transform(V, D) {	
 
-	cvs.width = 400;
-	cvs.height = 400;
+	cvs.width = window.innerWidth;
+	cvs.height = window.innerHeight;
 
 	var A = V.times(D).times(V.inverse());
 
