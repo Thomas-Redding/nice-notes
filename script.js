@@ -2,7 +2,7 @@
 console.log("script.js loaded");
 
 var header_html = "";
-var footer_html = "<hr><a href='https://github.com/Thomas-Redding/Nice Notes'>Contribute</a>";
+var footer_html = "<hr><a href='https://github.com/Thomas-Redding/nice-notes'>Contribute</a>";
 
 var foo;
 onload = function() {
