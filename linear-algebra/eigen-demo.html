@@ -54,37 +54,35 @@ function draw_arrow(c, x, y, dx, dy, head_size, sharpness) {
 }
 
 function fromx(x) {
-	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	var s = Math.min(cvs.width, cvs.height) / 6;
 	return (x - cvs.width / 2) / s;
 }
 function fromy(y) {
-	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	var s = Math.min(cvs.width, cvs.height) / 6;
 	return (y - cvs.height / 2) / -s;
 }
 
 function tox(x) {
-	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	var s = Math.min(cvs.width, cvs.height) / 6;
 	return cvs.width / 2 + x * s;
 }
 function toy(y) {
-	var s = Math.min(cvs.width, cvs.height) / 5.5;
+	var s = Math.min(cvs.width, cvs.height) / 6;
 	return cvs.height / 2 - y * s;
 }
 
 function render_linear_transform(V, D) {	
 
-	cvs.width = 400;
-	cvs.height = 400;
+	cvs.width = window.innerWidth;
+	cvs.height = window.innerHeight;
 
 	var A = V.times(D).times(V.inverse());
 
-	matrix_div.innerHTML = "Matrix:" + A.toHTML();
 	eigen_div.innerHTML = `
-	<table>
+	<table style="text-align:center;">
 		<thead>
 			<tr>
-				<td><b>x</b></td>
-				<td><b>y</b></td>
+				<td colspan=2><b>vector</b></td>
 				<td><b>value</b></td>
 			</tr>
 		</thead>
@@ -92,7 +90,7 @@ function render_linear_transform(V, D) {
 			<tr>
 				<td>` + V.get(0, 0) + `</td>
 				<td>` + V.get(1, 0) + `</td>
-				<td>` + num2str(D.get(1, 1)) + `</td>
+				<td>` + num2str(D.get(0, 0)) + `</td>
 			</tr>
 			<tr>
 				<td>` + V.get(0, 1) + `</td>
@@ -103,76 +101,61 @@ function render_linear_transform(V, D) {
 	</table>
 	`;
 
-	var n = 256;
-	var from = new Matrix(2, n);
-	for (var i = 0; i < n; ++i) {
-		var theta = Math.PI * 2 * i / n;
-		from.set(0, i, Math.cos(theta));
-		from.set(1, i, Math.sin(theta));
-	}
-
-	var to = A.times(A.times(from));
-
 	var c = cvs.getContext("2d");
-	c.strokeStyle = "red";
-	c.fillStyle = "red";
-	for (var i = 0; i < from.width; i += Math.floor(from.width / 32)) {
-		var theta = Math.PI * 2 * i / n;
-		// for (var i = 0; i < from.width; ++i) {
-		c.beginPath();
-		var x = tox(from.get(0, i));
-		var y = toy(from.get(1, i));
-		x = tox(Math.cos(theta));
-		y = toy(Math.sin(theta));
-		var dx = tox(to.get(0, i)) - x;
-		var dy = toy(to.get(1, i)) - y;
-		draw_arrow(c, x, y, dx, dy, 5, 1);
-	}
 
 	// draw circle
+	c.lineWidth = 2;
 	c.strokeStyle = "black";
 	c.beginPath();
 	c.arc(tox(0), toy(0), tox(1) - tox(0), 0, 6.28, false);
 	c.stroke();
 
-	// draw circle
-	c.strokeStyle = "black";
-	c.lineWidth = 3;
-	c.beginPath();
-	c.moveTo(tox(to.get(0, 0)), toy(to.get(1, 0)));
-	for (var i = 1; i < to.width; ++i) {
-		c.lineTo(tox(to.get(0, i)), toy(to.get(1, i)));
-	}
-	c.lineTo(tox(to.get(0, 0)), toy(to.get(1, 0)));
-	c.stroke();
+	// draw vectors
+	c.lineWidth = 1;
+	c.strokeStyle = "red";
+	c.fillStyle = "red";
+	var n = 16;
+	for (var i = 0; i < n; ++i) {
 
-	// draw column vectors
-	c.lineWidth = 2;
-	c.strokeStyle = "#00f";
-	c.fillStyle = "#00f";
-	var dx = tox(A.get(0, 0)) - tox(0);
-	var dy = toy(A.get(1, 0)) - toy(0);
-	var mag = Math.sqrt(dx * dx + dy * dy);
-	dx *= 64 / mag;
-	dy *= 64 / mag;
-	draw_arrow(c, tox(0), toy(0), dx, dy, 5, 1);
-	dx = tox(A.get(0, 1)) - tox(0);
-	dy = toy(A.get(1, 1)) - toy(0);
-	mag = Math.sqrt(dx * dx + dy * dy);
-	dx *= 64 / mag;
-	dy *= 64 / mag;
-	draw_arrow(c, tox(0), toy(0), dx, dy, 5, 1);
-	c.beginPath();
-	c.arc(tox(0), toy(0), 5, 0, 6.28, false);
-	c.fill();
+		var theta = Math.PI * 2 * i / n;
+		var from = new Matrix([0, 0]);
+		var to = new Matrix([Math.cos(theta), Math.sin(theta)]);
+
+		for (var j = 0; j < 36; ++j) {
+
+			c.beginPath();
+			x = tox(from.get(0, 0));
+			y = toy(from.get(1, 0));
+			var dx = tox(to.get(0, 0)) - x;
+			var dy = toy(to.get(1, 0)) - y;
+			draw_arrow(c, x, y, dx, dy, 5, 1);
+
+			from = to;
+			to = A.times(from);
+		}
+	}
 
 	// draw eigen vectors
 	c.globalAlpha = 1;
 	c.lineWidth = 4;
 	c.strokeStyle = "#0f0";
 	c.fillStyle = "#0f0";
-	draw_arrow(c, tox(0), toy(0), tox(V.get(0, 0)) - tox(0), toy(V.get(1, 0)) - toy(0), 10, 1);
-	draw_arrow(c, tox(0), toy(0), tox(V.get(0, 1)) - tox(0), toy(V.get(1, 1)) - toy(0), 10, 1);
+	c.beginPath();
+	c.moveTo(tox(0), toy(0));
+	c.lineTo(tox(V.get(0, 0)), toy(V.get(1, 0)));
+	c.stroke();
+	c.beginPath();
+	c.arc(tox(V.get(0, 0)), toy(V.get(1, 0)), 5, 0, 6.28);
+	c.fill();
+
+	c.beginPath();
+	c.moveTo(tox(0), toy(0));
+	c.lineTo(tox(V.get(0, 1)), toy(V.get(1, 1)));
+	c.stroke();
+	c.beginPath();
+	c.arc(tox(V.get(0, 1)), toy(V.get(1, 1)), 5, 0, 6.28);
+	c.fill();
+
 	c.beginPath();
 	c.arc(tox(0), toy(0), 5, 0, 6.28, false);
 	c.fill();
@@ -203,6 +186,9 @@ window.onmousedown = function(e) {
 }
 
 window.onmousemove = function(e) {
+
+	var limit = 2;
+
 	if (dragging == undefined) return;
 
 	if (dragging == 0) {
@@ -210,9 +196,9 @@ window.onmousemove = function(e) {
 		V.set(1, 0, Math.round(fromy(e.clientY - 8 + drag_offset["y"]) * 20) / 20);
 		D.set(0, 0, Math.round(Math.sqrt(V.column(0).sum_of_squares()) * 20) / 20);
 
-		if (D.get(0, 0) > 1.5) {
-			var s = 1.5 / D.get(0, 0);
-			D.set(0, 0, 1.5);
+		if (D.get(0, 0) > limit) {
+			var s = limit / D.get(0, 0);
+			D.set(0, 0, limit);
 			V.set(0, 0, Math.round(V.get(0, 0) * s * 20) / 20);
 			V.set(1, 0, Math.round(V.get(1, 0) * s * 20) / 20);
 		}
@@ -224,9 +210,9 @@ window.onmousemove = function(e) {
 		V.set(1, 1, Math.round(fromy(e.clientY - 8 + drag_offset["y"]) * 20) / 20);
 		D.set(1, 1, Math.round(Math.sqrt(V.column(1).sum_of_squares()) * 20) / 20);
 
-		if (D.get(1, 1) > 1.5) {
-			var s = 1.5 / D.get(1, 1);
-			D.set(1, 1, 1.5);
+		if (D.get(1, 1) > limit) {
+			var s = limit / D.get(1, 1);
+			D.set(1, 1, limit);
 			V.set(0, 1, Math.round(V.get(0, 1) * s * 20) / 20);
 			V.set(1, 1, Math.round(V.get(1, 1) * s * 20) / 20);
 		}
@@ -247,7 +233,6 @@ window.onload = function() {
 <body>
 <canvas id="cvs">
 </canvas>
-<div id="matrix_div" style="position: absolute; left: 0; top: 0;"></div>
 <div id="eigen_div" style="position: absolute; right: 0; top: 0;"></div>
 </body>
 </html>
