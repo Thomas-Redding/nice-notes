@@ -8,11 +8,27 @@ body {
     font-family: serif;
 }
 
+header {
+	text-align: center;
+}
+
 main {
     width: 95%;
     max-width: 34em;
     margin: 0 auto;
     overflow-x: hidden;
+    min-height: 70vh;
+}
+
+footer {
+	text-align: center;
+}
+
+footer > hr {
+	display: block;
+	width: 90%;
+	max-width: 20em;
+	margin: 2em auto;
 }
 
 
