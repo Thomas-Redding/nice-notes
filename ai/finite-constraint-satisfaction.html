@@ -14,6 +14,7 @@ MathJax.Hub.Config({
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
 </head>
 <body>
 <main>
@@ -54,40 +55,40 @@ MathJax.Hub.Config({
 </p>
 <p>
     Enter the idea of a <em>constraint graph</em>. A constraint graph is a graph whose vertices correspond to variables and whose edges correspond to constraints. In particular
-    <code class="code-block">
-    class Node {<br/>
-    &emsp;set&lt;VALUE&gt; domain; <br/>
-    &emsp;set&lt;BinaryConstraint*&gt; constraints; <br/>
-    } <br/>
-    <br/>
-    class BinaryConstraint {<br/>
-    &emsp;Node* x; <br/>
-    &emsp;Node* y; <br/>
-    &emsp;bool get_y_domain(set&lt;VALUE&gt; x_domain); <br/>
-    }
-    </code>
+<pre>
+class Node {
+    set&lt;VALUE&gt; domain;
+    set&lt;BinaryConstraint*&gt; constraints;
+}
+
+class BinaryConstraint {
+    Node* x;
+    Node* y;
+    bool get_y_domain(set&lt;VALUE&gt; x_domain);
+}
+</pre>
     To be a little more precise, each constraint corresponds two two directed edges: one from vertex/variable $A$ to $B$, and the other from $B$ to $A$.
 </p>
 <p>
     So, now we've represented the CSP as a graph - so what? Well, now we can use a smarter set of algorithms collectively called <em>backtracking search</em>. Here's the general procedure:
-    <code class="code-block">
-    backtrack(Assignment ass, CSP csp) {<br/>
-    &emsp;if (ass complete) return ass;<br/>
-    &emsp;var = <span style="color: red">select_unassigned_variable</span>(csp, ass); <br/>
-    &emsp;for each value in domain_of(var, ass) { <br/>
-    &emsp;&emsp;if (value doesn't violate csp.constraints) { <br/>
-    &emsp;&emsp;&emsp;ass[var] = value <br/>
-    &emsp;&emsp;&emsp;result = backtrack(ass, csp); <br/>
-    &emsp;&emsp;&emsp;if (result != null) return result; <br/>
-    &emsp;&emsp;&emsp;delete ass[var]; <br/>
-    &emsp;&emsp;} <br/>
-    &emsp;} <br/>
-    &emsp;return null; <br/>
+<pre>
+backtrack(Assignment ass, CSP csp) {
+    if (ass complete) return ass;
+    var = <span style="color: red">select_unassigned_variable</span>(csp, ass);
+    for each value in domain_of(var, ass) {
+        if (value doesn't violate csp.constraints) {
+            ass[var] = value <br/>
+            result = backtrack(ass, csp);
+            if (result != null) return result;
+            delete ass[var]; <br/>
+        }
     }
-    </code>
+    return null;
+}
+</pre>
 </p>
 <p>
-    You'll note, however, that the function <span style="color: red">select_unassigned_variable</span> is left deliberately vague. If this just randomly chooses a variable, then we haven't really improved over our simple depth-first search.
+    You'll note, however, that the function <code style="color: red;">select_unassigned_variable</code> is left deliberately vague. If this just randomly chooses a variable, then we haven't really improved over our simple depth-first search.
 </p>
 <p>
     However, if we use the <em>minimum remaining values</em> (MRV) heuristic, then we can often (but not always) do much better. This heuristic basically says that we should assign the variable with the fewest choices to assign. The idea being that we want to fail as fast as possible to reduce the number of nodes we need to search.

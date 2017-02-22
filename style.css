@@ -12,6 +12,7 @@ main {
     width: 95%;
     max-width: 34em;
     margin: 0 auto;
+    overflow-x: hidden;
 }
 
 
@@ -22,6 +23,11 @@ main {
 
 body, h1 {
     counter-reset: h2counter h3counter;
+}
+
+h1 {
+	text-align: center;
+	margin-bottom: 2em;
 }
 
 h2:before {
@@ -59,15 +65,22 @@ ol > li:before {
     counter-increment: list;
 }
 
+ol > ol > li {
+	list-style: lower-alpha;
+}
+
+ol > ol > li:before {
+    content: ""
+}
 
 
 
-
-.code-block {
+pre {
     background-color: hsl(0, 0%, 90%);
     display: block;
     margin: 1em;
     padding: 0.5em;
+    overflow-x: scroll;
 }
 
 .definition {

@@ -14,6 +14,7 @@ MathJax.Hub.Config({
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
 </head>
 <body>
 <main>
@@ -211,43 +212,80 @@ MathJax.Hub.Config({
 		</li>
 	</ol>
 </p>
-<code class="code-block">
-foo(prior, transition, emit, evidence) { <br/>
-&emsp;// compute the distribution of X_1
-&emsp;dist = {} <br/>
-&emsp;for (state in prior) { <br/>
-&emsp;&emsp;dist[state] = prior[state] * emit[evidence[0], state] <br/>
-&emsp;} <br/>
-&emsp;dist = normalize(dist); <br/>
-&emsp;<br/>
-&emsp;// dynamically compute later distributions <br/>
-&emsp;for (t = 1; t < evidence.length; ++t) { <br/>
-&emsp;&emsp;new_dist = {} <br/>
-&emsp;&emsp;for (old_state in prior) { <br/>
-&emsp;&emsp;&emsp;new_dist[state] = 0; <br/>
-&emsp;&emsp;&emsp;for (new_state in prior) { <br/>
-&emsp;&emsp;&emsp;&emsp;new_dist[state] += dist[old_state] * transition[new_state, old_state]; <br/>
-&emsp;&emsp;&emsp;} <br/>
-&emsp;&emsp;&emsp;new_dist[new_state] *= emit[evidence[t], new_state]; <br/>
-&emsp;&emsp;} <br/>
-&emsp;&emsp;dist = normalize(new_dist); <br/>
-&emsp;} <br/>
-&emsp;return dist; <br/>
-} <br/>
-<br/>
-normalize(dist) { <br/>
-&emsp;float sum = 0; <br/>
-&emsp;for (state in dist) <br/>
-&emsp;&emsp;sum += dist[state] ;<br/>
-&emsp;for (state in dist) <br/>
-&emsp;&emsp;dist[state] /= sum; <br/>
-&emsp;return dist; <br/>
-}>
-</code>
+<pre>
+foo(prior, transition, emit, evidence) {
+    // compute the distribution of X_1
+    dist = {}
+    for (state in prior) {
+        dist[state] = prior[state] * emit[evidence[0], state]
+    }
+    dist = normalize(dist);
+    
+    // dynamically compute later distributions
+    for (t = 1; t < evidence.length; ++t) {
+        new_dist = {}
+        for (old_state in prior) {
+            new_dist[state] = 0;
+            for (new_state in prior) {
+                new_dist[state] += dist[old_state] * transition[new_state, old_state];
+            }
+            new_dist[new_state] *= emit[evidence[t], new_state];
+        }
+        dist = normalize(new_dist);
+    }
+    return dist;
+}
+
+normalize(dist) {
+    float sum = 0;
+    for (state in dist)
+        sum += dist[state];
+    for (state in dist)
+        dist[state] /= sum;
+    return dist;
+}
+</pre>
 <p>
 	To understand this algorithm, you need to realize that <code>dist</code> represents the distribution of variable $X_t$ given evidence $e_1,\dots,e_t$.
-</p
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+</p>
+<p>
+	[todo]
+</p>
+<h3>Particle Filtering</h3>
+<p>
+	As implemented above, this forward algorithm runs in $O(S^2 \cdot T)$ time, where $S$ is the number of states and $T$ is the number of time-steps. However, if each state only has a small number of neighboring states, than a bit of cleverness can reduce this to $O(S \cdot T)$.
+</p>
+<p>
+	To improve this running time, we have to drop Bayesian-optimal belief updating. Basically, we choose a subset of states called <em>particles</em> and
+	<ol>
+		<li>update the probability each particle is correct when we are given evidence</li>
+		<li>change each particle's state based on transition probabilities</li>
+	</ol>
+</p>
+<p>
+	While the psudocode is a little lengthy, here's the idea:
+	<ol>
+		<li>Create $n$ particles. Each particle is just a state-float pair. At the beginning - we randomly select states according to our prior to create each particle, and we set its value to 1.</li>
+		<li>For each time-step</li>
+		<ol>
+			<li>Change each particle's state randomly - according to the transitio probabilities</li>
+			<li>Update each particle's value by multiplying it by the likelihood it is true given the new evidence.</li>
+			<li>Sample $n$ particles from this list with replacement. However, make this a weighted random choosing, so that particles with higher values are more likely to be chosen. This new set of particles is used in the next iteration, and each particle has value 1 again.</li>
+		</ol>
+	</ol>
+</p>
+<h3>Viterbi Algorithm</h3>
+<p>
+	So, far we have focused on finding the most likely state you are currently in. However, what if you want to find the most likely sequence of states you were in over time? This might be useful for, say, speech-to-text models. More formally, we're computing
+	$$argmax_{x_1,\dots,x_t}{P(X_1=x_1,\dots,X_t=x_t | E_1=e_1,\dots,E_t=e_t)}$$
+</p>
+<p>
+	It turns out we can do this in a dynamic way:
+	<ol>
+		<li>Create a table of states to probabilities - initalized to priors.</li>
+		<li>todo</li>
+	</ol>
+</p>
 </main>
 </body>
 </html>
