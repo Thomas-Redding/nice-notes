@@ -75,27 +75,27 @@ MathJax.Hub.Config({
 <p>
     While value iteration is very effective if we know how $T$ and $R$ are defined. In real-world problems, these functions are often unknown, which motives an algorithm that can "explore" the world to evaluate a policy. One such algorithm is <em>Temporal-Difference (TD) Learning</em>. Here is the pseudocode
 </p>
-<code class="code-block">
-    TD_Learn(Game game, Map&lt;State,Action&gt; policy, float alpha) {<br/>
-    &emsp;Map&lt;State, float&gt; V;<br/>
-    &emsp;while(!game.is_over()) { <br/>
-    &emsp;&emsp;s = game.current_state; <br/>
-    &emsp;&emsp;a = policy[s]; <br/>
-    &emsp;&emsp;reward, s' = game.do(a); <br/>
-    &emsp;&emsp;V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); <br/>
-    &emsp;} <br/>
-    &emsp;return V; <br/>
-    }
-</code>
+<pre>
+TD_Learn(Game game, Map&lt;State,Action&gt; policy, float alpha) {
+    Map&lt;State, float&gt; V;
+    while(!game.is_over()) {    
+        s = game.current_state;    
+        a = policy[s];    
+        reward, s' = game.do(a);    
+        V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);    
+    }    
+    return V;    
+}
+</pre>
 <p>
     and <a href="td-learning.py" target="_blank">here</a> is the actual code.
 </p>
 <p>
     So, basically we just choose the action the policy dictates and then update our estimate for <code>V[s]</code> - otherwise known as $V^\pi(s)$. We just have to talk about why the given formula works.
 </p>
-<code class="code-block">
+<pre>
 V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']); 
-</code>
+</pre>
 <p>
     We want to argue that our algorithm causes <code>V[s]</code> to converge to $V^\pi(s)$ in the long-run. Recall that
 
@@ -120,30 +120,29 @@ V[s] = (1-alpha) * V[s] + alpha * (reward + gamma * V[s']);
 </p>
 <p>
     Q-Learning is similar to <a href="zero-sum-games.html#monte-carlo-tree-search">Monte Carlo tree search</a> in that we randomly select actions, but with a bias towards (1) actions that ended well before and (2) actions we haven't take very often. There are many ways for us to balance these two biases that guarantee our policy will converge to the optimal policies - these are all Q-learning algorithms. Before we talk about those, let's talk about the general structure (though the code is <a href="q-learning.py" target="_blank">here</a> if you want it):
-    <code class="code-block">
-    q_learn(Game game, float alpha, float gamma) { <br/>
-    &emsp;Map&lt;(State, Action), float&gt; Q; <br/>
-    &emsp;Map&lt;(State, Action), float&gt; N; <br/>
-    &emsp;while (game.current_state() != null) { <br/>
-    &emsp;&emsp;State s = game.current_state(); <br/>
-    &emsp;&emsp;List<Action> actions = game.legal_actions() <br/>
-    &emsp;&emsp;Action a = <span style="color: red">select_action</span>(s, actions, Q, N); <br/>
-    &emsp;&emsp;++N[s, a]; <br/>
-    &emsp;&emsp;(float, state) (reward, s') = game.do(a); <br/>
-    &emsp;&emsp;Q[s,a]=(1-alpha)*Q[s,a]+alpha*(reward+gamma*max_q(game, Q, s'))<br/>
-    &emsp;}
-    <br/>
-    } <br/>
-    <br/>
-    max_q(Game game, Map&lt;(State, Action), float&gt; Q, State s) { <br/>
-    &emsp;rtn = -Infinity <br/>
-    &emsp;for (a in game.get_actions(s)) { <br/>
-    &emsp;&emsp;if (Q[(s, a)] > rtn)<br/>
-    &emsp;&emsp;&emsp;rtn = Q[(s, a)] <br/>
-    &emsp;} <br/>
-    &emsp;return rtn; <br/>
+    <pre>
+q_learn(Game game, float alpha, float gamma) {    
+    Map&lt;(State, Action), float&gt; Q;    
+    Map&lt;(State, Action), float&gt; N;    
+    while (game.current_state() != null) {    
+        State s = game.current_state();    
+        List&lt;Action&gt; actions = game.legal_actions()    
+        Action a = <span style="color: red">select_action</span>(s, actions, Q, N);    
+        ++N[s, a];    
+        (float, state) (reward, s') = game.do(a);    
+        Q[s,a]=(1-alpha)*Q[s,a]+alpha*(reward+gamma*max_q(game, Q, s'));
     }
-    </code>
+}
+   
+max_q(Game game, Map&lt;(State, Action), float&gt; Q, State s) {    
+    rtn = -Infinity    
+    for (a in game.get_actions(s)) {    
+        if (Q[(s, a)] > rtn)
+            rtn = Q[(s, a)]    
+    }    
+    return rtn;    
+}
+    </pre>
 </p>
 <p>
     Here <code>game</code> is an object that encodes the game we're playing, <code>alpha</code> is a number between 0 and 1 representing the learning rate, and <code>gamma</code> is a number between 0 and 1 representing the discount rate. One thing to realize is that <code>max_q(g, Q, s)</code> returns our estiamte of the expected utility of pursuing the optimal policy at state <code>s</code>, so <code>max_q(g, Q, s)</code> can be thought of as our estimate for $V^*(s)$.
@@ -180,38 +179,38 @@ $$Q(s,a) + \frac{k}{N(s,a)}$$
 </p>
 <p>
     The general psuedocode is
-    <code class="code-block">
-    Game game; <br/>
-    List&lt;Feature&gt; features; <br/>
-    float alpha; <br/>
-    float gamma; <br/>
-     <br/>
-    float Q(s, a) { <br/>
-    &emsp;float rtn = 0; <br/>
-    &emsp;for (i = 0; i < weights.length; ++i) { <br/>
-    &emsp;&emsp;rtn += weights[i]*features[i](s, a) <br/>
-    &emsp;} <br/>
-    &emsp;return rtn; <br/>
-    } <br/>
-     <br/>
-    while (game.alive()) {<br/>
-    &emsp;weights = [0] * features.length; <br/>
-    &emsp;s = game.state; <br/>
-    &emsp;a = <span style="color: red;">choose_move</span>(game); <br/>
-    &emsp;reward, s' = game.do(act); <br/>
-    &emsp;actions = game.get_actions() <br/>
-    &emsp;max_val = -1e300; <br/>
-    &emsp;for (a' in actions) { <br/>
-    &emsp;&emsp;val = Q(s', a') <br/>
-    &emsp;&emsp;if (val > max_val) <br/>
-    &emsp;&emsp;&emsp;max_val = val; <br/>
-    &emsp;} <br/>
-    &emsp;diff = reward + gamma * max_val - Q(s, a) <br/>
-    &emsp;for (i = 0; i < weights.length; ++i) { <br/>
-    &emsp;&emsp;weights[i] += alpha * diff * features[i](s, a); <br/>
-    &emsp;} <br/>
+<pre>
+Game game;    
+List&lt;Feature&gt; features;    
+float alpha;    
+float gamma;    
+    
+float Q(s, a) {    
+    float rtn = 0;    
+    for (i = 0; i < weights.length; ++i) {    
+        rtn += weights[i]*features[i](s, a)    
+    }    
+    return rtn;    
+}    
+    
+while (game.alive()) {
+    weights = [0] * features.length;    
+    s = game.state;    
+    a = <span style="color: red;">choose_move</span>(game);    
+    reward, s' = game.do(act);    
+    actions = game.get_actions()    
+    max_val = -1e300;    
+    for (a' in actions) {    
+        val = Q(s', a')    
+        if (val > max_val)    
+            max_val = val;    
+    }    
+    diff = reward + gamma * max_val - Q(s, a)
+    for (i = 0; i < weights.length; ++i) {
+        weights[i] += alpha * diff * features[i](s, a);
     }
-    </code>
+}
+</pre>
 </p>
 <p>
     In English, we perform moves and update our weights each time. In this way, our weights (and hence our Q's) become a bit better each time. We choose our moves in a way similar to vanilla Q-learning.
