@@ -19,8 +19,76 @@ MathJax.Hub.Config({
 <body>
 <main>
 <h1>Linear Classifiers</h1>
-<h2>...</h2>
-<h3>...</h3>
+<h2>Background</h2>
+<p>
+    Imagine I have $n$ datapoints of dimension $m$. The goal of classification is to find the function $f$ that takes each row of $X$ and returns the appropriate value of $Y$, and continues to do so as we get more data. Failing that (which we usually do), we want to be correct as often as possible.
+</p>
+<p>
+    If we have two categories and two featues, we can think of a linear classifier as drawing a line through the feature-spcae and guessing that everything above is in one category, and everything below is in the other. This generalizes to higher dimensions, so if we have $m$ dimensions, the classifier draws a $m-1$ hyperplane to make its guesses.
+</p>
+<h2>Perceptron</h2>
+<h3>Binary</h3>
+<p>
+    A perceptron simply takes a vector features and returns a weighted sum of them. In the words of linear algebra, if we have a feature vector $\vec{x}$ and a weight vector $\vec{w}$, then the perceptron takes the dot product:
+    $$\vec{x} \cdot \vec{w}$$
+    This is known as the <em>activation</em> of the perceptron.
+</p>
+<p>
+    For simplicity, let's first consider a binary perceptron - that is a single perceptron that's trying to classify all data into one of two categories: $A$ and $B$. In this case, the classification is straightforward. The perceptron has a weight vector $\vec{w}$, and for every feature vector $x$, it classifies it as $A$ if $\vec{x} \cdot \vec{w} > 0$ and otherwise guesses $B$.
+</p>
+<p>
+    To learn, we first need to define a loss function. To do so, let $y$ denote the true category, using $1$ to denote $A$ and $-1$ to denote $B$. Then, we typically define the loss function as
+    $$\max{\left(0, -y \cdot (\vec{x} \cdot \vec{w}) \right)}$$
+    where $$
+    Some introspection should allow you to convince yourself that the loss will be 0 if we guess the right answer, and some positive number otherwise. The value of the positive number will be proportional to "how far off" our guess was.
+</p>
+<p>
+    From here, we basically just do gradient descent:
+<pre>
+Matrix<double>x = matrix of features
+Vector<int>y = vector of categories (1s and -1s)
+Vector<double>w = [0] * m
+while (true) {
+    int num_wrong = 0;
+    for (uint i = 0; i < n; ++i) {
+        double dot = dot_product(x[i], w);
+        int guess = dot > 0 ? 1 : -1;
+        if (guess == y[i]) continue;
+        else ++num_wrong;
+        for (uint j = 0; j < w.length; ++j) {
+            w[j] += y[i] * x[j];
+        }
+    }
+    if (num_wrong == 0) break;
+}
+</pre>
+</p>
+<p>
+    There is a pretty large problem with this so far: if all your features are 0, then your sum will always be 0, so we'll always guess $B$. This is easy to solve, though, by introducing a <em>bias</em> features, which is just always a 1 for every datapoint.
+</p>
+<p>
+    The running time of this algorithm is $O(l^2/d^2)$ where $l$ is the largest of all the feature vectors' lengths, and where $d$ is the minimum distance between an $A$ feature and a $B$ feature.
+</p>
+<h3>Multiway</h3>
+<p>
+    The idea is basically the same for multiway perceptrons, except
+    <ol>
+        <li>you create a bunch of binar perceptrons for each category</li>
+        <li>you guess the category whose dot product is largest</li>
+        <li>the update step is different. If $w_i$ represents the weights of the correct category, than we update it by adding the features to the weights, in a pairwise fashion. If $w_j$ represents the weights of an incorrect category, then we updated it by <em>subtracting</em> the features from the weights, in a pairwise fashion. Some thought should convince you that this is very similar to the binary case.</li>
+    </ol>
+</p>
+<h3>Problems</h3>
+<ol>
+    <li>They can't learn non-separable data.</li>
+    <li>The generalizations can be poor.</li>
+    <li>They tend to overfit the training data with too many iterations.</li>
+</ol>
+<h2>MIRA</h2>
+<p>
+    ...
+</p>
+<h2>Maximum Entropy</h2>
 <p>
     ...
 </p>

@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Supervised Learning</h1>
+<h2>Overview</h2>
+<p>
+    Supervised learning refers to a wide variety of machine learning algorithms that attempt to learn how to guess the value of one variable given the values of other variables. One common output is what category a datapoint belongs to.
+</p>
+<p>
+    For instance, you could imagine you're trying to figure out whether a particular email is spam. Your might handcode some features like
+    <ol>
+        <li>the domain of the sender</li>
+        <li>whether the subject is in all caps</li>
+        <li>the proportion of characters that are punctuation</li>
+    </ol>
+</p>
+<p>
+    Then, the machine learning algorithm figures out which combinations of these predict that an email is spam or not, and uses these to classify the emails.
+</p>
+<p>
+    We can evaluate how good (or bad) a classification scheme is using loss functions. For instance, if $h$ is the predicted value and $y$ is the actual value, then we could try to minimize square loss:
+    $$\sum_i{(h(x_i)-y_i)^2}$$
+</p>
+<p>
+    The principle problem with just minimizing loss over your dataset is that this tends to lead to overfitting - after all you can fit any $n$ datapoints with an $(n+1)$-degree polynomial. To get around this problem, we partition the data into three groups:
+    <ol>
+        <li><b>Training Data</b> - this data is used to construct the function (often by choosing weights)</li>
+        <li><b>Validation Data</b> - this data is used to tune hyperparameters or choices about data-processing</li>
+        <li><b>Test Data</b> - this data is used to evaluate teh actual accruacy of the test set</li>
+    </ol>
+</p>
+<h2>Fitting</h2>
+<p>
+    Given that most functions are incomputable, it's pretty obvious that no machine learning algorithm is going to consider all possible functions. Instead, each algorithm has a set of functions its considering called the <em>hypothesis space</em>. Learning is the process of finding the function that minimizies the loss function.
+</p>
+<h2>Pruning</h2>
+<p>
+    ...
+</p>
+</main>
+</body>
+</html>
