@@ -1,49 +1,49 @@
 
 console.log("script.js loaded");
-
-var header_html = "";
-var footer_html = "<hr><a href='https://github.com/Thomas-Redding/nice-notes'>Contribute</a>";
-
 var foo;
-onload = function() {
-	var url = window.location.href;
-	path = url.substr(url.indexOf("nice-notes") + 11).replace("-", " ").split("/");
+
+function construct_header() {
+    var header_html = "";
+    var url = window.location.href;
+    path = url.substr(url.indexOf("nice-notes") + 11).replace("-", " ").split("/");
     var file;
-	if (path.length == 1) {
-		// index.html
+    if (path.length == 1) {
+        // index.html
         file = path[0];
-		console.log("index.html");
-		header_html += "<a href=\"index.html\">Nice Notes</a>";
-	}
-	else {
-		var folder = path[0];
-		file = path[1];
-		header_html += "<a href=\"../index.html\">Nice Notes</a>";
-		if (path[1] == "index.html") {
-			// linear-algebra/index.html
-			header_html += " / <a href='index.html'>" + folder + "</a>";
-		}
-		else {
-			// linear-algebra/eigenvectors.html
-			var title = document.getElementsByTagName("h1")[0].innerHTML;
-			header_html += " / <a href='index.html'>" + folder + "</a>";
-			header_html += " / <a href='" + file + "'>" + title + "</a>";
-		}
-	}
+        console.log("index.html");
+        header_html += "<a href=\"index.html\">Nice Notes</a>";
+    }
+    else {
+        var folder = path[0];
+        file = path[1];
+        header_html += "<a href=\"../index.html\">Nice Notes</a>";
+        if (path[1] == "index.html") {
+            // linear-algebra/index.html
+            header_html += " / <a href='index.html'>" + folder + "</a>";
+        }
+        else {
+            // linear-algebra/eigenvectors.html
+            var title = document.getElementsByTagName("h1")[0].innerHTML;
+            header_html += " / <a href='index.html'>" + folder + "</a>";
+            header_html += " / <a href='" + file + "'>" + title + "</a>";
+        }
+    }
 
-	var main = document.getElementsByTagName("main")[0];
+    var header = document.createElement("header");
+    header.innerHTML = header_html;
+    document.body.insertBefore(header, document.body.firstChild);
+}
 
-	var header = document.createElement("header");
-	header.innerHTML = header_html;
-    document.body.insertBefore(header, document.body.firstChild)
-
-
-	var footer = document.createElement("footer");
-	footer.innerHTML = footer_html;
+function construct_footer() {
+    var footer_html = "<hr><a href='https://github.com/Thomas-Redding/nice-notes'>Contribute</a>";
+    var main = document.getElementsByTagName("main")[0];
+    var footer = document.createElement("footer");
+    footer.innerHTML = footer_html;
     main.parentNode.insertBefore(footer, main.nextSibling);
+}
 
-    if (file == "index.html")
-        return;
+function construct_table_of_contents() {
+    var main = document.getElementsByTagName("main")[0];
 
     var nav = document.createElement("nav");
     var h2s = document.getElementsByTagName("h2");
@@ -77,7 +77,16 @@ onload = function() {
 
     var title = document.getElementsByTagName("h1")[0];
 
-	main.insertBefore(nav, title.nextElementSibling);
+    main.insertBefore(nav, title.nextElementSibling);
+}
+
+onload = function() {
+	construct_header();
+    construct_footer();
+
+    var url = window.location.href;
+    var path = url.substr(url.indexOf("nice-notes") + 11).replace("-", " ").split("/");
+    if (path[path.length-1] != "index.html") construct_table_of_contents();
 }
 
 function get_y_pos(el) {

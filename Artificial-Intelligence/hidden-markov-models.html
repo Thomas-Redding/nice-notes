@@ -18,6 +18,7 @@ MathJax.Hub.Config({
 </head>
 <body>
 <main>
+<!--
 <h1>Markov Models</h1>
 <h2>The Markov Assumption</h2>
 <p>
@@ -185,12 +186,11 @@ MathJax.Hub.Config({
 	Note, that the prior distribution for $X_1$, the emission probabilities, and the transition probabilities are all given by  and constant throughout the problem, so we've really just used all these known variables to compute the distribution of $X_1$ given $E_1=e_1$.
 </p>
 <p>
-	Imagine, now, that we wanted to compute $P(X_2=x_2 | E_1=e_1,E_2=e_2)$. By Bayes' theorem, we can compute this:
+	Imagine, now, that we wanted to compute $P(X_2=x_2 | E_1=e_1,E_2=e_2)$. By Bayes' theorem, we can compute this, but let's ignore the denominator, because we can simply normalize it later:
 	$$P(X_2=x_2 | E_1=e_1,E_2=e_2) \propto P(E_1=e_1,E_2=e_2 | X_2=x_2) P(X_2=x_2)$$
-	...[todo]
 </p>
 <p>
-	We will, however, ignore the denominator, because we can simply normalize it later.
+    ...[todo]
 </p>
 <h3>Forward Algorithm</h3>
 <p>
@@ -274,18 +274,61 @@ normalize(dist) {
 		</ol>
 	</ol>
 </p>
+-->
 <h3>Viterbi Algorithm</h3>
 <p>
 	So, far we have focused on finding the most likely state you are currently in. However, what if you want to find the most likely sequence of states you were in over time? This might be useful for, say, speech-to-text models. More formally, we're computing
 	$$argmax_{x_1,\dots,x_t}{P(X_1=x_1,\dots,X_t=x_t | E_1=e_1,\dots,E_t=e_t)}$$
 </p>
 <p>
-	It turns out we can do this in a dynamic way:
-	<ol>
-		<li>Create a table of states to probabilities - initalized to priors.</li>
-		<li>todo</li>
-	</ol>
+	It turns out we can do this in a dynamically
 </p>
+<pre>
+function viterbi(priors, transition, emissions, evidence) {
+    /* probs[s] will be the probability of
+    the most likely path that ends in state s */
+    Map<State, double> probs[evidence.length];
+    Map<State, State> froms[evidence.length];
+
+    // initalize probs to priors and mlu
+    for (s in states) {
+        probs[0][s] = prior[s] * emission[s, evidence[0]];
+        froms[0][s] = null;
+    }
+
+    // dynamicaly update probs and froms
+    for (var i = 1; i < evidence.length; ++i) {
+        for (state_to in states) {
+            max_p = 0;
+            max_from = null;
+            for (s in states) {
+                p = probs[i-1][s] * emission[s, evidence[1]] * transition[s, state_to];
+                if (p > max_p) {
+                    max_p = p;
+                    max_from = s;
+                }
+            }
+            probs[i][state_to] = max_p;
+            froms[i][max_from] = max_from;
+        }
+    }
+
+    // find path's endpoint
+    max_p = -100;
+    endpoint = null;
+    for (s in states) {
+        if (probs.end()[s] > max_p) {
+            max_p = probs.end()[s];
+            endpoint = s;
+        }
+    }
+
+    path = [endpoint];
+    for (var i = froms.length - 1; i > 0; --i) path.append(froms[i][path.first()]);
+    path.reverse();
+    return path;
+}
+</pre>
 </main>
 </body>
 </html>

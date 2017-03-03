@@ -32,22 +32,56 @@ MathJax.Hub.Config({
     A perceptron simply takes a vector features and returns a weighted sum of them. In the words of linear algebra, if we have a feature vector $\vec{x}$ and a weight vector $\vec{w}$, then the perceptron takes the dot product:
     $$\vec{x} \cdot \vec{w}$$
     This is known as the <em>activation</em> of the perceptron.
+    <figure>
+    <canvas id="max-margin" width="600" height="600">
+    </canvas>
+    <figcaption>x</figcaption>
+    </figure>
 </p>
+<style>
+#max-margin {
+    max-width: 100%;
+    max-height: 30vh;
+    display: block;
+    margin: 1em auto;
+}
+</style>
+<script src="../math.js"></script>
+<script src="../draw.js"></script>
+<script>
+var cvs = document.getElementById("max-margin");
+var c = cvs.getContext("2d");
+c.lineWidth = 10;
+draw_arrow(c, 100, 500, 100, 100, 10);
+draw_arrow(c, 100, 500, 500, 500, 10);
+c.beginPath();
+c.arc(100, 500, 5, 0, 2*Math.PI);
+c.fill();
+var red = random_points(10, [0, 0], [1, 1], function (pt) { return pt[0] < pt[1] - 0.1; })
+var blue = random_points(10, [0, 0], [1, 1], function (pt) { return pt[0] > pt[1] + 0.1; });
+c.lineWidth = 3;
+c.fillStyle = "red";
+draw_points(c, red, 10, [400, 400], [100, 500]);
+c.fillStyle = "blue";
+draw_points(c, blue, 10, [400, 400], [100, 500]);
+draw_line(c, 100, 500, 500, 100);
+// todo
+</script>
 <p>
     For simplicity, let's first consider a binary perceptron - that is a single perceptron that's trying to classify all data into one of two categories: $A$ and $B$. In this case, the classification is straightforward. The perceptron has a weight vector $\vec{w}$, and for every feature vector $x$, it classifies it as $A$ if $\vec{x} \cdot \vec{w} > 0$ and otherwise guesses $B$.
 </p>
 <p>
     To learn, we first need to define a loss function. To do so, let $y$ denote the true category, using $1$ to denote $A$ and $-1$ to denote $B$. Then, we typically define the loss function as
     $$\max{\left(0, -y \cdot (\vec{x} \cdot \vec{w}) \right)}$$
-    where $$
+    where $y$ is the correct classification, $\vec{x}$ is the feature vector, and $vec{w}$ is the weight vector.
     Some introspection should allow you to convince yourself that the loss will be 0 if we guess the right answer, and some positive number otherwise. The value of the positive number will be proportional to "how far off" our guess was.
 </p>
 <p>
     From here, we basically just do gradient descent:
 <pre>
-Matrix<double>x = matrix of features
-Vector<int>y = vector of categories (1s and -1s)
-Vector<double>w = [0] * m
+Matrix&lt;double&gt; x = matrix of features
+Vector&lt;int&gt; y = vector of categories (1s and -1s)
+Vector&lt;double&gt; w = [0] * m
 while (true) {
     int num_wrong = 0;
     for (uint i = 0; i < n; ++i) {
@@ -86,11 +120,38 @@ while (true) {
 </ol>
 <h2>MIRA</h2>
 <p>
-    ...
+    MIRA is a variation on the perceptron algorithm in which we move the weights more intelligently. In particular, we'll multiply the weight change by
+    $$\min{\left(\frac
+    {\left( \vec{w}_\mathrm{old}-\vec{w}^*_\mathrm{old} \right) \cdot \vec{x} + 1}
+    {2\vec{x} \cdot \vec{x}}
+    ,M\right)}$$
+    where $\vec{w}_\mathrm{old}$ is the previous weight vector and $\vec{w}_\mathrm{old}^*$ is ...
 </p>
-<h2>Maximum Entropy</h2>
 <p>
-    ...
+    This is relaed to max-margin methods, which try to define a boundary that maximizes the minimum distances between points and the boundary.
+</p>
+<p>
+    While MIRA and max-margin methods tend to do better in practice, they are still limited to finding a perfect linear solution. If no such solution exists, they fail.
+</p>
+<h2>Logistic Regression</h2>
+<p>
+    Also known as Maximum Entropy, Logistic Regession is a very common machine learning/statistical technique. Unlike the Perceptron and MIRA methods, logistic regression isn't restricted to just outputing a category, but can instead output a probability that a point belongs to a class. In particular, for class $i$, we'll model the probability as
+    $$P(c=i|X=\vec{x})=\frac{1}{1+e^{-\vec{w}_i \cdot \vec{x}}}$$
+    where $\vec{w}_i$ is the weight vector for class $i$.
+</p>
+<p>
+    If your features are booleans, then you can think of this as each feature "voting" and the overall decision being a weighted sum of the votes.
+</p>
+<h3>Entropy</h3>
+<p>
+    Intuitively, entropy is a measure how uncertain you are about an outcome. If you are completely certain, the entropy is 0, and if you are uniformly uncertain about an event with $n$ coutcomes, then the entropy is $\log{n}$.
+</p>
+<p>
+    In particular, we define entropy as
+    $$H(X) = \sum_x{P(X=x) \cdot \log{\left(P(X=x)\right)}}$$
+</p>
+<p>
+    Logistic regression is called maximum entropy, because it makes the distribution follow the constraints from the training data, but otherwise maximizes entropy (uncertainty).
 </p>
 </main>
 </body>
