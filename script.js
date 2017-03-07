@@ -34,6 +34,10 @@ function construct_header() {
     document.body.insertBefore(header, document.body.firstChild);
 }
 
+function scroll_to_top() {
+    document.getElementsByTagName("main")[0].scrollIntoView();
+}
+
 function construct_footer() {
     var footer_html = "<hr><a href='https://github.com/Thomas-Redding/nice-notes'>Contribute</a>";
     var main = document.getElementsByTagName("main")[0];

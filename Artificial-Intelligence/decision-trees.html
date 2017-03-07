@@ -19,7 +19,28 @@ MathJax.Hub.Config({
 <main>
 <h1>Decision Trees</h1>
 <h2>The Model</h2>
-<h2>Training</h2>
+<p>
+    A decision tree is a tree where each node is a question, and each edge is an answer. It allows us to represent how categorical variables relate to classes:
+</p>
+<figure>
+    <img src="titanic-decision-tree.png" style="max-height: 15em;">
+    <figcaption>Decision tree for Titanic survivors</figcaption>
+</figure>
+<h2>Construction</h2>
+<p>
+    Given any dataset where any identical inputs always get classified the same way, there is always a decision tree that correctly classifies that data. The issue is that this is the mother of all overfitting.
+</p>
+<p>
+    ...
+</p>
+<p>
+    We can measure the entropy (uncertainty) of $Y$ given $X$ with
+</p>
+$$H(Y|X) = - \sum_{j=1}^m {p(x_j) \sum_{i=1}^k p(y_i | x_j) \log_2{p(y_i | x_j)}}$$
+<p>
+    Basically, when constructing our tree, we want to greedily choose variables that gain us the most information - i.e. that minimize entropy:
+    $$\mathrm{InformationGain}(X) = H(Y) - H(Y | X)$$
+</p>
 <h2>Pruning</h2>
 <p>
     ...

@@ -233,6 +233,15 @@ while (game.alive()) {
 <p>
     <em>Model-based learning</em> tries out actions in different states, and then tries to estimate both the transition function, $T(s,a,s')$, and also the reward function, $R(s,a,s')$. It does this by walking around and observing these values, and then using value- or policy-iteration to find the optimal policy.
 </p>
+<p>
+    As examples:
+    <ol>
+        <li>Value iteration is not really a learning algorithm - it just solves the problem</li>
+        <li>TD-learning is model-based</li>
+        <li>Q-learning is model-free</li>
+        <li>Approximate Q-learning is ???</li>
+    </ol>
+</p>
 </main>
 </body>
 </html>

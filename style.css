@@ -17,7 +17,7 @@ header {
 	padding: 0.5em 0;
 	width: 100%;
 	z-index: 100;
-	border-bottom: 1px solid #888;
+    border-bottom: 0.1em solid #aaa;
 }
 
 main {
@@ -29,9 +29,9 @@ main {
 }
 
 nav {
-    background-color: #EEE;
+    background-color: hsl(0, 0%, 97%);
     display: inline-block;
-    padding: 1em;
+    padding: 0.5em 1em;
 }
 
 nav > ol {
