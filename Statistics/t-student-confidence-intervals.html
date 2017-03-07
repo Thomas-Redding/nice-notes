@@ -1,0 +1,53 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>T Confidence Intervals</h1>
+<h3>General Idea</h3>
+T confidence intervals are a combination of <a href="T-Testing.html">T hypothesis testing</a> and <a href="Confidence Intervals.html">confidence intervals</a>. They assume a normal distribution with an unknown standard deviation. As you know, when $\sigma$ is unknown, the sample mean follows a t-distribution with center $\mu$, standard error $\sigma$, and degrees of freedom $n-1$. T confidence intervals just extend this fact to confidence intervals.
+<h3>Example</h3>
+You sample the heights of 400 women in a town and find that the sample has an average of 64" and a standard deviation of 2". We can write the t-statistic:
+$$T^*=\frac{\bar{X}-\mu}{s/\sqrt{n}}$$
+$$T^*=\frac{64-\mu}{2/\sqrt{400}}$$
+$$T^*=\frac{64-\mu}{0.1}$$
+<br><br>
+Now, $T^*$ follows a T-distribution centered on $\mu$ with 399 degrees of freedom, so we can write a confidence interval for $T^*$:
+$$0.95=P\left(q_1 \lt T^* \lt q_2\right)$$
+$$0.95=P\left(q_1 \lt \frac{64-\mu}{0.1} \lt q_2\right)$$
+$$0.95=P\left(64+0.1q_1 \gt \mu \gt 64-0.1q_2\right)$$
+We can compute $q_1$ and $q_2$ for a 95% confidence interval using the inverse t-distribution function with 399 degrees of freedom.
+<img src="Normal CI.png" style="max-width:400px;">
+$$q_1=-1.965927, q_2=1.965927$$
+Thus,
+$$0.95=P\left(64+0.197 \gt \mu \gt 64-0.197\right)$$
+$$0.95=P\left(64.197 \gt \mu \gt 63.803\right)$$
+Thus, we can say that "there is a 95% chance that the true average height of women in this town is between 63.8 and 64.2 inches tall."
+<h3>Generalization</h3>
+Difference in Means
+<br><br>
+... todo ...
+<br><br>
+Pooling the variance of the two populations provides a small gain  if the two populations have the same variance. Otherwise, it causes very poor performance. In general, this is difficult to verify whether the two populations have equal variance, so pooling variances should generally be avoided, especially so if the sample sizes are unequal. A single exception is if one of the samples is very small, such that it provides little information about its population's variance. In this case, it <i>might</i> be better to assume the variances are equal, because we have so much uncertainty about one of the population's variances.
+<h3>Assumptions</h3>
+Using the t confidence interval method, makes the assumption that the population is normally distributed. The method is resistant to violations of this assumption if the distribution is symmetric and the sample size is reasonably large. However, this method does not work well at all if the population is skewed.
+<br><br>
+Skewness matters less for two-sample t confidence intervals if the two samples have similar levels of skewness in the same direction, because the two population's skewness tend to cancel each other out.
+</main>
+</body>
+</html>

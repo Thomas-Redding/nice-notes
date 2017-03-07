@@ -1,0 +1,194 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+<style>
+.probability-table {
+    text-align: center;
+}
+
+.probability-table > tbody > tr > td {
+    border: 1px solid black;
+    padding: 1em 0;
+}
+
+</style>
+</head>
+<body>
+<main>
+<h1>Probability</h1>
+<h2>Basic Concepts</h2>
+<h3>Events</h3>
+<p>
+    If I have a coin and you are uncertain whether it's a trick double-heads coin or a fair coin, you could say that the world is in one of two states:
+    <ol>
+        <li>The coin is double-heads</li>
+        <li>The coin is fair</li>
+    </ol>
+</p>
+<p>
+    We call two events <em>mutually exclusive</em> if they can't both happen. For instance, the three events above are mutually exclusive, because only one of them can occur.
+</p>
+<p>
+    Likewise, we call a set of events <em>exhaustive</em> if at least one of them must happen. While we often assume a coin must land heads or tails, there are other possible outcomes such as landing on it's edge or not landing because someone caught it. Howeer, we often ignore these edge cases to simplify problems, so it's reasonable for us to say that the three events listed above are also exhaustive.
+</p>
+<p>
+    This ability to divide the world into exhaustive and mutually exclusive events is at the heart of probability theory, and the question of how to specific to make each event depends on the question you want to answer. I might split up the last into four:
+    <ol>
+        <li>The coin lands heads, and it will rain tomorrow</li>
+        <li>The coin lands heads, and it won't rain tomorrow</li>
+        <li>The coin lands tails, and it will rain tomorrow</li>
+        <li>The coin lands tails, and it won't rain tomorrow</li>
+    </ol>
+    If you just care about how the coin will land, then tomorrow's weather is irrelevant, and you might as well use the two events from before. However, if both things matter (say you've made a bet with a friend that you wouldn't wear a coat tomorrow), this new information might be useful.
+</p>
+<h3>Probability</h3>
+<p>
+    If the heart of probability theory is dividing the world into mutually exclusive and exhaustive events, then the brain is realizing that we can assign these events numbers called <em>probabilities</em>. Although the philosophical interpretation of "probability" varies widely, everyone agrees that the numbers should correspond to how likely the event is to happen. In particular, if event $A$ has twice the probability of event $B$, then it should be twice as likely to happen.
+</p>
+<p>
+    For instance, if I roll a fair dice, then we can say there is an equal probability of each number between 1 and 6. We can represent this graphically as
+<table class="probability-table"><tbody><tr>
+<td style="background-color: hsl(0,   80%, 80%);">1</td>
+<td style="background-color: hsl(60,  80%, 80%);">2</td>
+<td style="background-color: hsl(120, 80%, 80%);">3</td>
+<td style="background-color: hsl(180, 80%, 80%);">4</td>
+<td style="background-color: hsl(240, 80%, 80%);">5</td>
+<td style="background-color: hsl(300, 80%, 80%);">6</td>
+</tr></tbody></table>
+</p>
+<p>
+Note, that just as each event has equal probability, each event has equal area. On the other hand, if you roll two dice, the table looks like
+<table class="probability-table"><tbody>
+<tr>
+    <td style="background-color: hsl(0,   80%, 80%);"  width="5.556%">2</td>
+    <td style="background-color: hsl(60,  80%, 80%);" width="11.111%">3</td>
+    <td style="background-color: hsl(120, 80%, 80%);" width="16.667%">4</td>
+    <td style="background-color: hsl(180, 80%, 80%);" width="22.222%">5</td>
+    <td style="background-color: hsl(240, 80%, 80%);" width="27.778%">6</td>
+    <td style="background-color: hsl(300, 80%, 80%);" width="16.667%" rowspan="2">7</td>
+</tr>
+<tr>
+    <td style="background-color: hsl(0,   80%, 80%);">12</td>
+    <td style="background-color: hsl(60,  80%, 80%);">11</td>
+    <td style="background-color: hsl(120, 80%, 80%);">10</td>
+    <td style="background-color: hsl(180, 80%, 80%);">9</td>
+    <td style="background-color: hsl(240, 80%, 80%);">8</td>
+</tr>
+</tbody></table>
+</p>
+<p>
+    This makes sense, because rolling a 2 is half as likely as rolling a 3, which is half as likely as rolling a 5.
+</p>
+<h2>Symbols</h2>
+<h3>Axioms</h3>
+<p>
+    Because drawing these tables is neither easy nor objective, it's often useful to use mathematics to make our lives easier. However, before we can use mathematics, need to things: a formal definition of probability and some notation.
+</p><p>
+    To define probability, we'll have <a href="https://en.wikipedia.org/wiki/Probability_axioms">three criteria</a>
+    <ol>
+        <li>Every event must have a  probability between 0 and 1.</li>
+        <li>If I have a set of mutually exclusive events, then the probability of that set is equal to the sum of the individual probabilities.</li>
+        <li>The probability of a exhaustive set of events is 1.</li>
+    </ol>
+</p>
+<p>
+    We also need some notation. We'll generally describe events in terms of <em>random variables</em> and <em>values</em>. For instance, we can represent the result of a dice roll as a random variable $D$. Unlikely normal variables, $D$ doesn't actually have a particular value that we need to solve for.
+</p>
+<p>
+    Instead, we use random variables to talk about random events. For instance, we could denote the event "I roll a 3" as $D=3$. To connect this with probabilities, I can denote "The probability I roll a 3" as $P(D=3)$.
+</p>
+<p>
+    We can treat $P(D=3)$ like a number. So, we can say that every outcome of the dice is equally likely by stating
+    $$P(D=1)=P(D=2)=\cdots=P(D=6)$$
+</p>
+<p>
+    Similarly, we can say that a coin is biased towards heads with
+    $$P(C=\mathrm{head}) > P(C=\mathrm{tails})$$
+</p>
+<p>
+    Knowing this notation, we can rewrite our three axioms more formally. To do this, let $\Omega$ denote a set of mutually exclusive and exhaustive events.
+</p>
+<style>
+.spaced-list > li {
+    padding: 0.5em 0;
+}
+</style>
+<ol class="spaced-list">
+    <li>$0 \leq P(x) \leq 1$ for all $x$ in $\Omega$ <br/> Every event must have a  probability between 0 and 1.</li>
+    <li>$P(A) = \sum_{a \in A}{P(a)}$ for all $A \subseteq \Omega$ <br/> If I have a set of mutually exclusive events, then the probability of that set is equal to the sum of the individual probabilities.</li>
+    <li>$\sum_{e \in \Omega}{P(e)} = 1$ <br/> The probability of a exhaustive set of events is 1.</li>
+</ol>
+<h2>More Notation</h2>
+<p>
+    From this point forward, you should assume (unless otherwise stated) that coins and dice are fair.
+</p>
+<p>
+    In English, we can use the word "or" to combine two events. For instance, we might say "The probability that I flip a  or a 5". We can represent this as $P(D=3 \cup D=5)$.
+<table class="probability-table"><tbody>
+<tr>
+    <td style="background: repeating-linear-gradient(45deg, hsl(0,80%,80%), hsl(0,80%,80%) 10px, hsl(0,80%,90%) 10px, hsl(0,80%,90%) 20px);" width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{heads}$</td>
+    <td style="background: repeating-linear-gradient(45deg, hsl(60,80%,80%), hsl(60,80%,80%) 10px, hsl(60,80%,90%) 10px, hsl(60,80%,90%) 20px);"  width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{heads}$</td>
+</tr>
+<tr>
+    <td style="background-color: hsl(120,80%,80%);"  width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{tails}$</td>
+    <td style="background: repeating-linear-gradient(45deg, hsl(180,80%,80%), hsl(180,80%,80%) 10px, hsl(180,80%,90%) 10px, hsl(180,80%,90%) 20px);" width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{tails}$</td>
+</tr>
+</tbody></table>
+</p>
+<p>
+    Imagine, on the other hand, that you roll two dice: $D_1$ and $D_2$. You might be interested in the probability that you roll "doubles" - that is, the same number on each dice. We can denote this $P(D_1 = D_2)$.
+<table class="probability-table"><tbody>
+<tr>
+    <td style="background-color: hsl(0,  80%, 80%);" width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{heads}$</td>
+    <td style="background: repeating-linear-gradient(45deg, hsl(60,80%,80%), hsl(60,80%,80%) 10px, hsl(60,80%,90%) 10px, hsl(60,80%,90%) 20px);"  width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{heads}$</td>
+</tr>
+<tr>
+    <td style="background: repeating-linear-gradient(45deg, hsl(120,80%,80%), hsl(120,80%,80%) 10px, hsl(120,80%,90%) 10px, hsl(120,80%,90%) 20px);"  width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{tails}$</td>
+    <td style="background-color: hsl(180,  80%, 80%);" width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{tails}$</td>
+</tr>
+</tbody></table>
+</p>
+<p>
+    Finally, we probably want a way to denote that two events both happen. For instance, the probability that we rolled a "2" with the first dice and a "5" with the second dice. We can represent this simply with a comma: $P(D_1=3, D_2=5)$.
+<table class="probability-table"><tbody>
+<tr>
+    <td style="background-color: hsl(0,  80%, 80%);" width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{heads}$</td>
+    <td style="background: repeating-linear-gradient(45deg, hsl(60,80%,80%), hsl(60,80%,80%) 10px, hsl(60,80%,90%) 10px, hsl(60,80%,90%) 20px);"  width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{heads}$</td>
+</tr>
+<tr>
+    <td style="background-color: hsl(120,80%,80%);"  width="50%">$C_1=\mathrm{tails}, C_2=\mathrm{tails}$</td>
+    <td style="background-color: hsl(180,  80%, 80%);" width="50%">$C_1=\mathrm{heads}, C_2=\mathrm{tails}$</td>
+</tr>
+</tbody></table>
+</p>
+<h2>Correspondence</h2>
+<p>
+    This notation may all seem rather etheral, so let's make it more concrete. If I have a far coin, $C$, then the probability I flip a head is 50%. That is, $P(c=\mathrm{head})=0.50$. We can represent this graphically as
+<table class="probability-table"><tbody>
+<tr>
+    <td style="background: repeating-linear-gradient(45deg, hsl(0,80%,80%), hsl(0,80%,80%) 10px, hsl(0,80%,90%) 10px, hsl(0,80%,90%) 20px);"  width="50%">$C=\mathrm{heads}$</td>
+    <td style="background-color: hsl(60,  80%, 80%);" width="50%">$C=\mathrm{tails}$</td>
+</tr>
+</tbody></table>
+    Note, that the areas of both events are equal, because their probabilities are equal.
+</p>
+<h2>Dependence</h2>
+<p>
+    ...
+</p>
+</main>
+</body>
+</html>

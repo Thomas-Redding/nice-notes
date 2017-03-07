@@ -1,0 +1,95 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Unbiasedness</h1>
+<div class="grey">
+<ol>
+<li><a href="#Theory">Theory</a></li>
+<li><a href="#Example 1: Maximum Likelihood">Example 1: Maximum Likelihood</a></li>
+<li><a href="#Unbiasedness of Mean.html">Unbiasedness of Mean</a></li>
+</ol>
+</div>
+<h3 id="Theory">Theory</h3>
+So far, we have talked about two different types of estimation techniques: <a href="Maximum Likelihood.html">maximum likelihood estimation</a> and the <a href="Method of Moments.html">method of moments</a>. Now, we will talk about ways to evaluate how "good" different estimators are.
+<br><br>
+An estimator for a parameter, $\theta$ is <b>unbiased</b> if, given some value for $\theta$, the expected value of the estimator is $\theta$. Formally, the <b>bias</b> of an estimator is
+
+$$E\left[\hat{\theta}\right]-\theta$$
+
+<h3 id="Example 1: Maximum Likelihood">Example 1: Maximum Likelihood</h3>
+We would use our lottery-ticket example, but this turns out to not work out nicely, mathematically speaking. Instead, we will use a very similar example: a <u>continuous</u> uniform distribution from 0 to $b$.
+<br><br>
+We <a href="Maximum Likelihood.html#Example 2: Continuous Uniform">know</a> that the maximum likelihood estimator for $b$ for a uniform distribution from 0 to $b$ is simply the maximum of the sample. We also know that the definition of bias is
+$E\left[\hat{b}\right]-b$. Therefore, we know that the bias of this estimator is simply:
+
+$$E\left[m\right]-b$$
+
+where $m$ is the maximum of our sample.
+<br><br>
+We also <a href="Sampling Distributions.html#Example: Maximum of the Uniform">know</a> that the sampling distribution for $m$ is
+
+$$f(m)=\frac{nm^{n-1}}{b^n}, m \leq b$$
+
+This means we can compute the expected value of $m$:
+
+$$E\left[m\right] = \int_0^b{m\frac{nm^{n-1}}{b^n} dm} = \frac{n}{b^n} \int_0^b{m^n dm} = \frac{n}{n+1}b$$
+
+Thus, the bias of our estimator is given by:
+
+$$E\left[m\right]-b = \frac{n}{n+1}b-b = \frac{-b}{n+1}$$
+
+We can see, then, that our estimator has a negative bias, meaning that it will tend to underestimate $b$. This makes sense, considering that that the maximum of a sample can never exceed $b$, it is almost certain that it will be less than $b$.
+
+<h3>Example 1: Method of Moments</h3>
+We <a href="Method of Moments#Example #2: Uniform Continuous">know</a> that the method of moments estimator for a continuous uniform distribution from 0 to $b$ is simply twice the mean.
+<br><br>
+We haven't proven this yet, but it is also true that the mean of a sample is an unbiased estimate of a distribution's mean. This is proven <a href="#Unbiasedness of Mean">below</a>. The sample mean of a uniform distribution from 0 to $b$ is $\frac{b}{2}$. Thus, we know that the expected value for $\bar{x}$ is simply $\frac{b}{2}$. Now, we have enough knowledge to evaluate its bias:
+
+$$E\left[2\bar{x}\right] = 2E\left[\bar{x}\right]=2\frac{b}{2}=b$$
+
+Because the expected value of our estimator is equal to the parameter, we know that our estimator is unbaised.
+
+<h3 id="Unbiasedness of Mean">Unbiasedness of Mean</h3>
+Here, we will prove that the sample mean is an unbiased estimator of the population mean for every distribution. In other words, we will prove that
+
+$$E\left[\bar{x}\right]=\mu$$
+
+In this case, we will only prove it for discrete distributions, but a very similar proof holds for continuous ones.
+
+$$E\left[\frac{x_1+\cdots+x_n}{n}\right] = \frac{E\left[x_1+\cdots+x_n\right]}{n}$$
+
+By independence, this equals
+
+$$\frac{E\left[x_1\right]+\cdots+E\left[x_n\right]}{n}$$
+
+But $E[X]$ is the same thing, becaue $\mu$ is just the expected value of the distribution, so, this equals
+
+$$\frac{\mu + \cdots + \mu}{n}$$
+
+which just equals
+
+$$\mu$$
+
+Therefore
+
+$$E\left[\bar{x}\right]=\mu$$
+</main>
+</body>
+</html>

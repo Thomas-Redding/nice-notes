@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Efficiency</h1>
+<div class="contents">
+<ol>
+<li><a href="#Example: Uniform Distribution">Example: Uniform Distribution</a></li>
+<li><a href="#Theorem">Theorem</a></li>
+</ol>
+</div>
+<br><br>
+Let's say we have some parameter $\theta$ and two different estimators: $\hat{\theta}_1$ and $\hat{\theta}_2$. We can say that $\hat{\theta}_1$ is more <b>efficient</b> than $\hat{\theta}_2$ if it has lower variance:
+
+$$Var\left[\hat{\theta}_1\right] \lt Var\left[\hat{\theta}_2\right]$$
+
+<h3 id="Example: Uniform Distribution">Example: Uniform Distribution</h3>
+For a continuous uniform distribution from 0 to $b$, we have thus far explored 3 different estimators for $b$:
+
+<ol>
+<li>$m$ - maximum likelihood</li>
+<li>$2\bar{x}$ - method of moments</li>
+<li>$\frac{n+1}{n}m$ - unbiased maximum likelihood</li>
+</ol>
+
+We have deduced that the first one has a bias of $\frac{-b}{n+1}$ and the other two are unbiased. Now, let's compute each estimator's efficiency.
+<br><br>
+For <u>estimator #1</u>, we should recall that
+<ol>
+<li>The pdf of $m$ is $\frac{nm^{n-1}}{b^n}$</li>
+<li>The expected value of $m$ is $\frac{nb}{n+1}$
+</ol>
+From this, we can find the variance:
+
+$$Var\left[m\right] = \int_0^b{\frac{nm^{n-1}}{b^n}\left(m-E\left[m\right]\right)^2 dm} = \int_0^b{\frac{nm^{n-1}}{b^n}\left(m-\frac{nb}{n+1}\right)^2 dm}$$
+
+We'll leave it to the reader to solve this integral, but it turns out to be
+
+$$Var\left[m\right] = \frac{nb^2}{(n+1)^2(n+2)}$$
+For <u>estimator #2</u>, we have a special case of the the fact that <b>the variance of the sample mean is equal to the variance of the distribution divided by the sample-size</b>. This is proven <a href="#Theorem">below</a>. The variance of a uniform distribution between 0 and $b$ is simply $\frac{b^2}{12}$, so the variance of the sample-mean is
+$$\frac{b^2}{12n}$$
+
+The calculations for the variance of <u>estimator #3</u> are greatly simplified by the fact that we have already calculated #1:
+
+$$Var\left[\frac{n+1}{n}m\right] = \left(\frac{n+1}{n}\right)^2Var\left[m\right] = \left(\frac{n+1}{n}\right)^2\frac{nb^2}{(n+1)^2(n+2)} = \frac{b^2}{n(n+2)}$$
+
+Comparing all three variances as $n$ becomes large, we have
+
+$$\frac{b^2}{n(n+2)} \geq \frac{nb^2}{(n+1)^2(n+2)} \geq \frac{b}{12n}$$
+
+Thus, we can say that (for large $n$s), estimator #1 is the most efficient, estimator #2 is the least efficient, and estimator #3 is in between.
+<br><br>
+Note, that estimator #2 and #3 are both unbiased, but estimator #3 has lower variance, so in some sense estimator #3 is "strictly better" than estimator #2. However, the question remains: should we use estimator #1 or estimator #3? #1 has smaller variance but is biased; #2 has larger variance but is unbiased. Which is "better"?
+
+<h3 id="Theorem">Theorem</h3>
+<b>The variance of the sample mean is equal to the variance of the distribution divided by the sample-size.</b>
+<br><br>
+Consider the sample $X_1, X_2, ..., X_n$.
+<br><br>
+We want to compute
+
+$$Var\left[\bar{X}\right]$$
+
+$$Var\left[\bar{X}\right] = Var\left[\frac{X_1+\cdots+X_n}{n}\right] = \frac{Var\left[X_1+\cdots+X_n\right]}{n^2}$$
+
+$$ = \frac{Var\left[X_1\right]+\cdots+Var\left[X_n\right]}{n^2} = \frac{nVar\left[X\right]}{n^2} = \frac{Var\left[X\right]}{n}$$
+
+Thus,
+
+$$Var\left[\bar{X}\right] = \frac{Var\left[X\right]}{n}$$
+</main>
+</body>
+</html>

@@ -8,10 +8,45 @@ body {
     font-family: serif;
 }
 
+header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	text-align: center;
+	background-color: white;
+	padding: 0.5em 0;
+	width: 100%;
+	z-index: 100;
+    border-bottom: 0.1em solid #aaa;
+}
+
 main {
     width: 95%;
     max-width: 34em;
-    margin: 0 auto;
+    margin: 2em auto;
+    overflow-x: hidden;
+    min-height: 70vh;
+}
+
+nav {
+    background-color: hsl(0, 0%, 97%);
+    display: inline-block;
+    padding: 0.5em 1em;
+}
+
+nav > ol {
+    padding-left: 0;
+}
+
+footer {
+	text-align: center;
+}
+
+footer > hr {
+	display: block;
+	width: 90%;
+	max-width: 20em;
+	margin: 2em auto;
 }
 
 
@@ -24,18 +59,38 @@ body, h1 {
     counter-reset: h2counter h3counter;
 }
 
+h1 {
+	text-align: center;
+	margin-bottom: 2em;
+}
+
 h2:before {
     content: counter(h2counter) "\0000a0\0000a0";
+}
+
+h2 {
     counter-increment: h2counter;
     counter-reset: h3counter;
 }
 
 h3:before {
     content: counter(h2counter) "." counter(h3counter) "\0000a0\0000a0";
-    counter-increment: h3counter;
 }
 
-h1, h2, h3 {
+h3 {
+    counter-increment: h3counter;
+    counter-reset: h4counter;
+}
+
+h4:before {
+    content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) "\0000a0\0000a0";
+}
+
+h4 {
+    counter-increment: h4counter;
+}
+
+h1, h2, h3, h4 {
     color: hsl(0, 0%, 25%);
 }
 
@@ -59,15 +114,26 @@ ol > li:before {
     counter-increment: list;
 }
 
+ol > ol > li {
+	list-style: lower-alpha;
+}
+
+ol > ol > li:before {
+    content: ""
+}
 
 
 
 
-.code-block {
+
+
+
+pre {
     background-color: hsl(0, 0%, 90%);
     display: block;
     margin: 1em;
     padding: 0.5em;
+    overflow-x: scroll;
 }
 
 .definition {
@@ -99,4 +165,10 @@ a {
 
 a.incomplete {
     color: red;
+}
+
+table {
+    width: 100%;
+    margin: 1em auto;
+    border-collapse: collapse;
 }

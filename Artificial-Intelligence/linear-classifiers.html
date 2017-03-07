@@ -1,0 +1,239 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Linear Classifiers</h1>
+<h2>Background</h2>
+<p>
+    Imagine I have $n$ datapoints of dimension $m$. The goal of classification is to find the function $f$ that takes each row of $X$ and returns the appropriate value of $Y$, and continues to do so as we get more data. Failing that (which we usually do), we want to be correct as often as possible.
+</p>
+<p>
+    If we have two categories and two featues, we can think of a linear classifier as drawing a line through the feature-spcae and guessing that everything above is in one category, and everything below is in the other. This generalizes to higher dimensions, so if we have $m$ dimensions, the classifier draws a $m-1$ hyperplane to make its guesses.
+</p>
+<h2>Perceptron</h2>
+<h3>Binary</h3>
+<p>
+    A perceptron simply takes a vector features and returns a weighted sum of them. In the words of linear algebra, if we have a feature vector $\vec{x}$ and a weight vector $\vec{w}$, then the perceptron takes the dot product:
+    $$\vec{x} \cdot \vec{w}$$
+    This is known as the <em>activation</em> of the perceptron.
+    <figure>
+    <canvas id="linear-example" width="600" height="600">
+    </canvas>
+    <figcaption>Datapoints classified by a linear classification</figcaption>
+    </figure>
+</p>
+<style>
+#linear-example {
+    max-width: 100%;
+    max-height: 30vh;
+    display: block;
+    margin: 0 auto;
+}
+</style>
+<script src="../math.js"></script>
+<script src="../draw.js"></script>
+<script>
+var cvs = document.getElementById("linear-example");
+var c = cvs.getContext("2d");
+c.lineWidth = 10;
+draw_arrow(c, [20, 580], [20, 20], 10);
+draw_arrow(c, [20, 580], [580, 580], 10);
+c.beginPath();
+c.arc(20, 580, 5, 0, 2*Math.PI);
+c.fill();
+
+var red = random_points(400, [0, 0], [1, 1], function (pt) { return 1.5*pt[0]-0.2 < pt[1] - 0.03; })
+var blue = random_points(400, [0, 0], [1, 1], function (pt) { return 1.5*pt[0]-0.2 > pt[1] + 0.03; });
+c.lineWidth = 3;
+c.fillStyle = "red";
+draw_points(c, red, 5, [20, 580], [560, 560]);
+c.fillStyle = "blue";
+draw_points(c, blue, 5, [20, 580], [560, 560]);
+draw_line(c, 94.67, 580, 580, -148);
+</script>
+<p>
+    For simplicity, let's first consider a binary perceptron - that is a single perceptron that's trying to classify all data into one of two categories: $A$ and $B$. In this case, the classification is straightforward. The perceptron has a weight vector $\vec{w}$, and for every feature vector $x$, it classifies it as $A$ if $\vec{x} \cdot \vec{w} > 0$ and otherwise guesses $B$.
+</p>
+<p>
+    To learn, we first need to define a loss function. To do so, let $y$ denote the true category, using $1$ to denote $A$ and $-1$ to denote $B$. Then, we typically define the loss function as
+    $$\max{\left(0, -y \cdot (\vec{x} \cdot \vec{w}) \right)}$$
+    where $y$ is the correct classification, $\vec{x}$ is the feature vector, and $vec{w}$ is the weight vector.
+    Some introspection should allow you to convince yourself that the loss will be 0 if we guess the right answer, and some positive number otherwise. The value of the positive number will be proportional to "how far off" our guess was.
+</p>
+<p>
+    From here, we basically just do gradient descent:
+<pre>
+Matrix&lt;double&gt; x = matrix of features
+Vector&lt;int&gt; y = vector of categories (1s and -1s)
+Vector&lt;double&gt; w = [0] * m
+while (true) {
+    int num_wrong = 0;
+    for (uint i = 0; i < n; ++i) {
+        double dot = dot_product(x[i], w);
+        int guess = dot > 0 ? 1 : -1;
+        if (guess == y[i]) continue;
+        else ++num_wrong;
+        for (uint j = 0; j < w.length; ++j) {
+            w[j] += y[i] * x[j];
+        }
+    }
+    if (num_wrong == 0) break;
+}
+</pre>
+</p>
+<p>
+    There is a pretty large problem with this so far: if all your features are 0, then your sum will always be 0, so we'll always guess $B$. This is easy to solve, though, by introducing a <em>bias</em> features, which is just always a 1 for every datapoint.
+</p>
+<p>
+    The running time of this algorithm is $O(l^2/d^2)$ where $l$ is the largest of all the feature vectors' lengths, and where $d$ is the minimum distance between an $A$ feature and a $B$ feature.
+</p>
+<h3>Multiway</h3>
+<p>
+    The idea is basically the same for multiway perceptrons, except
+    <ol>
+        <li>you create a bunch of binar perceptrons for each category</li>
+        <li>you guess the category whose dot product is largest</li>
+        <li>the update step is different. If $w_i$ represents the weights of the correct category, than we update it by adding the features to the weights, in a pairwise fashion. If $w_j$ represents the weights of an incorrect category, then we updated it by <em>subtracting</em> the features from the weights, in a pairwise fashion. Some thought should convince you that this is very similar to the binary case.</li>
+    </ol>
+</p>
+<h3>Problems</h3>
+<ol>
+    <li>They can't learn non-separable data.</li>
+    <li>The generalizations can be poor.</li>
+    <li>They tend to overfit the training data with too many iterations.</li>
+</ol>
+<h2>MIRA</h2>
+<p>
+    Margin Infused Relaxed Algorithm (MIRA) is a variation on the perceptron algorithm in which we move the weights more intelligently. In particular, if we guess correctly, we do nothing (ase before), but if we guess incorrectly, we'll multiply the weight change from the perceptron algorithm by
+    $$\min{\left(\frac
+    {\left( \vec{w}_\mathrm{old}-\vec{w}^*_\mathrm{old} \right) \cdot \vec{x} + 1}
+    {2\vec{x} \cdot \vec{x}}
+    ,M\right)}$$
+
+    where $\vec{w}_\mathrm{old}$ is the previous weight vector for the guessed class, $\vec{w}_\mathrm{old}^*$ is the previous weight vector for the correct class, and $M$ is some constant.
+</p>
+<p>
+    Here's the pseudocode for the multiclassification case:
+</p>
+<pre>
+MIRA(float[][] input, float[] output, uint iterations) -> float[][] {
+    float[][] weights = new float[num_classes][input[0].length];
+    for (var it = 0; it < iterations; ++it) {
+        for (var i = 0; i < input.length; ++i) {
+            best_guess = -1;
+            highest_value = -1e300;
+            // make a guess
+            for (var j = 0; j < num_classes; ++j) {
+                value = dot(input[i], weights)
+                if (value > highest_value) {
+                    highest_value = value;
+                    best_guess = j;
+                }
+            }
+            // update weights if we guessed wrong
+            new_weights[num_classes][input[0].length];
+            if (best_guess != output[i]) {
+                // compute tau
+                var numerator = dot(subtact(weight[output[i]], weight[best_guess]), input[i]) + 1;
+                var denominator = 2 * dot(input[i], input[i]);
+                tau = numerator / denominator;
+
+                // make best_guess less likely
+                new_weights[best_guess] = subtract(weights[best_gesss], scale(input[i], tau));
+
+                // make output[i] more likely
+                new_weights[output[i]] = add(weights[output[i]], scale(input[i], tau));
+            }
+        }
+    }
+    return weights;
+}
+</pre>
+<p>
+    This is relaed to max-margin methods, which try to define a boundary that maximizes the minimum distances between points and the boundary.
+</p>
+<p>
+    While MIRA and max-margin methods tend to do better in practice, they are still limited to finding a perfect linear solution. If no such solution exists, they fail.
+</p>
+<h2>Logistic Regression</h2>
+<p>
+    Also known as Maximum Entropy, Logistic Regession is a very common machine learning/statistical technique. Unlike the Perceptron and MIRA methods, logistic regression isn't restricted to just outputing a category, but can instead output a probability that a point belongs to a class. In particular, for class $i$, we'll model the probability as
+    $$P(c=i|X=\vec{x})=\frac{1}{1+e^{-\vec{w}_i \cdot \vec{x}}}$$
+    where $\vec{w}_i$ is the weight vector for class $i$.
+</p>
+<p>
+    If your features are booleans, then you can think of this as each feature "voting" and the overall decision being a weighted sum of the votes.
+</p>
+<h3>Maximum Entropy</h3>
+<p>
+    Intuitively, entropy is a measure how uncertain you are about an outcome. If you are completely certain, the entropy is 0, and if you are uniformly uncertain about an event with $n$ coutcomes, then the entropy is $\log{n}$.
+</p>
+<p>
+    In particular, we define entropy as
+    $$H(X) = \sum_x{P(X=x) \cdot \log{\left(P(X=x)\right)}}$$
+</p>
+<p>
+    Logistic regression is called maximum entropy, because it makes the distribution follow the constraints from the training data, but otherwise maximizes entropy (uncertainty).
+</p>
+<p>
+    In particular, our constraints are that we want a model so that "the empirical expectation offeatures and model expectation of features are the same". In other words, if we are classifying whether animals are mammals, we want it so if 70% of animals with hair are mammals, then we want our model to classify 70% of animals with hair as mammals - even if having hair correlates with, say, producing milk.
+</p>
+<h3>Generalized Iterative Scaling</h3>
+<p>
+    Although we could use any number of <a href="https://en.wikipedia.org/wiki/Generalized_iterative_scaling">better</a> optimization methods, we'll consider generalized linear scaling (GLS) in particular.
+</p>
+<p>
+    Before we go into details, we need to satisfy one requirement that GLS has, which is that the sum of all features must be equal. To do this, we'll introduce a non-negative "slack" feature to each make each datapoint's featuers add up to the same value.
+</p>
+<p>
+    This algorithm repeatedly changes weights so that the empirical expectation of features and model expectation of features are the same.
+    <ol>
+        <li>Compute the expectation of each feature based on the training data.
+        $$E_\tilde{p}\left[\phi_i\right]$$
+        </li>
+        <li>Initialize the weight vector to 1s</li>
+        <li>Repeat until convergence:</li>
+        <ol>
+            <li>Compute feature expectations for current model.</li>
+            <li>Compute ratio of the model's current expectations with the expectations we want based on the training data.</li>
+            <li>Update the weights based on these ratios by multipling each by
+            $$\left(\frac{E_\tilde{p}\left[\phi_i\right]}{E_\mathrm{current}}\right)^{1/V}$$
+            where $V$ is the sum of all features in each datapoint - these are all the same, because of the slack feature.
+            </li>
+        </ol>
+    </ol>
+</p>
+<p>
+    It turns out that, we will
+    <ol>
+        <li>always converge</li>
+        <li>converge to the same answer regardless of starting weights (assuming they're nonzero)</li>
+        <li>converge to a distribution that obeys the constraints and maximizes entropy</li>
+    </ol>
+</p>
+<h3>Pros and Cons</h3>
+<ol>
+    <li>doesn't allow you to find interacitons between features (unless you make that interaction an explicit feature)</li>
+    <li>avoids possibility of double counting that naive Bayes falls into</li>
+    <li>often needs <em>regularization</em> to avoid overfitting</li>
+    <li>can be slow</li>
+</ol>
+</main>
+</body>
+</html>

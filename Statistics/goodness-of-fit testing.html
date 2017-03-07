@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Goodness-of-Fit Testing</h1>
+<h3>General Ideas</h3>
+Sometimes, instead of trying to determine if two variables are independent, we are trying to determine how well they fit a model. For instance, we learn in highschool biology that there is a 50% chance of being born a boy and a 50% chance of being born a girl. Of course, in any given sample, there might not be exactly 50% of each.
+<h3>Example #1</h3>
+In 2008, there were 2.173 million boys born and 2.074 million girls in the United States. We can conduct a chi-square goodness-of-fit test to determine what the odds are of being this far off from the expected distribution of 2.1235 million each. Thus, we compute the chi-square test statistic:
+$$c=\frac{\left(2,173,000-2,123,500\right)^2}{2,123,500}+\frac{\left(2,074,000-2,123,500\right)^2}{2,123,500} \approx 2308$$
+There is 1 degree of freedom, because if we know how many boys were born and how many people were born, we can compute how many girls were born. Plugging this in the the chi-squared CDF function yields:
+$$p = 0$$
+Obviously, the p-value isn't actually 0, but its within a rounding error, which generally means less than $10^{-10}$. Thus, we can confidently say that the odds of a girl and boy being born are not equal. This turns out be true - boys are slightly more likely to be born than girls.
+<br><br>
+Note, that we couldn't have used a permutation test in this example, because we had nothing to permute.
+<h3>Generalization</h3>
+In general, if you are conducting a goodness-of-fit test without any parameters on a factor with $n$ levels, then there are $n-1$ degrees of freedom. However, you can conduct a goodness-of-fit test on more complex models.
+<h3>Example #2</h3>
+<a href="http://www.2700chess.com/?per-page=100">This website</a> keeps an up-to-date ranking of the top 100 chess players. As of January 17, 2015, the distribution of their ratings look like this:
+<img src="chessHistogram.png" style="width:400px">
+More precisely:
+<table border=1>
+<tr><th>2650-2700</th><th>2700-2750</th><th>2750-2800</th><th>2800-2850</th><th>&gt;2850</th></tr>
+<tr><td>53</td><td>32</td><td>10</td><td>2</td><td>1</td></tr>
+</table>
+<br>
+It looks like a shifted exponential distribution. As a reminder, an exponential distribution has a density function that looks like:
+$$f\left(x\right)=\lambda e^{-\lambda x}, x \ge 0$$
+Of course, we are postulating an exponential distribution shifted by 2650 points - that is:
+$$f\left(x\right)=\lambda e^{-\lambda \left(x-2650\right)}, x \ge 2650$$
+Rest assured that this is entirely legal from a probabilistic point of view - the proof of this fact is left as an exercise to the reader.
+<br><br>
+Now, the expected value of an exponential distribution is equal to $1/\lambda$. Thus, if this truly is an exponential function, we can estimate what $\lambda$ is. The average rating turns out to be 2704. Shifted to the left by 2650, this becomes 54. Using this information, we can compute an expected value for each rating-group using the cumulative distribution function
+$$P\left(X \lt x\right)=1-e^{\lambda \left(x-2650\right)}$$
+<table border=1>
+<tr><th>2650-2700</th><th>2700-2750</th><th>2750-2800</th><th>2800-2850</th><th>&gt;2850</th></tr>
+<tr><td>60.4</td><td>23.9</td><td>9.5</td><td>3.7</td><td>1.5</td></tr>
+</table>
+<br>
+We noted before that one of the rule-of-thumb when performing a chi-squared test is that each space in the table should have an expected value of more than 5. To conform to this expectation, we can combine the largest two columns:
+<br><br>
+<table border=1>
+<tr><th></th><th>2650-2700</th><th>2700-2750</th><th>2750-2800</th><th>&gt;2800</th></tr>
+<tr><td><b>Obs</b></td><td>53</td><td>32</td><td>10</td><td>3</td></tr>
+<tr><td><b>Exp</b></td><td>60.4</td><td>23.9</td><td>9.5</td><td>5.2</td></tr>
+</table>
+<br><br>
+Computing the chi-squared statistic:
+$$c=\frac{\left(53-60.4\right)^2}{60.4}+\frac{\left(32-23.9\right)^2}{23.9}+\frac{\left(10-9.5\right)^2}{9.5}+\frac{\left(3-5.2\right)^2}{5.2} \approx 4.61$$
+This chi-square distribution actually has 2 degrees of freedom. It starts out with $n=4$, but it loses 1 because we know the overall sum is 100, and it loses another because our distribution has one calculated parameter, $\lambda$. Pluging in $c=4.61$ and $df=2$ into the cumulative distribution function yields
+$$p \approx 0.100$$
+Because this is above our threshold of 0.05, we cannot reject the model - though, with a p-value of 10%, this data certainly doesn't support it!
+<h3>Assumptions</h3>
+The assumptions for goodness-of-fit are the same as those for <a href="chi-square-testing.html">chi-square testing</a>.
+</main>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<!--
+<h1>Markov Models</h1>
+<h2>The Markov Assumption</h2>
+<p>
+    A Markov model is a model in which the probability distribution of future states depends only on the current states. This is known as the <em>Markov assumption</em>.
+</p>
+<p>
+    For example, we could denote the weather on day $t$ as $X_t$. The Markov assumption is then that the weather today only depends on the weather yesterday - that is, the days before yesteday don't convey any additional information. Formally, we can state this
+    $$\forall t \; p(X_{t+1}|X_t=x_t) = p(X_{t+1}=x_t | X_t=x_t,\dots,X_0=x_0)$$
+</p>
+<p>
+    where the lowercase $p$ yields the distribution of a variable, rather than the raw probability given by the uppercase $P$.
+</p>
+<p>
+    At first this Markov assumption may seem very restrictive, but it is actually not too bad. Take the weather for instance. Suppose, we wanted to take into account the last three days, rather than just yesterday. Then, we can just let $X_t$ represent three days of weather, rather than one - thereby satisfying the Markov assumption.
+</p>
+<p>
+    Similarly, we can easily build Markov models over multiple variables. For instance, if we want a model over variables $A$, $B$, and $C$, then we can define a new variable $X$ as a tuple of $A,B,C$ values.
+</p>
+<h2>Transition Matrices</h2>
+<p>
+    Suppose that the domain of our random variable $X$ is the set of integers between $0$ and $n$. Then, given that we're in state $i$, the probability of transition to state $j$ is simply some constant number, which we can denote $a_{ij}$. As the notation might indicate, we can use this to define a $n \times n$ matrix, $A$, which will soon prove to be useful.
+</p>
+<p>
+    Suppose at the beginning, you had an $n$-component vector $\vec{v}$ for which $\vec{v}_i$ represents your prior of beginning in state $i$. It turns out that $A \vec{v}$ must likewise yield a vector representing the probability you assign to being in a state at time $1$. Likewise, $A^t \vec{v}$ yields the probabilities you assign to be in different states at time $t$.
+</p>
+<h3>Example</h3>
+<p>
+    Suppose we were modeling the weather with two states: sunny and rainy. We can draw such a model as
+</p>
+<figure>
+<img src="simple-markov-model.svg" style="width: 100%;">
+<figcaption>A simple Markov model of weather</figcaption>
+</figure>
+<p>
+    The model above, for instance, indicates if yesterday was sunny, then today has a 70% chance of being sunny and a 30% chance of being rainy. If yesterday was rainy, on the other hand, then today has a 80% chance of being sunny and a 20% chance of being rainy.
+</p>
+<p>
+    If we call "sunny" 0 and "rainy" 1, then we can represent this as a <em>transition matrix</em>:
+    $$A = \left[\begin{matrix}
+    0.7 & 0.8 \\
+    0.3 & 0.2
+    \end{matrix}\right]$$
+    or, more generally, $A=[a_{ij}]$ where
+    $$a_{ij} = P(X_{t+1} = i | X_t = j)$$
+</p>
+<p>
+    Suppose the first day was sunny:
+    $$\vec{v}_0 = \left[\begin{matrix}
+    1 \\
+    0
+    \end{matrix}\right]$$
+</p>
+<p>
+    Then we can compute the probability distribution for the second day:
+    $$A \vec{v} = \left[\begin{matrix}
+    0.7 & 0.8 \\
+    0.3 & 0.2
+    \end{matrix}\right] \left[\begin{matrix}
+    1 \\
+    0
+    \end{matrix}\right] = \left[\begin{matrix}
+    0.7 \\
+    0.3
+    \end{matrix}\right]$$
+</p>
+<p>
+    This should make sense if you think about the model. Likewise, we can compute the probability distribution of $2$ days:
+    $$A^2 \vec{v} = \left[\begin{matrix}
+    0.73 & 0.72 \\
+    0.27 & 0.28
+    \end{matrix}\right] \left[\begin{matrix}
+    1 \\
+    0
+    \end{matrix}\right] = \left[\begin{matrix}
+    0.73 \\
+    0.27
+    \end{matrix}\right]$$
+</p>
+<h3>Taking the Limit</h3>
+<p>
+    In the example above, we can consider what happens when $t$ goes to infinity by evaluating
+    $$\lim_{t \rightarrow \infty}{A^t \vec{v}}$$
+</p>
+<p>
+    It turns out that in lots of models we care about, this limit does exist. For instance, in the example above, we get
+    $$\lim_{t \rightarrow \infty}{A^t \vec{v}} = \left(\lim_{t \rightarrow \infty}{A^t}\right) \vec{v} = \left[\begin{matrix}
+    8/11 & 8/11 \\
+    3/11 & 3/11
+    \end{matrix}\right] \vec{v}$$
+</p>
+<p>
+    Note, that this means that regardless of wheather the first day is sunny or rainy, the probabilities eventually converge to an $8/11$ chance of sunny:
+    $$\left[\begin{matrix}
+    8/11 & 8/11 \\
+    3/11 & 3/11
+    \end{matrix}\right] \left[\begin{matrix}
+    1 \\
+    0
+    \end{matrix}\right] = \left[\begin{matrix}
+    8/11 \\
+    3/11
+    \end{matrix}\right]$$
+    $$\left[\begin{matrix}
+    8/11 & 8/11 \\
+    3/11 & 3/11
+    \end{matrix}\right] \left[\begin{matrix}
+    0 \\
+    1
+    \end{matrix}\right] = \left[\begin{matrix}
+    8/11 \\
+    3/11
+    \end{matrix}\right]$$
+</p>
+<p>
+    Another way to interpret this is that, in the long run, 8 of 11 days will be sunny. More generally, the <a href="../linear-algebra/eigenvectors.html">eigenvector</a> of the transition matrix can be interpreted as the expected proportion of time we'll spend in each state. We call this expected proportion a <em>stationary distribution</em>
+</p>
+<p>
+	Note, just as a single matrix can have multiple eigenvectors, a single model can have multiple stationary distributions. You could imagine, for instance, a very simple Markov model for a person in a video game:
+</p>
+<figure>
+<img src="ergodic-violation.svg"/>
+<figcaption>A non-ergodic Markov model.</figcaption>
+</figure>
+<p>
+	In this model, if you fall into either pit, you'll stay there forever. If you start in World, then the expected proportion of times you'll stay in Pit 1 is 50% - likewise for Pit 2. However, if you start in Pit 1, then you expect to be there for literally every state - a proportion of 100%.
+</p>
+<p>
+	Hence, there are actually an infinite number limiting distributions (eigenvectors), all of the form: $[0,x,1-x]$. For many models, however, there is exactly one stationary distribution; in other words, for many models, no matter where you start, you'll eventually reach the same stationary distribution - in this case, we call it a <em>limiting distribution</em>.
+</p>
+<p>
+
+</p>
+<h2>Hidden Markov Models</h2>
+<p>
+    You could imagine the true state ($X_t$) is hidden, but that we have access to a piece of evidence, $E_t$, each time-step. This is the general idea of hidden Markov models. In particular, we assume that the evidence variable's distribution depends only on the corresponding $X_t$.
+</p>
+<p>
+    For instance, imagine you grew up on a farm. Since then, you've moved away, but you come back every 4th of July. You can remember, on a scale from 1-10, how much rain fell the year you left, but you can only observe the height of the corn on the 4th of July.
+</p>
+<p>
+    In this example, imagine $X_t$ is the raininess of year $t$, and $E_t$ is the height of corn that year: $X_t$ is the hidden variable that determines the evidence $E_t$.
+</p>
+<h3>Theory</h3>
+<p>
+	In particular, as with the normal Markov models, we will still have
+	<ol>
+		<li>a prior for the starting distribution, represented as a vector</li>
+		<li>transition probabilities, represented as a matrix</li>
+	</ol>
+	However, we now also have emission probabilities - that is, the probability of observing some $E_t$ given $X_t$. We can represented this as a matrix $B=[b_{ij}]$ where
+	$$b_{ij} = P(E_t = i | X_t = j)$$
+</p>
+<p>
+	Before continuing, we should note something that will make our lives much simpler: when applying Bayes' theorem, we can usually ignore the denominator. The denominator is simply a way to ensure the probabilities add up to 1, but if we relax this assumption, then all probabilities will remain proportional to one another. So, we adopt have the theorem
+	$$P(T=t|E=e) \propto P(E=e|T=t) P(T=t)$$
+</p>
+<p>
+	Now, we can talk about how to algorithmically compute the distribution for $X_t$ given all evidence up until then. However, before giving the actual pseudocode, let's go through the math to establish why the algorithm works.
+</p>
+<p>
+	You start out with a prior distribution for $X_1$. The first step is just to update on the evidence $E_1$ using Bayes' theorem:
+	$$P(X_1=x_1 | E_1=e_1) \propto P(E_1=e_1 | X_1=x_1) P(X_1=x_1)$$
+</p>
+<p>
+	Note, that the prior distribution for $X_1$, the emission probabilities, and the transition probabilities are all given by  and constant throughout the problem, so we've really just used all these known variables to compute the distribution of $X_1$ given $E_1=e_1$.
+</p>
+<p>
+	Imagine, now, that we wanted to compute $P(X_2=x_2 | E_1=e_1,E_2=e_2)$. By Bayes' theorem, we can compute this, but let's ignore the denominator, because we can simply normalize it later:
+	$$P(X_2=x_2 | E_1=e_1,E_2=e_2) \propto P(E_1=e_1,E_2=e_2 | X_2=x_2) P(X_2=x_2)$$
+</p>
+<p>
+    ...[todo]
+</p>
+<h3>Forward Algorithm</h3>
+<p>
+	Using this information, we can update in a Bayesian and "dynamic" way as we move.
+</p>
+<p>
+	While we'll present the pseudocode soon, here's the jist:
+	<ol>
+		<li>
+			Compute the distribution of $X_1$ by using the prior and the evidence $E_1$:
+			$$P(X_1=x_1 | E_1=e_1) \propto P(E_1=e_1 | X_1=x_1) * P(X_1=x_1)$$
+		</li>
+		<li>
+			For each $i \in [2, t]$, dynamically update the distribution for $X_i$. In particular, take our distribution for $X_{i-1}$ and 
+			<ol>
+				<li>multiply this distribution (vector) by our transition matrix, to compute the distribution for $X_i$.</li>
+				<li>multiply this distribution (vector) component-wise the probability of observing $E_i$ given that state</li>
+			</ol>
+		</li>
+	</ol>
+</p>
+<pre>
+foo(prior, transition, emit, evidence) {
+    // compute the distribution of X_1
+    dist = {}
+    for (state in prior) {
+        dist[state] = prior[state] * emit[evidence[0], state]
+    }
+    dist = normalize(dist);
+    
+    // dynamically compute later distributions
+    for (t = 1; t < evidence.length; ++t) {
+        new_dist = {}
+        for (old_state in prior) {
+            new_dist[state] = 0;
+            for (new_state in prior) {
+                new_dist[state] += dist[old_state] * transition[new_state, old_state];
+            }
+            new_dist[new_state] *= emit[evidence[t], new_state];
+        }
+        dist = normalize(new_dist);
+    }
+    return dist;
+}
+
+normalize(dist) {
+    float sum = 0;
+    for (state in dist)
+        sum += dist[state];
+    for (state in dist)
+        dist[state] /= sum;
+    return dist;
+}
+</pre>
+<p>
+	To understand this algorithm, you need to realize that <code>dist</code> represents the distribution of variable $X_t$ given evidence $e_1,\dots,e_t$.
+</p>
+<p>
+	[todo]
+</p>
+<h3>Particle Filtering</h3>
+<p>
+	As implemented above, this forward algorithm runs in $O(S^2 \cdot T)$ time, where $S$ is the number of states and $T$ is the number of time-steps. However, if each state only has a small number of neighboring states, than a bit of cleverness can reduce this to $O(S \cdot T)$.
+</p>
+<p>
+	To improve this running time, we have to drop Bayesian-optimal belief updating. Basically, we choose a subset of states called <em>particles</em> and
+	<ol>
+		<li>update the probability each particle is correct when we are given evidence</li>
+		<li>change each particle's state based on transition probabilities</li>
+	</ol>
+</p>
+<p>
+	While the psudocode is a little lengthy, here's the idea:
+	<ol>
+		<li>Create $n$ particles. Each particle is just a state-float pair. At the beginning - we randomly select states according to our prior to create each particle, and we set its value to 1.</li>
+		<li>For each time-step</li>
+		<ol>
+			<li>Change each particle's state randomly - according to the transitio probabilities</li>
+			<li>Update each particle's value by multiplying it by the likelihood it is true given the new evidence.</li>
+			<li>Sample $n$ particles from this list with replacement. However, make this a weighted random choosing, so that particles with higher values are more likely to be chosen. This new set of particles is used in the next iteration, and each particle has value 1 again.</li>
+		</ol>
+	</ol>
+</p>
+-->
+<h3>Viterbi Algorithm</h3>
+<p>
+	So, far we have focused on finding the most likely state you are currently in. However, what if you want to find the most likely sequence of states you were in over time? This might be useful for, say, speech-to-text models. More formally, we're computing
+	$$argmax_{x_1,\dots,x_t}{P(X_1=x_1,\dots,X_t=x_t | E_1=e_1,\dots,E_t=e_t)}$$
+</p>
+<p>
+	It turns out we can do this in a dynamically
+</p>
+<pre>
+function viterbi(priors, transition, emissions, evidence) {
+    /* probs[s] will be the probability of
+    the most likely path that ends in state s */
+    Map<State, double> probs[evidence.length];
+    Map<State, State> froms[evidence.length];
+
+    // initalize probs to priors and mlu
+    for (s in states) {
+        probs[0][s] = prior[s] * emission[s, evidence[0]];
+        froms[0][s] = null;
+    }
+
+    // dynamicaly update probs and froms
+    for (var i = 1; i < evidence.length; ++i) {
+        for (state_to in states) {
+            max_p = 0;
+            max_from = null;
+            for (s in states) {
+                p = probs[i-1][s] * emission[s, evidence[1]] * transition[s, state_to];
+                if (p > max_p) {
+                    max_p = p;
+                    max_from = s;
+                }
+            }
+            probs[i][state_to] = max_p;
+            froms[i][max_from] = max_from;
+        }
+    }
+
+    // find path's endpoint
+    max_p = -100;
+    endpoint = null;
+    for (s in states) {
+        if (probs.end()[s] > max_p) {
+            max_p = probs.end()[s];
+            endpoint = s;
+        }
+    }
+
+    path = [endpoint];
+    for (var i = froms.length - 1; i > 0; --i) path.append(froms[i][path.first()]);
+    path.reverse();
+    return path;
+}
+</pre>
+</main>
+</body>
+</html>

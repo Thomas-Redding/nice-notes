@@ -1,0 +1,34 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js"></script>
+</head>
+<body>
+<main>
+<h1>Proportion Confidence Intervals</h1>
+<h3>General Idea</h3>
+As $n$ becomes large, the sampling distribution of $\hat{p}$ becomes normal:
+
+$$N\left(p, \frac{p(1-p)}{n}\right)$$
+
+We also know that, for a normal distribution, the z-score is a <a href="Pivotal Quantities.html">pivotal quantity</a> that follows a normal distribution. Therefore, to find a two-sided confidence interval, we can use
+
+$$P\left(X\right)$$
+
+<img src="Normal CI 2.png" style="max-width:300px"/>
+</main>
+</body>
+</html>
