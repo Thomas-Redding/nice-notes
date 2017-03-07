@@ -67,14 +67,14 @@ def train_random_forest(X, Y, number_of_trees):
 <h3>Adaboost</h3>
 
 <p>
-    Adaboost is a very common and lauded modification to the naive random forest, and describes a way to reweight the importance datapoints and trees.  Adaboost was originally formulated for binary classification.
+    Adaboost is a very common and lauded modification to the naive random forest, and describes a way to reweight the importance datapoints and trees.  Points that are weighted more will be more often selected to be used to train future trees.  Adaboost was originally formulated for binary classification.
 </p>
 <p>
-    The algorithm begins by initializing the weight of every point to 1.  Every time it trains a tree, it computes the (weighted) error rate of the tree.  If we are training the m<sup>th</sup> tree and the current weights are $w_1, w_2, ..., w_N$, then we define the error rate:
+    The algorithm begins by initializing the weight of every point to 1.  Every time it trains a tree, it samples (with replacement) from the training data (as is typical for bagging), but with the probability of selecting a datapoint proportional to its weight.  If we define the current weights of the training data at some m<sup>th</sup> step of the algorithm as $w_1, w_2, ..., w_N$, then we can define the error rate as:
 
     \[e_m = \frac{\Sigma (w_i \cdot I(y_i \neq \hat{y_i}))}{\Sigma (w_i)} = \frac{\text{weighted sum of errors}}{\text{normalization constant}} \]
 
-    Let $\alpha_m = \frac{e_m}{1 - e_m}$.  Then, for every point that was misclassified by the most recent tree, we multiply their weights by $\alpha_m^{-1}$ (as well as renormalize, so that the weights sum up to 1).
+    Let $\alpha_m = \frac{e_m}{1 - e_m}$.  Then, for every point that was misclassified by the most recent tree, we multiply their weights by $\alpha_m^{-1}$, and then renormalize at the end of the step (so that the weights are probabilities).
 </p>
 <p>
     As a sanity check, note that if $0 < e_m < 0.5$ (which should always be the case for a weak learner), then $\alpha_m^{-1} > 1$, which means that misclassified points will have their weights increased.
@@ -86,6 +86,18 @@ def train_random_forest(X, Y, number_of_trees):
 
     Where $g_m$ is the prediction of the m<sup>th</sup> tree.
 </p>
+<h3>Adaboost in Regression (<a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.31.314&rep=rep1&type=pdf">source</a>)</h3>
+
+<pre>
+    For regression problems with the loss function $L$, let $D = \sup{L(y_i, \hat{y}_i)}$.  We use $D$ to force the errors between zero and one, and compute the expected (weighted) loss:
+
+    \[ e_m = \Sigma \frac{L(y_i, \hat{y}_i) w_i}{D} \]
+
+    This "D" trick seems super sketch to me... but I'm not a CS professor.  Then, as in classification, we let $\alpha_m = \frac{e^m}{1 - e^m}$.  Every training point's weight is multiplied by $\alpha_m^{1 - L(y, \hat{y}) / D}$.  If a datapoint is predicted perfectly, it is multiplied by 1, while large errors will force the exponent to be negative (and $\alpha_m < 0.5$)
+</pre>
+<pre>
+    
+</pre>
 
 <h2>Gradient Boosting</h2>
 <p>

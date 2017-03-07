@@ -1,0 +1,172 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    },
+    TeX: { equationNumbers: { autoNumber: "AMS"} }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<h1>Gaussian Processes</h1>
+
+<h2>Brief Overview of Linear Regression</h2>
+
+Let $X$ and $\vec{y}$ be your training data.  The Bayesian approach to linear regression is to assume that
+
+\[ \vec{y} + \vec{\epsilon} = X^T \vec{w} \]
+
+<p>
+For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  It turns out the maximum likelihood estimator of $w$ is the same line that minimizes squared error.
+</p>
+<p>
+What's interesting about this formulation is that it gives us a distribution.  If $x_*$ is a (test) data point and $y_*$ is its label, then
+
+\[ p(y_* | \vec{x}_*) \propto \mathcal{N}(\mu = \vec{x}_*^Tw, \text{var} = \sigma^2) \]
+</p>
+<p>
+A common trick is to use some function
+
+\[ \phi: \mathbb{R}^D \rightarrow \mathbb{R}^N \]
+
+to map data from a low dimensional space to a high dimensional space, and then performing linear regression on the high-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
+
+\[ \phi(x) = [1, x, x^2, x^3] \]
+
+then a linear regression on $\phi[X]$ is equivalent to finding the least-squares cubic polynomial.  In essence, by choosing some $\phi$, you're claiming that you believe the data can be modeled as
+
+\[ \vec{y} + \vec{\epsilon} = \phi[X]^T \vec{w} \]
+
+for some $\vec{w}$, where $\vec{w}$ comes from some Gaussian distribution with mean=0.
+</p>
+
+<h2>Kernel Trick</h2>
+
+<p>
+The least-squares solution (i.e. the MLE, assuming it is a linear function with Gaussian noise) can become computationally problematic for when $\phi$ maps to extremely high dimensions.  The solution is given as:
+
+\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\frac{1}{\sigma^2} \phi(x_*)^T A^{-1} \phi[X] y, \phi(x_*)^T A^{-1} \phi(x_*)) \]
+
+Where $A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1}$, where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.
+</p>
+<p>
+Note that $A$ is an $N \times N$ matrix, where N is the dimensionality of the data.  When $N$ is large, inverting $A$ can be numerically problematic.  Naturally, if we want to let $N$ be infinite, we run into extreme difficulties!
+</p>
+<h3>The Solution</h3>
+<p>
+Using the substitution $K = \phi[X]^T \Sigma \phi[X]$, we can rewrite the above equation:
+
+\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\]
+
+\[\mu = \phi(x_*)^T \Sigma \phi[X] (K + \sigma^2 I)^{-1} y,\]
+
+\[\text{var} = \phi(x_*)^T \Sigma \phi(x_*) - \phi(x_*)^T \Sigma \phi[X] (K + \sigma^2 I)^{-1} \phi[X]^T \Sigma \phi(x_*)\]
+\[) \]
+
+At first blush this looks more complicated!  What's worth noting is that now we're only taking the inverse of $K$, which is $|X| \times |X|$.  If your training set is large, this isn't that helpful, but for a relatively tame number of points, this may still be feasible.
+</p>
+<p>
+Now let
+
+\[k(x,y) = \phi(x)^T \Sigma \phi(y)\]
+
+We can rewrite the above as:
+
+\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\]
+
+\[\mu = k(x_*, X) (K + \sigma^2 I)^{-1} y,\]
+
+\[\text{var} = k(x_*, x_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, x_*)\]
+\[) \]
+</p>
+<h3>Why?</h3>
+<p>
+What is fascinating about this is that the posterior is defined <i>solely</i> in terms of inner-products &mdash; that is, some notion of similarity (technically their covariance).  This can be remarkably convienent, because often there are more computationally direct/efficient methods of computing the inner product of two vectors than to explicitly compute the feature expansion.
+</p>
+<p>
+For example, suppose you have two binary vectors $\vec{x}$ and $\vec{y}$, so that each is a member of the powerset $\mathcal{P}(n)$.  We <i>could</i> have a feature expansion that goes from $N$ dimensions to $2^N$ by making each output dimension an indicator for whether a member of $\mathcal{P}(n)$ is a subset of $x$, but such a feature expansion would naturally be computationally expensive!  The kernel trick let's us compute the linear regression using by calculating the dot-product that we would have calculated with the feature expansion.  In this case
+
+\[ \phi(x)^T \phi(y)\]
+
+Is simply equal to the sum of the bitwise-and of each vector, which can be computed in linear time.
+</p>
+<p>
+	And, perhaps more to the point, if we want to express an <i>infinite</i> feature expansion (i.e. a function), we have no choice but to find some alternative to the naive $\phi$ feature expansion.
+</p>
+<h2>Gaussian Processes</h2>
+<p>
+	Now suppose we want to have a prior over possible <i>functions</i> (rather than $\vec{w}$ vectors) and we want to use inference to compute a posterior distribution of functions, given the observations we have.  </p>
+<p>
+<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
+</p>
+<p>
+	In other words, for our purposes, you can think of a Guassian process as implicitly representing every possible input vector's label as coming from a normal distrbution.  Our task will be to consider how knowing about the normal distribution at some points should affect what we believe about the distribution at other points.
+</p>
+<p>
+	Note that the kernel $k$ computes the covariance between the labels of two points.  In other words:
+
+	\[\text{cov}(f(x), f(y) = k(x, y) = exp(-\frac{(x-y)^2}{-2})\]
+
+	<b>NOTE:</b> this means that the covariance between two outputs (e.g. our prediction of a test-output given a training input) does <i>not</i> depend on their y-values, but <i>only</i> on the similarity/covariance of their x-values.  This particular kernel has the convienence of only representing infinitely differentiable functions.
+</p>
+<p>
+The joint distribution of training outputs $f$, test outputs $f_*$, is given as (assuming an a priori mean of zero)
+
+\[ \begin{bmatrix}f\\f_*\end{bmatrix} \sim \mathcal{N}(0, \begin{bmatrix} K(X,X) & K(X_*,X) \\ K(X, X_*) & K(X_*, X_*) \end{bmatrix})
+ \]
+
+Where $K(X, X_*)$ is an $n \times n_*$ matrix of the covariances evaluated at all pairs of training and test points
+</p>
+<p>
+We would like to restrict this joint distribution to only contain functions that "agree" with the training set &mdash; i.e. we'd like to condition on our observations.  After lots of math, this gives:
+
+\[ p(f_* | X_*,X,f) \sim \mathcal{N}(\]
+
+\[ \mu = K(X_*, X)K(X,X)^{-1}f),\]
+
+\[ \text{var} = K(X_*,X_*) - K(X_*,X)K(X,X)^{-1}K(X,X_*)\]
+
+\[)\]
+
+For sanity, note that the dimensionality of the mean and variances equal the number of test-points.  When $|X_*| = 1$, this means we get a simple, 1-D normal distribution over the possible y-values.
+<h3>Noise</h3>
+You may not have noticed, but I have been subtlely ignoring the noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $K(X,X)$:
+
+\[ \begin{bmatrix}f\\f_*\end{bmatrix} \sim \mathcal{N}(0, \begin{bmatrix} K(X,X) + \sigma^2 I & K(X_*,X) \\ K(X, X_*) & K(X_*, X_*) \end{bmatrix})
+ \]
+
+ Which yields
+
+ \[ p(f_* | X_*,X,f) \sim \mathcal{N}(\bar{f}_*, \text{cov}(f_*))\]
+
+ Where
+
+ \[ \bar{f}_* = K(X_*,X)(K(X,X) + \sigma^2  I)^{-1} y \]
+
+ and
+
+ \[ \text{cov}(f_*) = K(X_*,X_*) - K(X_*,X)(K(X,X) + \sigma^2 I)^{-1}K(X,X_*)\]
+
+</p>
+<h3>Linear Combination of Training Points</h3>
+It is convient to exam the case where there is only one test point, and $K(X_*, X_*)$ is a scalar.  In this case, we can rewrite $\bar{f}_*$ as simply a weighted sum of the training weights' predictions:
+
+\[\bar{f}(x_*) = \sum_{i=1}^n \alpha_i k(x_i, x_*)\]
+
+Where $\alpha_i = (K(X,X) + \sigma^2 I)^{-1} y$.
+
+END: page 37
+<h2>Popular Kernels</h2>
+TODO
+</main>
+</body>
+</html>
