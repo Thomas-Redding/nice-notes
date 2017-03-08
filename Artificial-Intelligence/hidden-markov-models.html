@@ -267,7 +267,7 @@ normalize(dist) {
 		<li>Create $n$ particles. Each particle is just a state-float pair. At the beginning - we randomly select states according to our prior to create each particle, and we set its value to 1.</li>
 		<li>For each time-step</li>
 		<ol>
-			<li>Change each particle's state randomly - according to the transitio probabilities</li>
+			<li>Change each particle's state randomly - according to the transition probabilities</li>
 			<li>Update each particle's value by multiplying it by the likelihood it is true given the new evidence.</li>
 			<li>Sample $n$ particles from this list with replacement. However, make this a weighted random choosing, so that particles with higher values are more likely to be chosen. This new set of particles is used in the next iteration, and each particle has value 1 again.</li>
 		</ol>
