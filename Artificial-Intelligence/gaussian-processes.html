@@ -19,26 +19,29 @@ MathJax.Hub.Config({
 <main>
 <h1>Gaussian Processes</h1>
 
+<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
+</p>
+
 <h2>Brief Overview of Linear Regression</h2>
 
-Let $X$ and $\vec{y}$ be your training data.  The Bayesian approach to linear regression is to assume that
+Let $X$ and $\vec{y}$ be your observations (i.e. your "training data").  The Bayesian approach to linear regression is to assume that
 
-\[ \vec{y} + \vec{\epsilon} = X^T \vec{w} \]
+\[ \vec{y} = X^T \vec{w} + \vec{\epsilon} \]
 
 <p>
-For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  It turns out the maximum likelihood estimator of $w$ is the same line that minimizes squared error.
+For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  It turns out the maximum likelihood estimator for $w$ is the same line that minimizes squared error.
 </p>
 <p>
-What's interesting about this formulation is that it gives us a distribution.  If $x_*$ is a (test) data point and $y_*$ is its label, then
+What's interesting about this formulation of the problem is that, rather than merely a line, it yields a normal distribution at every x value.  In other words, the probability distribution over the value $y_*$ at some $x_*$ is:
 
-\[ p(y_* | \vec{x}_*) \propto \mathcal{N}(\mu = \vec{x}_*^Tw, \text{var} = \sigma^2) \]
+\[ p(y_* | X, \vec{y}, \vec{x}_*) \propto \mathcal{N}(\mu = \vec{x}_*^Tw, \text{var} = \sigma^2) \]
 </p>
 <p>
-A common trick is to use some function
+Of course there are a wide number of nonlinear relationships that cannot be represented as a linear regression.  A common trick to expand this same machinery to a wider class of functions is to use some function
 
 \[ \phi: \mathbb{R}^D \rightarrow \mathbb{R}^N \]
 
-to map data from a low dimensional space to a high dimensional space, and then performing linear regression on the high-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
+to map data from a low dimensional space to a higher dimensional space, and then performing linear regression on the higher-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
 
 \[ \phi(x) = [1, x, x^2, x^3] \]
 
@@ -46,125 +49,152 @@ then a linear regression on $\phi[X]$ is equivalent to finding the least-squares
 
 \[ \vec{y} + \vec{\epsilon} = \phi[X]^T \vec{w} \]
 
-for some $\vec{w}$, where $\vec{w}$ comes from some Gaussian distribution with mean=0.
 </p>
 
 <h2>Kernel Trick</h2>
 
 <p>
-The least-squares solution (i.e. the MLE, assuming it is a linear function with Gaussian noise) can become computationally problematic for when $\phi$ maps to extremely high dimensions.  The solution is given as:
+The least-squares solution (i.e. the MLE, assuming it is a linear function with Gaussian noise) is solved with the following formula:
 
 \[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\frac{1}{\sigma^2} \phi(x_*)^T A^{-1} \phi[X] y, \phi(x_*)^T A^{-1} \phi(x_*)) \]
 
-Where $A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1}$, where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.
+Where $A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1}$, where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.  Note that $A$ is a square matrix and its size is equal to the dimensionality of $\phi(x)$
 </p>
+
 <p>
-Note that $A$ is an $N \times N$ matrix, where N is the dimensionality of the data.  When $N$ is large, inverting $A$ can be numerically problematic.  Naturally, if we want to let $N$ be infinite, we run into extreme difficulties!
+The <b>kernel trick</b> is a trick in machine learning (and elsewhere) which, informally, involes swapping the dimensionality of your data points with the number of data points you have.  If you have data with high dimensionality and few points, you can often rephrase the problem as having low dimensionality and a high number of points (or vice-versa).
 </p>
-<h3>The Solution</h3>
+
 <p>
-Using the substitution $K = \phi[X]^T \Sigma \phi[X]$, we can rewrite the above equation:
+To arrive at Gaussian Processes, we will try to "kernalize" the linear regression formulation described above.  To do this, we will suppose we have some function $k(x_1,x_1) = \phi(x_1)^T \Sigma \phi(x_2)$ &mdash; i.e. the inner product of the points $x_1$ and $x_1$ (after their feature expansion).  This function is called the <b>kernel</b>.
+</p>
 
-\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\]
+<p>
+We will also extend this notation to matrices (i.e. sets of points):
 
-\[\mu = \phi(x_*)^T \Sigma \phi[X] (K + \sigma^2 I)^{-1} y,\]
+\[ k(A, B) = \begin{bmatrix}
+k(A_1, B_1) & k(A_1, B_2) & \dots & k(A_1, B_m)\\
+k(A_2, B_1) & k(A_2, B_2) & \dots & k(A_2, B_m)\\
+\vdots & \vdots & \ddots & \vdots \\
+k(A_n, B_1) & k(A_n, B_2) & \dots & k(A_n, B_m)\\
+\end{bmatrix} \]
 
-\[\text{var} = \phi(x_*)^T \Sigma \phi(x_*) - \phi(x_*)^T \Sigma \phi[X] (K + \sigma^2 I)^{-1} \phi[X]^T \Sigma \phi(x_*)\]
+It can be shown (not here!) that this allows us to re-write the linear regression as:
+
+\[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\]
+
+\[\mu = k(X_*, X) K^{-1} y,\]
+
+\[\text{var} = k(X_*, X_*) - k(x_*, X) K^{-1} k(X, X_*)\]
 \[) \]
 
-At first blush this looks more complicated!  What's worth noting is that now we're only taking the inverse of $K$, which is $|X| \times |X|$.  If your training set is large, this isn't that helpful, but for a relatively tame number of points, this may still be feasible.
+where $K = k(X, X)$.
 </p>
+
 <p>
-Now let
+Note that this formula can be used to evaluate any number of points (stored in $X_*$) based on any number of observed-points (stored in $X$).  The result is a multi-variate normal distribution over what the value of the function is at each of the $X_*$ variables.
+</p>
 
-\[k(x,y) = \phi(x)^T \Sigma \phi(y)\]
+<h3>Why Did We Do This?</h3>
 
-We can rewrite the above as:
+<p>
+First note that $K$ is a $|X| \times |X|$ matrix, which means that, as promised, calculating predictions no longer scales with the dimensionality of the data, but with the <i>number</i> of datapoints we have... and how long it takes us to compute the kernel.
+</p>
 
-\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\]
+<p>
+Indeed, it can be complained that we merely wrapped up the "dimension scaling" part of the computation inside the magic $k(x_1,x_1) = \phi(x_1)^T \Sigma \phi(x_2)$ kernel function.  And, indeed, we have!  What's key is that there are many (useful!) feature expansions whose corresponding kernel can be <i>far</i> more efficiently calculated than its corresponding $\phi$.  This efficiency is taken to the extreme when $\phi$ maps to an <i>infinite</i> dimensional space, which is ultimately where much of the fascination with Gaussian Processes comes from.
+</p>
 
-\[\mu = k(x_*, X) (K + \sigma^2 I)^{-1} y,\]
+<p>
+That being said, this writer doesn't think that describing Gaussian Processes as "a way to do feature expansions into infinite-dimensional space" as a very useful way to describe them (at least at first), because it is typically tricky to "convert" a feature expansion $\phi$ to its corresponding kernel $k$.
+</p>
 
-\[\text{var} = k(x_*, x_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, x_*)\]
+<p>
+A more intruitive explantion of what exactly the kernel function is is that it is a measure of <i>similarity</i> of two points.  In particular, it evaluates the <i>covariance</i> of their corresponding y values.  What's interesting about this is that Gaussian processes don't look at the y-values at all when determining the similarity of two points!
+</p>
+
+<h3>Example</h3>
+
+<p>
+For this example we will use the kernel
+
+\[k(x_1, x_2) = e^{-(x_1 - x_2)^2}\]
+
+And the observations
+
+\[
+\begin{bmatrix}
+(-1, 0)\\
+(0, 2)\\
+(1, 1)\\
+(2, 0)\\
+\end{bmatrix}
+\]
+
+Using the formula for $p(y_* | \vec{X}_*, X, \vec{y})$ above we can get a multivariate normal distribution for any finite number of points we want.  In this case, I evaluated it at 700 evenly spaced points between -3 and 4.  This resulted in a multivariate normal distribution defined by some 400-long $\vec{\mu}$ vector and a $400 \times 400$ covariance matrix (we'll call $\Sigma$).
+</p>
+
+<p>
+$\vec{\mu}$ is plotted below as a red line.  The diagonal of the covariance matrix gives us the variance of each distribution.  If we take the square root and multiply by $1.96$ we can find a region for every $x$ that has a 95% chance of containing the "true" function
+</p>
+
+<img src="gp_figure1.png">
+
+<p>
+Note that the red line hits every observed point exactly, and that our uncertainty at those points vanishes to zero, but the farther from those points we get, the less certain we are.  This leads us to our next consideration:
+</p>
+
+
+<h2>Noise</h2>
+<p>
+As you may have noticed, I have been subtlely ignoring noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $K(X,X)$.
+
+\[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\]
+
+\[\mu = k(X_*, X) (K + \sigma^2 I)^{-1} y,\]
+
+\[\text{var} = k(X_*, X_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, X_*)\]
 \[) \]
 </p>
-<h3>Why?</h3>
+
+<h2>Non-zero Prior</h2>
+
 <p>
-What is fascinating about this is that the posterior is defined <i>solely</i> in terms of inner-products &mdash; that is, some notion of similarity (technically their covariance).  This can be remarkably convienent, because often there are more computationally direct/efficient methods of computing the inner product of two vectors than to explicitly compute the feature expansion.
+Another thing you may have noticed is that in the above image the function tends towards zero when it lacks any other information.  While this may be completely reasonable in some situations, it would naturally be desirable to encode other priors.
 </p>
+
 <p>
-For example, suppose you have two binary vectors $\vec{x}$ and $\vec{y}$, so that each is a member of the powerset $\mathcal{P}(n)$.  We <i>could</i> have a feature expansion that goes from $N$ dimensions to $2^N$ by making each output dimension an indicator for whether a member of $\mathcal{P}(n)$ is a subset of $x$, but such a feature expansion would naturally be computationally expensive!  The kernel trick let's us compute the linear regression using by calculating the dot-product that we would have calculated with the feature expansion.  In this case
+Let $\bar{y}(X)$ yield your prior guess for every point in $X$.  Then:
 
-\[ \phi(x)^T \phi(y)\]
+\[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\]
 
-Is simply equal to the sum of the bitwise-and of each vector, which can be computed in linear time.
-</p>
-<p>
-	And, perhaps more to the point, if we want to express an <i>infinite</i> feature expansion (i.e. a function), we have no choice but to find some alternative to the naive $\phi$ feature expansion.
-</p>
-<h2>Gaussian Processes</h2>
-<p>
-	Now suppose we want to have a prior over possible <i>functions</i> (rather than $\vec{w}$ vectors) and we want to use inference to compute a posterior distribution of functions, given the observations we have.  </p>
-<p>
-<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
-</p>
-<p>
-	In other words, for our purposes, you can think of a Guassian process as implicitly representing every possible input vector's label as coming from a normal distrbution.  Our task will be to consider how knowing about the normal distribution at some points should affect what we believe about the distribution at other points.
-</p>
-<p>
-	Note that the kernel $k$ computes the covariance between the labels of two points.  In other words:
+\[\mu = \bar{y}(X_*) + k(X_*, X) (K + \sigma^2 I)^{-1} (y - \bar{y}(X)),\]
 
-	\[\text{cov}(f(x), f(y) = k(x, y) = exp(-\frac{(x-y)^2}{-2})\]
+\[\text{var} = k(X_*, X_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, X_*)\]
+\[) \]
 
-	<b>NOTE:</b> this means that the covariance between two outputs (e.g. our prediction of a test-output given a training input) does <i>not</i> depend on their y-values, but <i>only</i> on the similarity/covariance of their x-values.  This particular kernel has the convienence of only representing infinitely differentiable functions.
-</p>
-<p>
-The joint distribution of training outputs $f$, test outputs $f_*$, is given as (assuming an a priori mean of zero)
-
-\[ \begin{bmatrix}f\\f_*\end{bmatrix} \sim \mathcal{N}(0, \begin{bmatrix} K(X,X) & K(X_*,X) \\ K(X, X_*) & K(X_*, X_*) \end{bmatrix})
- \]
-
-Where $K(X, X_*)$ is an $n \times n_*$ matrix of the covariances evaluated at all pairs of training and test points
-</p>
-<p>
-We would like to restrict this joint distribution to only contain functions that "agree" with the training set &mdash; i.e. we'd like to condition on our observations.  After lots of math, this gives:
-
-\[ p(f_* | X_*,X,f) \sim \mathcal{N}(\]
-
-\[ \mu = K(X_*, X)K(X,X)^{-1}f),\]
-
-\[ \text{var} = K(X_*,X_*) - K(X_*,X)K(X,X)^{-1}K(X,X_*)\]
-
-\[)\]
-
-For sanity, note that the dimensionality of the mean and variances equal the number of test-points.  When $|X_*| = 1$, this means we get a simple, 1-D normal distribution over the possible y-values.
-<h3>Noise</h3>
-You may not have noticed, but I have been subtlely ignoring the noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $K(X,X)$:
-
-\[ \begin{bmatrix}f\\f_*\end{bmatrix} \sim \mathcal{N}(0, \begin{bmatrix} K(X,X) + \sigma^2 I & K(X_*,X) \\ K(X, X_*) & K(X_*, X_*) \end{bmatrix})
- \]
-
- Which yields
-
- \[ p(f_* | X_*,X,f) \sim \mathcal{N}(\bar{f}_*, \text{cov}(f_*))\]
-
- Where
-
- \[ \bar{f}_* = K(X_*,X)(K(X,X) + \sigma^2  I)^{-1} y \]
-
- and
-
- \[ \text{cov}(f_*) = K(X_*,X_*) - K(X_*,X)(K(X,X) + \sigma^2 I)^{-1}K(X,X_*)\]
+The effect of applying the prior $\bar{y}(x) = x$ to the example above is shown below.  Note that the uncertainty at every point is <i>unchanged</i> from when we had a prior of zero.
 
 </p>
-<h3>Linear Combination of Training Points</h3>
-It is convient to exam the case where there is only one test point, and $K(X_*, X_*)$ is a scalar.  In this case, we can rewrite $\bar{f}_*$ as simply a weighted sum of the training weights' predictions:
 
-\[\bar{f}(x_*) = \sum_{i=1}^n \alpha_i k(x_i, x_*)\]
+<img src="gp_figure2.png">
 
-Where $\alpha_i = (K(X,X) + \sigma^2 I)^{-1} y$.
 
-END: page 37
+
+<h2>Weighted Average Interpretation</h2>
+
+<p>
+It is convenient to examine the case where there is only one test point &mdash; when $|X_*| = 1$ and $K(X_*, X_*)$ is a scalar.  In this case, the resulting prediction is a normal distribution (<i>not</i> multivariate) and we can rewrite the mean as simply a weighted sum of the training weights' predictions:
+
+\[\bar{f}(x_*) = \sum_{i=1}^n \alpha_i \cdot k(x_i, x_*)\]
+
+Where $\alpha_i$ is the i<sup>th</sup> element of $(K(X,X) + \sigma^2 I)^{-1} y$.
+</p>
+
+<p>
+If it seems odd that we went through such lengths to simply derive the idea of using a weighted sum to approximate a function, first remember that Gaussian Processes <i>also</i> gives us a measure of our uncertainty (in fact they give us a pdf).  Furthermore what makes Gaussian processes <i>better</i> then a simple weighted average is the $(K(X,X) + \sigma^2 I)^{-1}$ term, which captures the idea that points that are near each other offer redundant information about points in their vicinity.
+</p>
+
 <h2>Popular Kernels</h2>
 TODO
 </main>
