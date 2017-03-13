@@ -24,7 +24,10 @@ MathJax.Hub.Config({
 </p>
 
 <p>
-This article will focus on Gaussian process that map one input dimension to one output dimension.  Gaussian processes offer a way to take knowledge of a function at certain points and use that knowledge to place a probability distribution over the value of the function at other points.  For example, given that we know the value of a function at x=-1, x=0, x=1, and x=2, a particular Gaussian Process might make the following predictions for the values of the function for the function on the interval from -3 to 4:
+This article will focus on Gaussian process that map one input dimension to one output dimension, though the extension to multiple input dimensions should be natural.
+</p>
+<p>
+Gaussian processes offer a way to take knowledge of a function at certain points and use that knowledge to place a probability distribution over the value of the function at other points.  For example, given that we know the value of a function at x=-1, x=0, x=1, and x=2, a particular Gaussian Process might make the following predictions for the values of the function for the function on the interval from -3 to 4:
 </p>
 
 <img src="gp_figure1.png">
@@ -34,14 +37,18 @@ This article will focus on Gaussian process that map one input dimension to one 
 <h3>Multivariate Gaussian Distribution</h3>
 
 <p>
-The most natural extension of a Gaussian distribution to multiple dimensions seems to be
+The most natural extension of a Gaussian distribution to multiple dimensions is
 
 \[ \begin{bmatrix} \mathcal{N}(\mu_1, \sigma_1) & \mathcal{N}(\mu_2, \sigma_2) & \dots & \mathcal{N}(\mu_n, \sigma_n) \end{bmatrix} \]
 
-In two dimensions, the result would be:
+A two dimensional example (where $\sigma_x = \sigma_y * 2$) is:
 </p>
 
 <img src="gaussian2d.png" height="256px">
+
+<p>
+In general, such distributions let us represent distributions whose contour lines are axis-aligned ellipses.
+</p>
 
 <!-- <canvas id="cvs">
 </canvas>
@@ -75,8 +82,8 @@ cvs.width = 512;
 cvs.height = 512;
 
 c.fillStyle = "red";
-c.globalAlpha = 0.5;
-for (var i = 0; i < 30000; ++i) {
+c.globalAlpha = 0.1;
+for (var i = 0; i < 50000; ++i) {
 	var a = rnorm();
 	var b = rnorm();
 	var x = a - b / 3;
@@ -86,24 +93,37 @@ for (var i = 0; i < 30000; ++i) {
 	c.fillRect(x, cvs.height - y, 2, 2);
 }
 
+c.globalAlpha = 0.5;
 c.fillStyle = "blue";
-c.fillRect(cvs.width / 2 - 2, 64, 4, cvs.height - 128);
-c.fillRect(64, cvs.height / 2 - 2, cvs.width - 128, 4);
+c.fillRect(cvs.width * 0.6, 64, 4, cvs.height - 128);
+
+// var x = 150;
+// var y = 92;
+// c.fillRect(x, y, cvs.width - 128, 4);
+// c.rotate(-Math.PI / 6);
 
 c.globalAlpha = 1;
 c.fillStyle = "black";
 c.font = "20px sans-serif";
-c.fillText("Normal Distribution", 200, 30);
-c.fillText("Normal Distribution", 30, 200);
+c.textAlign = "center";
+c.fillText("f(0) = x = 1.3", cvs.width * 0.65, 50);
+// c.fillText("Normal Distribution", 200, 30);
+// c.fillText("Normal Distribution", 30, 322);
+// c.fillText("Normal Distribution", 50, 150);
 
-c.lineWidth = 4;
-draw_arrow(c, 232, 40, 20, 24, 8, 1);
-draw_arrow(c, 100, 210,-30, 40, 8, 1);
+// c.lineWidth = 4;
+// draw_arrow(c, 232, 40, 20, 24, 8, 1);
+// draw_arrow(c, 100, 302,-30, -40, 8, 1);
+// draw_arrow(c, 120, 155, 40, 40, 8, 1);
 
 </script> -->
 
 <p>
-A multivariate Gaussian distribution is a bit more powerful, and also lets the dimensions be correlated with each other.  Visually, this lets use represent ellipse-shaped distributions.  Practically it means that knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension.
+A multivariate Gaussian distribution is a bit more powerful than this, as it also lets the dimensions be correlated with each other.  Visually, this lets use represent linear transformations of the ellipse-shape above.  Practically it means that knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension.
+</p>
+
+<p>
+An important property is that any "slice" of a multivariate Gaussian distribution is a multivariate Gaussian distribution.  We will exploit this property. 
 </p>
 
 <img src="gaussian2d-2.png" height="384px">
@@ -111,42 +131,54 @@ A multivariate Gaussian distribution is a bit more powerful, and also lets the d
 <p>
 We represent a D-dimensional multivariate Gaussian distribution using the typical normal distribution notation "$\mathcal{N}(\mu, \sigma^2)$", but use a vector of means and a matrix of variances and covariances:
 
-\[ p(X_1 = x_1, X_2 = x_2, X_3 = x_3) = \mathcal{N}(\vec{\mu}, \Sigma) \]
+\[ p(\vec{x}) = \mathcal{N}(\vec{x}, \vec{\mu}, \Sigma) \]
 
 $\vec{\mu}$ contains $D$ elements and $\Sigma$ is a $D \times D$ matrix.  The diagonal of $\Sigma$ contains the variance of each variable, while $\Sigma_{ij}$ represents the covariance between dimensions $i$ and $j$.  $\Sigma$ is symmetric and positive semi-definite.
 </p>
 
 <p>
-When we say that "knowing about the value of the distribution alongn one dimension can give you some knowledge about its value along another dimension", what we're really talking about is conditioning.  In other words, starting with the joing distribution:
+When we say that "knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension", what we're really talking about is conditioning.  In other words, starting with the 2D joint distribution:
 
-\[ p(Y = y, X = x) = \mathcal{N}(\vec{\mu}, \Sigma) \]
+\[ p([x, y]) = \mathcal{N}([x, y], \vec{\mu}, \Sigma) \]
 
 And trying to determine a posterior:
 
-\[ p(Y=y | X=x) = \dots \]
+\[ p(y | x) = \dots \]
 
-Most of what is described on this page can be derived once one knows the above expression.  We give this expression now, but in matrix form, which extends the solution to describing a posterior for multiple dimensions, given the values at multiple other dimensions.  Unsurprisingly, the posterior is another multivariate Gaussian!
+The pdf described by $p(y | x=c)$ is equivalent to asking for the (normalized) "slice" of the (original) joint distribution defined by $x = c$:
+
+<img src="gaussian2d-3.png" height="384px">
+
+Recall that this 'slice' is also a multivariate Gaussian distribution, so we'd like to define $p(y | x)$ using a mean vector $\mu$ and a variance matrix $\Sigma$.
 </p>
 
 <p>
-Suppose that, of the $D$ dimensions, you know the first $N$ dimensions.  Then let
+In the case where we condition on one dimension and want to know the distribution about another, the solution is is a regular 1-D Gaussian distirbution:
+
+\[ p(y | x) = \mathcal{N}(\mu, \Sigma)\]
+
+\[\mu = \mu_y + \frac{\text{cov}(x, y)}{\sigma_y} (x - \mu_x))\]
+
+\[ \Sigma = \sigma_y - \frac{\text{cov}(x, y)^2}{\sigma_x} \]
+</p>
+
+<p>
+But it will be useful to be able to condition on an arbitrary number of dimensions.  To that end, suppose you know the first $N$ dimensions of a $D$ dimensional multivariate Gaussian distribution.  Then we can organize $\Sigma$ into four corners:
 
 \[ \Sigma = \begin{bmatrix}
 \Sigma_{11} & \Sigma_{12}\\
 \Sigma_{21} & \Sigma_{22}
 \end{bmatrix} \]
 
-So that $\Sigma_{11}$ is the covariance matrix of the first $N$ dimensions and $Sigma_{22}$ is the covariance matrix of the remaining dimensions.  Also recall our prior:
+Recall that $\Sigma_{ij}$ is the covariance between dimensions $i$ and $j$.  $\Sigma_{11}$ is the covariance matrix of the first $N$ dimensions and $\Sigma_{22}$ is the covariance matrix of the remaining dimensions.  $\Sigma_{12}$ and $\Sigma_{21}$ are the covariances between the dimensions you know and the dimensions you don't know.  Then, for the joint distribution
 
-\[ p(X_1, X_2) = \mathcal{N}(\vec{\mu}, \Sigma) \]
+\[ p(\vec{x}) = \mathcal{N}(\vec{mu}, \Sigma) \]
 
-Then the posterior is:
+The conditional distribution is:
 </p>
 
 
-\[ p(X_2 | X_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
-
-Where
+\[ p(\vec{x}_2 | \vec{x}_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
 
 \[\vec{\mu}_{2|1} = \vec{\mu}_2 + \Sigma_{21} \Sigma_{11}^{-1} (X_1 - \vec{\mu}_1)\]
 
@@ -162,21 +194,21 @@ A Gaussian Process assigns every possible input-value a "dimension" in a multiva
 
 \[ f: \{0, 1\} \rightarrow \mathbb{R} \]
 
-Then in the image below, one could say that the "x-axis" represents our belief over the value of $f(0)$ and the "y-axis" represents our belief over the value of $f(1)$.  If we know the value of $f(0)$ (by observing it), then this may give us some information about the value of $f(1)$.  As noted above, conditioning on our knowledge of $f(0)$ yields a normal distribution over $f(1)$.
+Then in the image below, we could let the "x-axis" represent our belief over the value of $f(0)$ and the "y-axis" represent our belief over the value of $f(1)$.  If we know the value of $f(0)$ (by observing it), then this may give us some information about the value of $f(1)$.  As noted above, conditioning on our knowledge of $f(0)$ yields a normal distribution over $f(1)$.
 </p>
 
-<img src="gaussian2d-2.png" height="384px">
+<img src="gaussian2d-4.png" height="384px">
 
 <p>
 But many real world problems have uncountably many possible inputs.  A far more common case is a function that maps numbers to numbers:
 
 \[ f: \mathbb{R} \rightarrow \mathbb{R} \]
 
-A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: if will form a Gaussian distribution over every possible input-value &mdash; but in this case the distribution is infinite dimensional.  Then it will look at the values/dimensinos it knows (i.e. the "training set" or "observations") and use this knowledge to compute a new multi-variate distribution over all the other points.
+A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: if will form a Gaussian distribution over every possible input-value &mdash; but in this case the distribution is infinite dimensional.  Then it will look at the values/dimensions that it knows (i.e. the "training set" or "observations") and use this knowledge to compute a new multivariate distribution over all the other inputs.
 </p>
 
 <p>
-At first blush, it seems rather dubious that one could computationally use the machinery we used to condition finite-dimensional multivariate Gaussian distributions on infinite-dimensional ones... and such skepticism would be well place!  Recall the definition from the beginning of the article:
+At first blush, it seems rather dubious that one could computationally use the machinery we used to condition finite-dimensional multivariate Gaussian distributions to also condition on infinite-dimensional ones.  In fact, such skepticism would be well placed!  Recall the definition from the beginning of the article:
 
 <b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
 </p>
@@ -185,17 +217,17 @@ The key is that we only ever <i>care</i> about the Gaussian distribution at a fi
 
 <img src="gp_figure1.png">
 
-We only know the input at 4 locations, and so if we ever want to determine a prediction at some other point, we simply have to form a 5-dimensional multivariate Gaussian distribution and condition the dimension whose value we want on the dimensions whose values we know:
+We only know the input at 4 locations, and so if we ever want to determine a prediction at some other point, we simply have to form a 5-dimensional multivariate Gaussian distribution, condition on the dimensions we know and see what the resulting distribution is for the dimension we want to know.  So if I want to know the normal distribution as $x = \frac{1}{2}$, then I'm just computing
 
-\[ p(f(x)\ |\ f(-1), f(0), f(1), f(2)) = \dots\]
+\[ p(f(\frac{1}{2})\ |\ f(-1), f(0), f(1), f(2)) = \dots\]
 </p>
 
 <p>
-Since we don't know what x-values we will observe and what x-values we will want to predict (until we're actually feeding our model data), we typically can't write out $\Sigma$ explicitly.  Instead, we represent $\Sigma$ with a "kernel" function $k$
+The only difference is that since we don't know what x-values we will observe and what x-values we will want to predict a priori (until we're actually feeding our model data), we typically can't write out $\Sigma$ explicitly beforehand.  Instead, we represent $\Sigma$ with a "kernel" function $k$
 
 \[ k: \mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R} \]
 
-For example, if we want to evaluate the above model at $x=0.5$, then we have:
+For example, if we want to evaluate the above model at $x=\frac{1}{2}$, then we have:
 
 \[
 \Sigma = \begin{bmatrix}
@@ -209,50 +241,69 @@ k(\frac{1}{2}, -1) & k(\frac{1}{2}, 0) & k(\frac{1}{2}, 1) & k(\frac{1}{2}, 2) &
 
 Note that $k$ determines the covariance between two different inputs' outputs.  In other words
 
-\[ k(x_1, x_2) = cov(f(x_1), f(x_2))\]
+\[ k(x_1, x_2) = \text{cov}(f(x_1), f(x_2))\]
 
 </p>
 
 <h2>Another Perspective: Linear Regression</h2>
 
-Let's switch gears to another perspective, which is "deriving" Gaussian processes from linear regression... TODO
-
-Let $X$ and $\vec{y}$ be your observations (i.e. your "training data").  The Bayesian approach to linear regression is to assume that
+<p>
+Let's switch gears to another perspective, which is "deriving" Gaussian processes from linear regression. Let $X$ and $\vec{y}$ be your observations (i.e. your "training data").  The Bayesian approach to linear regression is to assume that
+</p>
 
 \[ \vec{y} = X^T \vec{w} + \vec{\epsilon} \]
 
 <p>
-For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  It turns out the maximum likelihood estimator for $w$ is the same line that minimizes squared error - i.e. <a href="https://en.m.wikipedia.org/wiki/Linear_regression">linear regression</a>.
+	For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  We can view the training data as evidence for what the true value of $w$ is, and arrive at a conditional probability over any $y_*$ given some $x_*$.  Some amount of fiddling around with Bayes' Theorem and normal distributions lets us arrive at this:
+
+	\[ p(y_* | x_*, X, \vec{y}) = \mathcal{N}(\vec{x}_*^T \vec{w}, \sigma^2) \]
+
+	Where $w^*$ is determined from the least-squares regression line, and $\sigma^2$ is a value we will calculate later.
 </p>
-<p>
-What's interesting about this formulation of the problem is that, rather than merely a line, it yields a normal distribution at every x value.  In other words, the probability distribution over the value $y_*$ at some $x_*$ is:
 
-\[ p(y_* | X, \vec{y}, \vec{x}_*) \propto \mathcal{N}(\mu = \vec{x}_*^Tw, \text{var} = \sigma^2) \]
+<p>
+	This means that the maximum likelihood estimator predicted by the Bayesian approach to linear regression is the same as a frequentists' least-squares regression line.  The difference is that a Bayesian has the solution formulated as a probability distribution (not just a line), so s/he may give probabilities that an observation will fall within some interval.
 </p>
+
+<h3>Higher Dimensions</h3>
+
 <p>
-Of course there are a wide number of nonlinear relationships that cannot be represented as a linear regression.  A common trick to expand this same machinery to a wider class of functions is to use some function
+	Of course there are a wide number of nonlinear relationships that cannot be represented as a linear regression.  A common trick to expand this same machinery to a wider class of functions is to use some function
 
-\[ \phi: \mathbb{R}^D \rightarrow \mathbb{R}^N \]
+	\[ \phi: \mathbb{R}^D \rightarrow \mathbb{R}^N \]
 
-to map data from a low dimensional space to a higher dimensional space, and then performing linear regression on the higher-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
+	to map data from a low dimensional space to a higher dimensional space, and then performing linear regression on the higher-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
 
-\[ \phi(x) = [1, x, x^2, x^3] \]
+	\[ \phi(x) = [1, x, x^2, x^3] \]
 
-then a linear regression on $\phi[X]$ is equivalent to finding the least-squares cubic polynomial.  In essence, by choosing some $\phi$, you're claiming that you believe the data can be modeled as
+	then a linear regression on $\phi[X]$ is equivalent to finding the least-squares cubic polynomial.  In essence, by choosing some $\phi$, you're claiming that you believe the data can be modeled as
 
-\[ \vec{y} + \vec{\epsilon} = \phi[X]^T \vec{w} \]
+	\[ \vec{y} = \phi[X]^T \vec{w} + \vec{\epsilon} \]
+</p>
 
+<p>
+	We haven't paid much attention to <i>actually calculating</i> the least squares line.  It turns out that the solution is given as
+
+	\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\mu, \sigma^2)\]
+
+	\[\mu = \frac{1}{\sigma^2} \phi(x_*)^T A^{-1} \phi[X] y\]
+
+	\[\sigma^2 = \phi(x_*)^T A^{-1} \phi(x_*) \]
+
+	\[ A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1} \]
+
+	Where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.  For example, if $\vec{w}$'s components are uncorrelated normal distributions with means of zero and standard deviations $\sigma_1, \sigma_2, \dots, \sigma_n$, then:
+
+	\[ \Sigma = \begin{bmatrix}
+	\sigma_1 & 0 & \dots & 0\\
+	0 & \sigma_2 & \dots & 0\\
+	\vdots & \vdots & \ddots & \vdots\\
+	0 & 0 & \ddots & \sigma_n\\
+	\end{bmatrix}
+	 \]
 </p>
 
 <h2>Kernel Trick</h2>
-
-<p>
-The least-squares solution (i.e. the MLE, assuming it is a linear function with Gaussian noise) is solved with the following formula:
-
-\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\frac{1}{\sigma^2} \phi(x_*)^T A^{-1} \phi[X] y, \phi(x_*)^T A^{-1} \phi(x_*)) \]
-
-Where $A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1}$, where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.  Note that $A$ is a square matrix and its size is equal to the dimensionality of $\phi(x)$
-</p>
 
 <p>
 The <b>kernel trick</b> is a trick in machine learning (and elsewhere) which, informally, involves swapping the dimensionality of your data points with the number of data points you have.  If you have data with high dimensionality and few points, you can often rephrase the problem as having low dimensionality and a high number of points.
@@ -272,11 +323,11 @@ k(A_2, B_1) & k(A_2, B_2) & \dots & k(A_2, B_m)\\
 k(A_n, B_1) & k(A_n, B_2) & \dots & k(A_n, B_m)\\
 \end{bmatrix} \]
 
-This notation allows us (after some thought) to rewrite the formula above as:
+This notation allows us (after some thought) to rewrite the formula for linear regression as:
 
-\[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\mu, \sigma^2)\]
+\[ p(\vec{y}_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\mu, \sigma^2)\]
 
-\[\mu = k(X_*, X) k(X, X)^{-1} y,\]
+\[\mu = k(X_*, X) k(X, X)^{-1} \vec{y},\]
 
 \[\sigma^2 = k(X_*, X_*) - k(x_*, X) (X, X)^{-1} k(X, X_*)\]
 
@@ -289,21 +340,25 @@ An astute reader will note that this looks eerily similar to the formula for the
 
 \[\Sigma_{22|1} = \Sigma_{22} - \Sigma_{21} \Sigma_{11}^{-1} \Sigma_{12}\]
 
-And, indeed, they are nearly identical, except that the multivariate gaussian formulation need not assume that the mean value a priori is zero.  In other words, if $\vec{\mu} = 0$, then both formulations are the same.
+And, indeed, they are nearly identical, except that the multivariate gaussian formulation need not assume that the mean value is zero a priori.  In other words, if $\vec{\mu} = 0$, then both formulations are the same.
 </p>
 
-<h3>Why Did We Do This?</h3>
+<h3>Why Kernels?</h3>
 
 <p>
-First note that $K$ is a $|X| \times |X|$ matrix, which means that, as promised, calculating predictions no longer scales with the dimensionality of the data, but with the <i>number</i> of datapoints we have... that is, assuming that $k(x_1, x_2)$ can be evaluated quickly.  But considering that we defined $k(x_1, x_2$ as the inner product of $\phi(x_1)$ and $\phi(x_2)$, it seems clear that it <i>does</i> scale with the number of dimensions in the feature expansion.
-</p>
-
-<p>
-What's key is that there are many (useful!) feature expansions whose corresponding kernel can be <i>far</i> more efficiently calculated than its corresponding $\phi$.  This efficiency is taken to the extreme when $\phi$ maps to an <i>infinite</i> dimensional space &mdash; for instance, the famous $k(x_1, x_2) = e^{-(x_1 - x_2)^2}$ kernel.  While an inner product of an infinite dimensional feature expansion would take forever, evaluating $e^{-(x_1 - x_2)^2}$ is nearly instantaneous!
+	So why is it advantageous to use the kernel-substitution?
 </p>
 
 <p>
-That being said, it's probably not worth your time to "convert" a feature expansion you'd like to do into its corresponding kernel.  Instead, consider what you think is a "good" measure of two points' similarity and choose a kernel that reflects that.  Better yet, simply choose from some of the most popular kernels (some are listed at the bottom of this page).  And remember: a kernel ultimately is a measure of the  <i>similarity</i> of two points &mdash; it determines the <i>covariance</i> of their corresponding y values.
+	First note that $K$ is a $|X| \times |X|$ matrix, which means that, as promised, calculating predictions no longer scales with the dimensionality of the data, but with the <i>number</i> of datapoints we have... assuming that $k(x_1, x_2)$ can be evaluated quickly.  But considering that we defined $k(x_1, x_2$ as the inner product of $\phi(x_1)$ and $\phi(x_2)$, it seems clear that it <i>does</i> scale with the number of dimensions in the feature expansion.
+</p>
+
+<p>
+	What's key is that there are many (useful!) feature expansions whose corresponding kernel can be <i>far</i> more efficiently calculated than its corresponding $\phi$.  This efficiency is taken to the extreme when $\phi$ maps to an <i>infinite</i> dimensional space &mdash; for instance, the famous $k(x_1, x_2) = e^{-(x_1 - x_2)^2}$ kernel.  While an inner product of an infinite dimensional feature expansion would take forever, evaluating $e^{-(x_1 - x_2)^2}$ is nearly instantaneous!
+</p>
+
+<p>
+	That being said, it's probably not worth your time to "convert" a feature expansion you'd like to do into its corresponding kernel.  Instead, consider what you think is a "good" measure of two points' similarity and choose a kernel that reflects that.  Better yet, simply choose from some of the most popular kernels (some are listed at the bottom of this page).  And remember: a kernel ultimately is a measure of the  <i>similarity</i> of two points &mdash; it determines the <i>covariance</i> of their corresponding y values.
 </p>
 
 <h3>Example</h3>
@@ -328,11 +383,15 @@ And the observations
 \end{bmatrix}
 \]
 
-Using the formula for conditioning on Gaussians, we can calculate the multivariate normal distribution for any finite number of points we want.  In this case, I evaluated it at 700 evenly spaced points between -3 and 4, which gave me a 700-long $\vec{\mu}$ which represents the best guess (i.e. the center of the Gaussian) at each point.  Plotting this gave me the red line.
+Don't be fooled by the Gaussian nature of this kernel!  I could have chosen a completely different kernel, but the reasoning below would still apply.
 </p>
 
 <p>
-I also got a covariance matrix out, and the diagonal of the covariance matrix gives us the variance of each distribution.  If we take the square root and multiply by $1.96$ we can find a region for every $x$ that has a 95% chance of containing the "true" function value &mdash; this is the blue region.
+	Using the formula for conditioning on Gaussians, we can calculate the multivariate normal distribution for any finite number of points we want.  In this case, I evaluated it at 700 evenly spaced points between -3 and 4, which gave me a 700-long $\vec{\mu}$ which represents the best guess (i.e. the center of the Gaussian) at each point.  Plotting this gave me the red line.
+</p>
+
+<p>
+	I also got a covariance matrix, and the diagonal of this covariance matrix gives us the variance of each distribution (i.e. our "uncertainty" at each x-value).  If we convert the variance to a standard deviation and multiply by $1.96$ we can find a region for every $x$ that has a 95% chance of containing the "true" function value &mdash; this is the blue region.
 </p>
 
 <p>
@@ -342,13 +401,24 @@ Note that the red line hits every observed point exactly, and that our uncertain
 
 <h2>Noise</h2>
 <p>
-As you may have noticed, I have been ignoring noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $K(X,X)$.
+As you may have noticed, I have been ignoring noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $k(X,X)$.
 
 \[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\vec{\mu}, \Sigma)\]
 
-\[\mu = k(X_*, X) (K + \sigma^2 I)^{-1} y\]
+\[\mu = k(X_*, X) (k(X,X) + \sigma^2 I)^{-1} y\]
 
-\[\Sigma = k(X_*, X_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, X_*)\]
+\[\Sigma = k(X_*, X_*) - k(x_*, X) (k(X,X) + \sigma^2 I)^{-1} k(X, X_*)\]
+
+Because uor observations are now noisy, observing $f(0) = 1$ means that there is a probability the <i>actual</i> value of $f(0)$ is, say, 0.7, which means that simply taking a "slice" of the original multivariate distribution is no longer sound statistics.
+</p>
+
+<p>
+Instead, we have to convolve the normal distribution representing our belief of the value of $f(0)$ over the multivariate Gaussian:
+
+\[ p(y_* | y) = \int_{-\infty}^\infty \ p(y_* | y) \cdot p(y)\ dy \]
+
+Which is a weighted average of slices.  This is equivalent (though we won't prove it here) to increasing the variance of $f(0)$ with itself, which is precisely what adding $\sigma^2 I$ to $k(X,X)$ does.
+</p>
 
 </p>
 
