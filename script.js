@@ -65,7 +65,7 @@ function construct_table_of_contents() {
     });
 
     headers.sort(function (a, b) {
-        return a.y > b.y
+        return a.y > b.y ? 1 : -1;
     });
 
     var level = 2;
