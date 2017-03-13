@@ -137,7 +137,11 @@ $\vec{\mu}$ contains $D$ elements and $\Sigma$ is a $D \times D$ matrix.  The di
 <p>
 When we say that "knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension", what we're really talking about is conditioning.  In other words, starting with the 2D joint distribution:
 
-\[ p([x, y]) = \mathcal{N}([x, y], \vec{\mu}, \Sigma) \]
+\[ p([x, y]) = \mathcal{N}([\mu_x, \mu_y], \begin{bmatrix}
+\sigma_x & \text{cov}(x, y)\\
+\text{cov}(x, y) & \sigma_y
+\end{bmatrix}
+)\]
 
 And trying to determine a posterior:
 
@@ -147,11 +151,11 @@ The pdf described by $p(y | x=c)$ is equivalent to asking for the (normalized) "
 
 <img src="gaussian2d-3.png" height="384px">
 
-Recall that this 'slice' is also a multivariate Gaussian distribution, so we'd like to define $p(y | x)$ using a mean vector $\mu$ and a variance matrix $\Sigma$.
+Recall that a "slice" is also a multivariate Gaussian distribution, so we'd like to define $p(y | x)$ using a mean vector $\mu$ and a variance matrix $\Sigma$.
 </p>
 
 <p>
-In the case where we condition on one dimension and want to know the distribution about another, the solution is is a regular 1-D Gaussian distirbution:
+In the case where we condition on one dimension and want to know the distribution about another, the solution is is a regular 1-D Gaussian distirbution, with the form:
 
 \[ p(y | x) = \mathcal{N}(\mu, \Sigma)\]
 
@@ -172,16 +176,20 @@ Recall that $\Sigma_{ij}$ is the covariance between dimensions $i$ and $j$.  $\S
 
 \[ p(\vec{x}) = \mathcal{N}(\vec{\mu}, \Sigma) \]
 
-And the conditional distribution is:
-</p>
+And the conditional distribution &mdash; the one that represents our beliefs about the variables <i>after</i> we make our observations is:
 
 
-\[ p(\vec{x}_2 | \vec{x}_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
+<div style="border: solid 1px;">
+	\[ p(\vec{x}_2 | \vec{x}_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
 
-\[\vec{\mu}_{2|1} = \vec{\mu}_2 + \Sigma_{21} \Sigma_{11}^{-1} (X_1 - \vec{\mu}_1)\]
+	\[\vec{\mu}_{2|1} = \vec{\mu}_2 + \Sigma_{21} \Sigma_{11}^{-1} (X_1 - \vec{\mu}_1)\]
 
-\[\Sigma_{22|1} = \Sigma_{22} - \Sigma_{21} \Sigma_{11}^{-1} \Sigma_{12}\]
+	\[\Sigma_{22|1} = \Sigma_{22} - \Sigma_{21} \Sigma_{11}^{-1} \Sigma_{12}\]
+</div>
 
+<br>
+
+We will be returning to this formula many times throughout this page, so remember it!
 </p>
 
 <h2>Gaussian Processes</h2>
@@ -255,7 +263,7 @@ As you may have noticed, I have been assuming our observations of the function a
 
 \[\Sigma = k(X_*, X_*) - k(x_*, X) (k(X,X) + \sigma^2 I)^{-1} k(X, X_*)\]
 
-Because uor observations are now noisy, observing $f(0) = 1$ means that there is a probability the <i>actual</i> value of $f(0)$ is, say, 0.7, which means that simply taking a "slice" of the original multivariate distribution is no longer sound statistics.
+Because our observations are now noisy, observing $f(0) = 1$ means that there is a probability the <i>actual</i> value of $f(0)$ is, say, 0.7, which means that simply taking a "slice" of the original multivariate distribution is no longer sound statistics.
 </p>
 
 <p>
@@ -306,15 +314,29 @@ The effect of applying the prior $\bar{y}(x) = x$ to the example above is shown 
 	And covariance matrices are positive semidefinite, which means that a function $k(x_1, x_2)$ is only a valid kernel function if it yields a positive semidefinite matrix for any input points $X$.
 </p>
 
-<p>
-	<b>Mercer's Theorem:</b><br>
+<!-- <theorem>
+	<div>Mercer's Theorem:</div>
 
-	A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
+	<div>
+		A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
 
-	\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
+		\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
 
-	if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
-</p>
+		if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
+	</div>
+</theorem> -->
+
+<theorem>
+	<h1>Mercer's Theorem:</h1>
+
+	<div>
+		A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
+
+		\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
+
+		if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
+	</div>
+</theorem>
 
 <p>
 	Which leads to an interesting interpretation of Gaussian Processes, which is that any kernel function you pick is implicitly a choice to use some feature expansion on your data.
