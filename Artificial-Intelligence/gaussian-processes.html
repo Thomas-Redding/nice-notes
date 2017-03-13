@@ -30,11 +30,9 @@ This article will focus on Gaussian process that map one input dimension to one 
 Gaussian processes offer a way to take knowledge of a function at certain points and use that knowledge to place a probability distribution over the value of the function at other points.  For example, given that we know the value of a function at x=-1, x=0, x=1, and x=2, a particular Gaussian Process might make the following predictions for the values of the function for the function on the interval from -3 to 4:
 </p>
 
-<img src="gp_figure1.png">
+<img src="gp-figure1.png">
 
-<h2>Overview</h2>
-
-<h3>Multivariate Gaussian Distribution</h3>
+<h2>Multivariate Gaussian Distribution</h2>
 
 <p>
 The most natural extension of a Gaussian distribution to multiple dimensions is
@@ -170,11 +168,11 @@ But it will be useful to be able to condition on an arbitrary number of dimensio
 \Sigma_{21} & \Sigma_{22}
 \end{bmatrix} \]
 
-Recall that $\Sigma_{ij}$ is the covariance between dimensions $i$ and $j$.  $\Sigma_{11}$ is the covariance matrix of the first $N$ dimensions and $\Sigma_{22}$ is the covariance matrix of the remaining dimensions.  $\Sigma_{12}$ and $\Sigma_{21}$ are the covariances between the dimensions you know and the dimensions you don't know.  Then, for the joint distribution
+Recall that $\Sigma_{ij}$ is the covariance between dimensions $i$ and $j$.  $\Sigma_{11}$ is the covariance matrix of the first $N$ dimensions and $\Sigma_{22}$ is the covariance matrix of the remaining dimensions.  $\Sigma_{12}$ and $\Sigma_{21}$ are the covariances between the dimensions you know and the dimensions you don't know.  Then the joint distribution is:
 
-\[ p(\vec{x}) = \mathcal{N}(\vec{mu}, \Sigma) \]
+\[ p(\vec{x}) = \mathcal{N}(\vec{\mu}, \Sigma) \]
 
-The conditional distribution is:
+And the conditional distribution is:
 </p>
 
 
@@ -186,7 +184,7 @@ The conditional distribution is:
 
 </p>
 
-<h3>Gaussian Processes</h3>
+<h2>Gaussian Processes</h2>
 
 <p>
 
@@ -200,34 +198,32 @@ Then in the image below, we could let the "x-axis" represent our belief over the
 <img src="gaussian2d-4.png" height="384px">
 
 <p>
-But many real world problems have uncountably many possible inputs.  A far more common case is a function that maps numbers to numbers:
+	But many real world problems have uncountably many possible inputs.  A far more common case is a function that maps numbers to numbers:
 
-\[ f: \mathbb{R} \rightarrow \mathbb{R} \]
+	\[ f: \mathbb{R} \rightarrow \mathbb{R} \]
 
-A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: if will form a Gaussian distribution over every possible input-value &mdash; but in this case the distribution is infinite dimensional.  Then it will look at the values/dimensions that it knows (i.e. the "training set" or "observations") and use this knowledge to compute a new multivariate distribution over all the other inputs.
+	A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: if will form a Gaussian distribution over every possible input-value &mdash; but in this case the distribution is infinite dimensional.  Then it will look at the values/dimensions that it knows (i.e. the "training set" or "observations") and use this knowledge to compute a new multivariate distribution over all the other inputs.
 </p>
 
 <p>
-At first blush, it seems rather dubious that one could computationally use the machinery we used to condition finite-dimensional multivariate Gaussian distributions to also condition on infinite-dimensional ones.  In fact, such skepticism would be well placed!  Recall the definition from the beginning of the article:
+	At first blush, it seems rather dubious that one could computationally use the machinery we used to condition finite-dimensional multivariate Gaussian distributions to also condition infinite-dimensional ones.  In fact, such skepticism would be well placed!  Recall the definition from the beginning of the article:
+<p>
 
-<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
+<p>
+	<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
 </p>
 
 The key is that we only ever <i>care</i> about the Gaussian distribution at a finite number of dimensions.  For example, if you recall the original example:
 
-<img src="gp_figure1.png">
+<img src="gp-figure1.png">
 
-We only know the input at 4 locations, and so if we ever want to determine a prediction at some other point, we simply have to form a 5-dimensional multivariate Gaussian distribution, condition on the dimensions we know and see what the resulting distribution is for the dimension we want to know.  So if I want to know the normal distribution as $x = \frac{1}{2}$, then I'm just computing
+We only know the input at 4 locations, and so if we want to determine our prediction of the function at some other point, we just form a 5-dimensional multivariate Gaussian distribution, condition on the dimensions we know and see what the resulting distribution is for the dimension we want to know.  So if I want to know the normal distribution as $x = \frac{1}{2}$, then I'm just computing
 
 \[ p(f(\frac{1}{2})\ |\ f(-1), f(0), f(1), f(2)) = \dots\]
 </p>
 
 <p>
-The only difference is that since we don't know what x-values we will observe and what x-values we will want to predict a priori (until we're actually feeding our model data), we typically can't write out $\Sigma$ explicitly beforehand.  Instead, we represent $\Sigma$ with a "kernel" function $k$
-
-\[ k: \mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R} \]
-
-For example, if we want to evaluate the above model at $x=\frac{1}{2}$, then we have:
+If $k(x_1, x_2)$ is a function that returns the covariance of $f(x_1)$ and $f(x_2)$, then
 
 \[
 \Sigma = \begin{bmatrix}
@@ -239,169 +235,19 @@ k(\frac{1}{2}, -1) & k(\frac{1}{2}, 0) & k(\frac{1}{2}, 1) & k(\frac{1}{2}, 2) &
 \end{bmatrix}
 \]
 
-Note that $k$ determines the covariance between two different inputs' outputs.  In other words
+If we assume $\mu = 0$ (i.e. a priori we expect half the points to be greater than zero and half to be less than zero), then this gives us all we need to compute the conditional distribution using the formula given above:
 
-\[ k(x_1, x_2) = \text{cov}(f(x_1), f(x_2))\]
-
-</p>
-
-<h2>Another Perspective: Linear Regression</h2>
-
-<p>
-Let's switch gears to another perspective, which is "deriving" Gaussian processes from linear regression. Let $X$ and $\vec{y}$ be your observations (i.e. your "training data").  The Bayesian approach to linear regression is to assume that
-</p>
-
-\[ \vec{y} = X^T \vec{w} + \vec{\epsilon} \]
-
-<p>
-	For some vector $\vec{w}$, where $\epsilon$ is a normally distributed noise with mean=0 and standard deviation = $\sigma$.  We can view the training data as evidence for what the true value of $w$ is, and arrive at a conditional probability over any $y_*$ given some $x_*$.  Some amount of fiddling around with Bayes' Theorem and normal distributions lets us arrive at this:
-
-	\[ p(y_* | x_*, X, \vec{y}) = \mathcal{N}(\vec{x}_*^T \vec{w}, \sigma^2) \]
-
-	Where $w^*$ is determined from the least-squares regression line, and $\sigma^2$ is a value we will calculate later.
-</p>
-
-<p>
-	This means that the maximum likelihood estimator predicted by the Bayesian approach to linear regression is the same as a frequentists' least-squares regression line.  The difference is that a Bayesian has the solution formulated as a probability distribution (not just a line), so s/he may give probabilities that an observation will fall within some interval.
-</p>
-
-<h3>Higher Dimensions</h3>
-
-<p>
-	Of course there are a wide number of nonlinear relationships that cannot be represented as a linear regression.  A common trick to expand this same machinery to a wider class of functions is to use some function
-
-	\[ \phi: \mathbb{R}^D \rightarrow \mathbb{R}^N \]
-
-	to map data from a low dimensional space to a higher dimensional space, and then performing linear regression on the higher-dimensional vectors.  For example, if you map $\mathbb{R}^1$ to $\mathbb{R}^4$ with:
-
-	\[ \phi(x) = [1, x, x^2, x^3] \]
-
-	then a linear regression on $\phi[X]$ is equivalent to finding the least-squares cubic polynomial.  In essence, by choosing some $\phi$, you're claiming that you believe the data can be modeled as
-
-	\[ \vec{y} = \phi[X]^T \vec{w} + \vec{\epsilon} \]
-</p>
-
-<p>
-	We haven't paid much attention to <i>actually calculating</i> the least squares line.  It turns out that the solution is given as
-
-	\[ p(y_* | \vec{x}_*, X, \vec{y}) = \mathcal{N}(\mu, \sigma^2)\]
-
-	\[\mu = \frac{1}{\sigma^2} \phi(x_*)^T A^{-1} \phi[X] y\]
-
-	\[\sigma^2 = \phi(x_*)^T A^{-1} \phi(x_*) \]
-
-	\[ A = \sigma^{-2}\phi[X] \phi[X]^T + \Sigma^{-1} \]
-
-	Where $\Sigma$ is the covariance matrix of the prior on $\vec{w}$.  For example, if $\vec{w}$'s components are uncorrelated normal distributions with means of zero and standard deviations $\sigma_1, \sigma_2, \dots, \sigma_n$, then:
-
-	\[ \Sigma = \begin{bmatrix}
-	\sigma_1 & 0 & \dots & 0\\
-	0 & \sigma_2 & \dots & 0\\
-	\vdots & \vdots & \ddots & \vdots\\
-	0 & 0 & \ddots & \sigma_n\\
-	\end{bmatrix}
-	 \]
-</p>
-
-<h2>Kernel Trick</h2>
-
-<p>
-The <b>kernel trick</b> is a trick in machine learning (and elsewhere) which, informally, involves swapping the dimensionality of your data points with the number of data points you have.  If you have data with high dimensionality and few points, you can often rephrase the problem as having low dimensionality and a high number of points.
-</p>
-
-<p>
-To do this, we will suppose we have some function $k(x_1,x_1) = \phi(x_1)^T \Sigma \phi(x_2)$ &mdash; i.e. the inner product of the points $x_1$ and $x_2$ (after their feature expansion).  This function is called the <b>kernel</b>, and will eventually play the same role as the "k" function described in the "Gaussian Processes" section of this page.
-</p>
-
-<p>
-We will also extend this notation to matrices (i.e. sets of points):
-
-\[ k(A, B) = \begin{bmatrix}
-k(A_1, B_1) & k(A_1, B_2) & \dots & k(A_1, B_m)\\
-k(A_2, B_1) & k(A_2, B_2) & \dots & k(A_2, B_m)\\
-\vdots & \vdots & \ddots & \vdots \\
-k(A_n, B_1) & k(A_n, B_2) & \dots & k(A_n, B_m)\\
-\end{bmatrix} \]
-
-This notation allows us (after some thought) to rewrite the formula for linear regression as:
-
-\[ p(\vec{y}_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\mu, \sigma^2)\]
-
-\[\mu = k(X_*, X) k(X, X)^{-1} \vec{y},\]
-
-\[\sigma^2 = k(X_*, X_*) - k(x_*, X) (X, X)^{-1} k(X, X_*)\]
-
-An astute reader will note that this looks eerily similar to the formula for the posterior of a multivariate Gaussian given in the "Multivariate Gaussian Distribution" section:
-
-
-\[ p(X_2 | X_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
+\[ p(\vec{x}_2 | \vec{x}_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
 
 \[\vec{\mu}_{2|1} = \vec{\mu}_2 + \Sigma_{21} \Sigma_{11}^{-1} (X_1 - \vec{\mu}_1)\]
 
 \[\Sigma_{22|1} = \Sigma_{22} - \Sigma_{21} \Sigma_{11}^{-1} \Sigma_{12}\]
 
-And, indeed, they are nearly identical, except that the multivariate gaussian formulation need not assume that the mean value is zero a priori.  In other words, if $\vec{\mu} = 0$, then both formulations are the same.
 </p>
-
-<h3>Why Kernels?</h3>
-
-<p>
-	So why is it advantageous to use the kernel-substitution?
-</p>
-
-<p>
-	First note that $K$ is a $|X| \times |X|$ matrix, which means that, as promised, calculating predictions no longer scales with the dimensionality of the data, but with the <i>number</i> of datapoints we have... assuming that $k(x_1, x_2)$ can be evaluated quickly.  But considering that we defined $k(x_1, x_2$ as the inner product of $\phi(x_1)$ and $\phi(x_2)$, it seems clear that it <i>does</i> scale with the number of dimensions in the feature expansion.
-</p>
-
-<p>
-	What's key is that there are many (useful!) feature expansions whose corresponding kernel can be <i>far</i> more efficiently calculated than its corresponding $\phi$.  This efficiency is taken to the extreme when $\phi$ maps to an <i>infinite</i> dimensional space &mdash; for instance, the famous $k(x_1, x_2) = e^{-(x_1 - x_2)^2}$ kernel.  While an inner product of an infinite dimensional feature expansion would take forever, evaluating $e^{-(x_1 - x_2)^2}$ is nearly instantaneous!
-</p>
-
-<p>
-	That being said, it's probably not worth your time to "convert" a feature expansion you'd like to do into its corresponding kernel.  Instead, consider what you think is a "good" measure of two points' similarity and choose a kernel that reflects that.  Better yet, simply choose from some of the most popular kernels (some are listed at the bottom of this page).  And remember: a kernel ultimately is a measure of the  <i>similarity</i> of two points &mdash; it determines the <i>covariance</i> of their corresponding y values.
-</p>
-
-<h3>Example</h3>
-
-<p>
-Now that we've seen two explanations of Gaussian Processes &mdash; one directly derived from the probabalistic interpretation of conditioning multivariate Gaussians, and one from linear regression, let's return to our original example:
-
-<img src="gp_figure1.png">
-
-For this example, I used the kernel
-
-\[k(x_1, x_2) = e^{-(x_1 - x_2)^2}\]
-
-And the observations
-
-\[
-\begin{bmatrix}
-(-1, 0)\\
-(0, 2)\\
-(1, 1)\\
-(2, 0)\\
-\end{bmatrix}
-\]
-
-Don't be fooled by the Gaussian nature of this kernel!  I could have chosen a completely different kernel, but the reasoning below would still apply.
-</p>
-
-<p>
-	Using the formula for conditioning on Gaussians, we can calculate the multivariate normal distribution for any finite number of points we want.  In this case, I evaluated it at 700 evenly spaced points between -3 and 4, which gave me a 700-long $\vec{\mu}$ which represents the best guess (i.e. the center of the Gaussian) at each point.  Plotting this gave me the red line.
-</p>
-
-<p>
-	I also got a covariance matrix, and the diagonal of this covariance matrix gives us the variance of each distribution (i.e. our "uncertainty" at each x-value).  If we convert the variance to a standard deviation and multiply by $1.96$ we can find a region for every $x$ that has a 95% chance of containing the "true" function value &mdash; this is the blue region.
-</p>
-
-<p>
-Note that the red line hits every observed point exactly, and that our uncertainty at those points vanishes to zero, but the farther from those points we get, the less certain we are.  This leads us to our next consideration:
-</p>
-
 
 <h2>Noise</h2>
 <p>
-As you may have noticed, I have been ignoring noise terms.  Adding noise terms is a simple matter of adding $\sigma^2 I$ to $k(X,X)$.
+As you may have noticed, I have been assuming our observations of the function are perfect, but in practice it is often useful to assume normally distributed noise..  Adding noise is a simple matter of adding $\sigma^2 I$ to $k(X,X)$.
 
 \[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\vec{\mu}, \Sigma)\]
 
@@ -420,12 +266,16 @@ Instead, we have to convolve the normal distribution representing our belief of 
 Which is a weighted average of slices.  This is equivalent (though we won't prove it here) to increasing the variance of $f(0)$ with itself, which is precisely what adding $\sigma^2 I$ to $k(X,X)$ does.
 </p>
 
+<p>
+If the noise of the observations is drawn from Gaussian distribution with a mean of zero and a standard deviation of 0.1, then the example we've been using becomes
 </p>
+
+<img src="gp-figure3.png">
 
 <h2>Non-zero Prior</h2>
 
 <p>
-Another thing you may have noticed is that in the above image the function tends towards zero when it lacks any other information.  While this may be completely reasonable in some situations, it would naturally be desirable to encode other priors.
+Another thing you may have noticed is that in the above image the function tends towards zero when it lacks any other information.  While this may be reasonable in some situations, it would naturally be desirable to be able to encode other priors.
 </p>
 
 <p>
@@ -438,17 +288,115 @@ Let $\bar{y}(X)$ yield your prior guess for every point in $X$.  Then:
 \[\Sigma = k(X_*, X_*) - k(x_*, X) (K + \sigma^2 I)^{-1} k(X, X_*)\]
 
 The effect of applying the prior $\bar{y}(x) = x$ to the example above is shown below.  Note that the uncertainty at every point is <i>unchanged</i> from when we had a prior of zero.
-
 </p>
 
-<img src="gp_figure2.png">
+<img src="gp-figure2.png">
+
+<h2>Kernels</h2>
+
+<p>
+	So far we have simply assumed the existence of some function $k(x_1, x_2)$, that returns the covariance of $f(x_1)$ and $f(x_2)$.  In other words:
+
+	\[ k(X, X) = \begin{bmatrix}
+	\text{cov}(X_1, X_1) & \dots & \text{cov}(X_1, X_n)\\
+	\vdots & \ddots & \vdots\\
+	\text{cov}(X_n, X_1) & \dots & \text{cov}(X_n, X_n)\\
+	\end{bmatrix}\]
+
+	And covariance matrices are positive semidefinite, which means that a function $k(x_1, x_2)$ is only a valid kernel function if it yields a positive semidefinite matrix for any input points $X$.
+</p>
+
+<p>
+	<b>Mercer's Theorem:</b><br>
+
+	A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
+
+	\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
+
+	if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
+</p>
+
+<p>
+	Which leads to an interesting interpretation of Gaussian Processes, which is that any kernel function you pick is implicitly a choice to use some feature expansion on your data.
+</p>
+<p>
+	Indeed, Gaussian Processes can also be derived by rewriting (Bayesian) linear regression in terms of $k(x_1, x_2)$, rather than the feature expansion directly.  In this way Gaussian Processes can be viewed as a "kernelized" form of Bayesian linear regression [citation needed].
+</p>
+
+<h3>More About Kernels</h3>
+
+<p>
+	A kernel $k(x_1, x_2)$ is <b>stationary</b> if it can be written as a function of the difference between $x_1$ and $x_2$.
+</p>
+
+<p>
+	Let $k_1$ and $k_2$ be kernels and let $c > 0$.  Then the following are also kernels:
+
+	\[ k_3(x_1, x_2) = k_1(x_1, x_2) + c\]
+
+	\[ k_3(x_1, x_2) = k_1(x_1, x_2) \cdot c\]
+
+	\[ k_3(x_1, x_2) = k_1(x_1, x_2) + k_2(x_1, x_2)\]
+
+	\[ k_3(x_1, x_2) = k_1(x_1, x_2) \cdot k_2(x_1, x_2)\]
+</p>
+
+<h3>Examples of Kernels</h3>
+
+<ul>
+
+<li>
+	One of the most popular kernels is called the <b>Gaussian Kernel</b>, <b>Squared Exponential Kernel</b>, or <b>Radial Basis Function</b>
+
+	\[ k(x_1, x_2) = 2\sigma^2 e^{\frac{(x_1 - x_2)^2}{-2l^2}} \]
+
+	Which has two hyper parameters: $\sigma$ and $l$.  This kernel can be viewed as only considering functions that are infinitely differentiable.  In other words, the mean function will always be nice and smooth.  An example is given below, with $\sigma = l = 1$.
+
+	<img src="gp-figure1.png">
+</li>
+
+<li>
+	But some would say it is too smooth for practical use!  The <b>Matérn</b> kernel weakens these requirements.  Technically the Matérn kernel is a very wide class of kernels specified by a hyperparameter v.  The most popular ones have $v = 1.5$ and $v = 2.5$, which can be written as 
+
+	\[k_{v=1.5}(r) = (1 + \frac{r\sqrt{3}}{l}) \cdot \text{exp}(\frac{r \sqrt{3}}{-l})\]
+
+	\[k_{v=2.5}(r) = (1 + \frac{r\sqrt{5}}{l} + \frac{5r^2}{3l^2}) \cdot \text{exp}(\frac{r \sqrt{5}}{-l})\]
+
+	Where $r = |x_1 - x_2|$.  These represent forming a prior over functions that are once and twice differentiable (respectively).  It is believed that choosing $v > 2.5$ tends to make functions "too smooth" for real problems, while $v < 1.5$ is too rough.  An example with $v = 1.5$ and $l = 1.0$ is given below:
+
+	<img src="matern-kernel.png">
+</li>
+
+<li>
+	Another useful kernel is the polynomial kernel, which is the kernel-representation of the feature expansion
+
+	\[ \phi(x) = [1, x, x^2, x^3, x^4, ..., x^p] \]
+
+	The corresponding kernel is:
+
+	\[ k(x_1, x_2) = (x_1^T x_2 + 1)^p \]
+
+	When $p=1$ the resulting mean function will be the least-squares regression line.  When $p=2$ it will be the least-squares quadratic line.  This is a <b>non-stationary</b> kernel.  The plot below uses $p=2$ and a noise with standard deviation 0.1, because if there is no noise, then there is no quadratic equation that passes through every point!
+
+	<img src="quadratic-kernel.png">
+</li>
+
+<li>
+	An <b>unpopular</b> kernel is the Dirac delta function:
+
+	\[k(x_1, x_2) = \delta(x_1 - x_2)\]
+
+	But for didatic purposes, here is the plot:
+
+	<img src="dirac-kernel.png">
+</li>
+
+</ul>
 
 <h2>Sampling From Function Space</h2>
 
 TODO
 
-<h2>Popular Kernels</h2>
-TODO
 
 <h2>Updating on Linear Functionals</h2>
 
