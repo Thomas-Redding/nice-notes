@@ -37,7 +37,7 @@ Gaussian processes offer a way to take knowledge of a function at certain points
 <p>
 The most natural extension of a Gaussian distribution to multiple dimensions is
 
-\[ \begin{bmatrix} \mathcal{N}(\mu_1, \sigma_1) & \mathcal{N}(\mu_2, \sigma_2) & \dots & \mathcal{N}(\mu_n, \sigma_n) \end{bmatrix} \]
+\[ \begin{bmatrix} \mathcal{N}(\mu_1, \sigma_1^2) & \mathcal{N}(\mu_2, \sigma_2^2) & \dots & \mathcal{N}(\mu_n, \sigma_n^2) \end{bmatrix} \]
 
 A two dimensional example (where $\sigma_x = \sigma_y * 2$) is:
 </p>
@@ -129,43 +129,39 @@ An important property is that any "slice" of a multivariate Gaussian distributio
 <p>
 We represent a D-dimensional multivariate Gaussian distribution using the typical normal distribution notation "$\mathcal{N}(\mu, \sigma^2)$", but use a vector of means and a matrix of variances and covariances:
 
-\[ p(\vec{x}) = \mathcal{N}(\vec{x}, \vec{\mu}, \Sigma) \]
+\[ p(\vec{x}) = \mathcal{N}(\vec{\mu}, \Sigma) \]
 
 $\vec{\mu}$ contains $D$ elements and $\Sigma$ is a $D \times D$ matrix.  The diagonal of $\Sigma$ contains the variance of each variable, while $\Sigma_{ij}$ represents the covariance between dimensions $i$ and $j$.  $\Sigma$ is symmetric and positive semi-definite.
 </p>
 
 <p>
-When we say that "knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension", what we're really talking about is conditioning.  In other words, starting with the 2D joint distribution:
+When we say that "knowing about the value of the distribution along one dimension can give you some knowledge about its value along another dimension", what we're really talking about is conditioning.  In other words, if we start with a 2D joint distribution:
 
-\[ p([x, y]) = \mathcal{N}([\mu_x, \mu_y], \begin{bmatrix}
-\sigma_x & \text{cov}(x, y)\\
-\text{cov}(x, y) & \sigma_y
+\[ p(X = x, Y = y) = \mathcal{N}([\mu_x, \mu_y], \begin{bmatrix}
+\sigma_x^2 & \text{cov}(x, y)\\
+\text{cov}(x, y) & \sigma_y^2
 \end{bmatrix}
 )\]
 
-And trying to determine a posterior:
-
-\[ p(y | x) = \dots \]
-
-The pdf described by $p(y | x=c)$ is equivalent to asking for the (normalized) "slice" of the (original) joint distribution defined by $x = c$:
+Then our knowledge of $y$ changes once we know the value of $x$.  In particular, if $X = c$, then our updated pdf for $Y$ is proportional to a "slice" of the joint multivariate Gaussian distribution:
 
 <img src="gaussian2d-3.png" height="384px">
 
-Recall that a "slice" is also a multivariate Gaussian distribution, so we'd like to define $p(y | x)$ using a mean vector $\mu$ and a variance matrix $\Sigma$.
+Recall that a "slice" of a multivariate Gaussian distribution is also a multivariate Gaussian distribution, so we know that $p(Y = y | X = c)$ is a Gaussian distribution.
 </p>
 
 <p>
-In the case where we condition on one dimension and want to know the distribution about another, the solution is is a regular 1-D Gaussian distirbution, with the form:
+In the case where we condition on <i>one</i> dimension and want to know about <i>one</i> other distribution, the solution is a regular 1-dimensional Gaussian distirbution, and is given by:
 
-\[ p(y | x) = \mathcal{N}(\mu, \Sigma)\]
+\[ p(Y = y | X = x) = \mathcal{N}(\mu, \Sigma)\]
 
-\[\mu = \mu_y + \frac{\text{cov}(x, y)}{\sigma_y} (x - \mu_x))\]
+\[\mu = \mu_y + \frac{\text{cov}(x, y)}{\sigma_y^2} (x - \mu_x))\]
 
-\[ \Sigma = \sigma_y - \frac{\text{cov}(x, y)^2}{\sigma_x} \]
+\[ \Sigma = \sigma_y^2 - \frac{\text{cov}(x, y)^2}{\sigma_x}^2 \]
 </p>
 
 <p>
-But it will be useful to be able to condition on an arbitrary number of dimensions.  To that end, suppose you know the first $N$ dimensions of a $D$ dimensional multivariate Gaussian distribution.  Then we can organize $\Sigma$ into four corners:
+It will be useful, however, to know the solution in an arbitrary number of dimensions.  Suppose you know the first $N$ dimensions of a $D$ dimensional multivariate Gaussian distribution.  Then we can organize $\Sigma$ into four corners:
 
 \[ \Sigma = \begin{bmatrix}
 \Sigma_{11} & \Sigma_{12}\\
@@ -176,7 +172,7 @@ Recall that $\Sigma_{ij}$ is the covariance between dimensions $i$ and $j$.  $\S
 
 \[ p(\vec{x}) = \mathcal{N}(\vec{\mu}, \Sigma) \]
 
-And the conditional distribution &mdash; the one that represents our beliefs about the variables <i>after</i> we make our observations is:
+Then the conditional distribution &mdash; the one that represents our beliefs about the variables <i>after</i> we make our observations is:
 
 
 <div style="border: solid 1px;">
@@ -200,34 +196,39 @@ A Gaussian Process assigns every possible input-value a "dimension" in a multiva
 
 \[ f: \{0, 1\} \rightarrow \mathbb{R} \]
 
-Then in the image below, we could let the "x-axis" represent our belief over the value of $f(0)$ and the "y-axis" represent our belief over the value of $f(1)$.  If we know the value of $f(0)$ (by observing it), then this may give us some information about the value of $f(1)$.  As noted above, conditioning on our knowledge of $f(0)$ yields a normal distribution over $f(1)$.
+Then in the image below, we could let the "x-axis" represent our belief over the value of $f(0)$ and the "y-axis" represent our belief over the value of $f(1)$.  If we know the value of $f(0)$ (by observing it), then this may give us some information about the value of $f(1)$.
 </p>
 
 <img src="gaussian2d-4.png" height="384px">
 
 <p>
-	But many real world problems have uncountably many possible inputs.  A far more common case is a function that maps numbers to numbers:
-
-	\[ f: \mathbb{R} \rightarrow \mathbb{R} \]
-
-	A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: if will form a Gaussian distribution over every possible input-value &mdash; but in this case the distribution is infinite dimensional.  Then it will look at the values/dimensions that it knows (i.e. the "training set" or "observations") and use this knowledge to compute a new multivariate distribution over all the other inputs.
+	In this case, knowing that $f(0)$ is higher than we expected leads us to believe that $f(1)$ will also be higher than we expected.
 </p>
 
 <p>
-	At first blush, it seems rather dubious that one could computationally use the machinery we used to condition finite-dimensional multivariate Gaussian distributions to also condition infinite-dimensional ones.  In fact, such skepticism would be well placed!  Recall the definition from the beginning of the article:
+	Unfortunately, many real world problems have uncountably many possible inputs.  A far more common case is trying to learn a function that maps real numbers to real numbers:
+
+	\[ f: \mathbb{R} \rightarrow \mathbb{R} \]
+
+	A Gaussian Process will reason about this the exact same way it reasoned about the discrete case: it will form a Gaussian distribution such that every possible input-value has a corresponding pdf over its possible output values.  Then it will look at the values/dimensions that it <i>does</i> know (i.e. the "training set" or "observations") and use this knowledge to compute a new multivariate distribution over all dimensions that it wants to predict.
+</p>
+
+<p>
+	At first blush, it seems rather dubious that the machinery we used for finite-dimensional multivariate Gaussian distributions would work well (computationally) for infinite-dimensional Gaussian distributions.  In fact, such skepticism would be well placed!  Recall the definition from the beginning of the article:
 <p>
 
 <p>
 	<b>Def:</b> A <u>Gaussian Process</u> is a collection of random variables, any finite number of which have a joint Gaussian distribution
 </p>
 
-The key is that we only ever <i>care</i> about the Gaussian distribution at a finite number of dimensions.  For example, if you recall the original example:
+<p>
+	The key is that we only ever <i>care</i> about the Gaussian distribution at a finite number of dimensions.  For example, if you recall the original example:
 
-<img src="gp-figure1.png">
+	<img src="gp-figure1.png">
 
-We only know the input at 4 locations, and so if we want to determine our prediction of the function at some other point, we just form a 5-dimensional multivariate Gaussian distribution, condition on the dimensions we know and see what the resulting distribution is for the dimension we want to know.  So if I want to know the normal distribution as $x = \frac{1}{2}$, then I'm just computing
+	We only know the input at 4 locations, and so if we want to determine our prediction of the function at some other point, we just form a 5-dimensional multivariate Gaussian distribution, condition on the dimensions we know and see what the resulting distribution is for the dimension we want to know.  So if I want to know the normal distribution as $x = \frac{1}{2}$, then I'm just computing
 
-\[ p(f(\frac{1}{2})\ |\ f(-1), f(0), f(1), f(2)) = \dots\]
+	\[ p(f(\frac{1}{2})\ |\ f(-1), f(0), f(1), f(2)) = \dots\]
 </p>
 
 <p>
@@ -243,7 +244,7 @@ k(\frac{1}{2}, -1) & k(\frac{1}{2}, 0) & k(\frac{1}{2}, 1) & k(\frac{1}{2}, 2) &
 \end{bmatrix}
 \]
 
-If we assume $\mu = 0$ (i.e. a priori we expect half the points to be greater than zero and half to be less than zero), then this gives us all we need to compute the conditional distribution using the formula given above:
+In the above example, I assume $\mu = 0$ (i.e. we have no expectation that $f(x)$ will be greater than or less than zero), then this gives us all we need to compute the conditional distribution using the formula given above:
 
 \[ p(\vec{x}_2 | \vec{x}_1) = \mathcal{N}(\vec{\mu}_{2|1}, \Sigma_{22|1})\]
 
@@ -251,11 +252,14 @@ If we assume $\mu = 0$ (i.e. a priori we expect half the points to be greater th
 
 \[\Sigma_{22|1} = \Sigma_{22} - \Sigma_{21} \Sigma_{11}^{-1} \Sigma_{12}\]
 
+The y-value of the red line at $x = \frac{1}{2}$ in the image above is simply the mean of the normal distribution that results from conditioning on the four points that were observed.  The 95% range is calculated from the variance of the resulting normal distribution.
+<p>
+
 </p>
 
 <h2>Noise</h2>
 <p>
-As you may have noticed, I have been assuming our observations of the function are perfect, but in practice it is often useful to assume normally distributed noise..  Adding noise is a simple matter of adding $\sigma^2 I$ to $k(X,X)$.
+As you may have noticed, I have been assuming our observations of the function are perfect, but in practice it is often useful to assume normally distributed noise.  Adding noise is a simple matter of adding $\sigma^2 I$ to $k(X,X)$:
 
 \[ p(y_* | \vec{X}_*, X, \vec{y}) = \mathcal{N}(\vec{\mu}, \Sigma)\]
 
@@ -263,22 +267,18 @@ As you may have noticed, I have been assuming our observations of the function a
 
 \[\Sigma = k(X_*, X_*) - k(x_*, X) (k(X,X) + \sigma^2 I)^{-1} k(X, X_*)\]
 
-Because our observations are now noisy, observing $f(0) = 1$ means that there is a probability the <i>actual</i> value of $f(0)$ is, say, 0.7, which means that simply taking a "slice" of the original multivariate distribution is no longer sound statistics.
+There is some amount of "intuition" behind this formula and it is, of course, derivable.  I simply don't think there is much value in deriving it.  Rest assured that it follows from no additional assumptions.
 </p>
 
 <p>
-Instead, we have to convolve the normal distribution representing our belief of the value of $f(0)$ over the multivariate Gaussian:
-
-\[ p(y_* | y) = \int_{-\infty}^\infty \ p(y_* | y) \cdot p(y)\ dy \]
-
-Which is a weighted average of slices.  This is equivalent (though we won't prove it here) to increasing the variance of $f(0)$ with itself, which is precisely what adding $\sigma^2 I$ to $k(X,X)$ does.
-</p>
-
-<p>
-If the noise of the observations is drawn from Gaussian distribution with a mean of zero and a standard deviation of 0.1, then the example we've been using becomes
+ If we add noise with a mean of zero and a standard deviation of 0.1, then the example we've been using becomes:
 </p>
 
 <img src="gp-figure3.png">
+
+<p>
+	Note that we know have some degree of uncertainty everywhere &mdash; even at the points we have observed.
+</p>
 
 <h2>Non-zero Prior</h2>
 
@@ -314,35 +314,31 @@ The effect of applying the prior $\bar{y}(x) = x$ to the example above is shown 
 	And covariance matrices are positive semidefinite, which means that a function $k(x_1, x_2)$ is only a valid kernel function if it yields a positive semidefinite matrix for any input points $X$.
 </p>
 
-<!-- <theorem>
-	<div>Mercer's Theorem:</div>
-
-	<div>
-		A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
-
-		\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
-
-		if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
-	</div>
-</theorem> -->
-
 <theorem>
 	<h1>Mercer's Theorem:</h1>
 
 	<div>
-		A symmetric function $k(x_1, x_2)$ can be expressed as an inner product of some feature expansion.
+		<p>
+			$k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
+		</p>
 
-		\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
+		<p>
+			if and only iff
+		</p>
 
-		if and only if $k(X, X)$ is positive semidefinite for any collection of points $X = \begin{bmatrix} x_1, \dots, x_n \end{bmatrix}$
+		<p>
+			$k(x_1, x_2)$ is symmetric (i.e. $k(x_1, x_2) = k(x_2, x_1)$) and can be expressed as an inner product of some feature expansion:
+
+			\[ k(x_1, x_2) = \langle \phi(x_1), \phi(x_2) \rangle \]
+		</p>
 	</div>
 </theorem>
 
 <p>
-	Which leads to an interesting interpretation of Gaussian Processes, which is that any kernel function you pick is implicitly a choice to use some feature expansion on your data.
+	Which leads to an interesting interpretation of Gaussian Processes, which is that any kernel function you pick is implicitly a choice of a feature expansion.
 </p>
 <p>
-	Indeed, Gaussian Processes can also be derived by rewriting (Bayesian) linear regression in terms of $k(x_1, x_2)$, rather than the feature expansion directly.  In this way Gaussian Processes can be viewed as a "kernelized" form of Bayesian linear regression [citation needed].
+	Indeed, Gaussian Processes can also be derived by rewriting (Bayesian) linear regression in terms of $k(x_1, x_2)$, rather than the feature expansion directly.  In this way Gaussian Processes can be viewed as a "kernelized" form of Bayesian linear regression.
 </p>
 
 <h3>More About Kernels</h3>
